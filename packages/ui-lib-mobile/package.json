@@ -14,7 +14,7 @@
   "scripts": {
     "build": "tsc -p tsconfig.json --noEmit",
     "dev": "tsc -w -p tsconfig.json --noEmit",
-    "lint": "echo \"lint ui-lib-mobile\"",
+    "lint": "eslint \"src/**/*.{ts,tsx}\" --max-warnings 0 -c ../../.eslintrc.cjs",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "echo \"no tests yet\""
   },

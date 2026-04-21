@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "expo start",
     "build": "echo \"Build handled by EAS\"",
-    "lint": "echo \"lint mobile\"",
+    "lint": "eslint \"*.{ts,tsx}\" --max-warnings 0 -c ../../.eslintrc.cjs",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "echo \"no tests yet\""
   },

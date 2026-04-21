@@ -10,3 +10,4 @@ storybook-static
 coverage
 
 .pnpm-home
+.worktrees
