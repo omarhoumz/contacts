@@ -1,6 +1,7 @@
 # Roadmap
 
 ## Phase 1 (MVP)
+
 - Email/password auth
 - Contacts CRUD
 - Search and labels
@@ -8,6 +9,7 @@
 - Web local run + mobile test builds
 
 ## Delivery Sequence
+
 1. Bootstrap monorepo and shared configs
 2. Implement Supabase schema + RLS
 3. Build auth on web and mobile
@@ -16,12 +18,14 @@
 6. Polish UI docs and release checks
 
 ## Phase 2
+
 - Performance and indexing improvements
 - Improved import/export flows
 - Collaboration basics (family/team tier)
 - Operational maturity and support workflows
 
 ## Success Criteria
+
 - Clean clone installs and builds
 - RLS verified against cross-user access
 - Android APK and iOS test app generated
