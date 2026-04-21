@@ -4,7 +4,7 @@
 
 - **Branch:** `main`
 - **Last updated:** 2026-04-21
-- **Status:** Phase 1 [roadmap](./roadmap.md) through **step 5** is implemented in clients (labels, trash, search). **Step 6** in-repo work includes Storybook autodocs + an extra Card story, Turbo `storybook-static/**` outputs, `.gitignore` for local Storybook output, and a CI check that `storybook-static/index.html` exists after `pnpm build`. External release steps (Netlify/EAS project wiring, full green CI on your runner) still depend on environment setup.
+- **Status:** Phase 1 [roadmap](./roadmap.md) through **step 5** is implemented in clients (labels, trash, search). **Step 6** in-repo work includes Storybook autodocs + an extra Card story, Turbo `storybook-static/`** outputs, `.gitignore` for local Storybook output, and a CI check that `storybook-static/index.html` exists after `pnpm build`. External release steps (Netlify/EAS project wiring, full green CI on your runner) still depend on environment setup.
 
 ## Completed Work
 
@@ -77,7 +77,7 @@
 - Converted `apps/ui-lib-docs` to Storybook (`@storybook/react-vite`).
 - Declared Storybook addons in `apps/ui-lib-docs/package.json`: `@storybook/addon-essentials`, `@storybook/addon-interactions` (matches `.storybook/main.ts`).
 - `Card` stories: **autodocs** tag, component description, **Default** and **Contact row example** (labels + actions layout); default preview layout **padded** for wider compositions.
-- Turbo `build` task outputs include **`storybook-static/**`** so Storybook builds cache correctly; `storybook-static` is gitignored for local runs.
+- Turbo `build` task outputs include `**storybook-static/**`** so Storybook builds cache correctly; `storybook-static` is gitignored for local runs.
 - CI workflow in `.github/workflows/ci.yml`:
   - install, lint, typecheck, build, **assert Storybook output** (`apps/ui-lib-docs/storybook-static/index.html`), migration presence checks for `20260421_initial_schema.sql` and `20260422_rls_contact_children_hardening.sql`
 - Added Netlify web deploy config: `apps/web/netlify.toml`.
@@ -98,7 +98,7 @@
 - `pnpm install`
 - If needed: `PNPM_HOME="$PWD/.pnpm-home" pnpm install --store-dir "$PWD/.pnpm-store"`
 
-2. Validate workspace:
+1. Validate workspace:
 
 - `pnpm lint`
 - `pnpm typecheck`
@@ -111,9 +111,9 @@
 
 - `supabase link --project-ref <project-ref>`
 - `supabase db push`
-- Or local Docker loop: `pnpm db:reset` (same directory; applies all migrations including `20260422`\_\*).
+- Or local Docker loop: `pnpm db:reset` (same directory; applies all migrations including `20260422`).
 
-2. Verify RLS with two test users (aligns with roadmap success criteria):
+1. Verify RLS with two test users (aligns with roadmap success criteria):
 
 - cross-user reads/writes denied on `contacts` and on nested rows (emails/phones/addresses/labels) for contacts not owned by the session.
 
@@ -123,11 +123,11 @@
 
 - `pnpm --filter @widados/web dev` (or `pnpm dev --filter=@widados/web` depending on pnpm version)
 
-2. Mobile run and smoke test:
+1. Mobile run and smoke test:
 
 - `pnpm --filter @widados/mobile dev`
 
-3. Add token persistence hardening for mobile (SecureStore adapter) if needed — `expo-secure-store` is already a dependency; wire Supabase auth storage when prioritized.
+1. Add token persistence hardening for mobile (SecureStore adapter) if needed — `expo-secure-store` is already a dependency; wire Supabase auth storage when prioritized.
 
 ### Docs and Release Prep
 
@@ -135,8 +135,8 @@
 
 - `pnpm --filter @widados/ui-lib-docs build`
 
-2. Configure Netlify site and environment variables.
-3. Configure EAS project and run preview build for Android/iOS.
+1. Configure Netlify site and environment variables.
+2. Configure EAS project and run preview build for Android/iOS.
 
 ## Definition of Done for Current Phase
 
