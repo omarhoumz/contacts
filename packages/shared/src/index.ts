@@ -12,3 +12,15 @@ export const contactSchema = z.object({
 });
 
 export type Contact = z.infer<typeof contactSchema>;
+
+const hexColor = z
+  .string()
+  .trim()
+  .regex(/^#([0-9a-fA-F]{6}|[0-9a-fA-F]{3})$/, "Use a CSS hex color like #4f46e5");
+
+export const labelCreateSchema = z.object({
+  name: z.string().trim().min(1).max(80),
+  color: hexColor.optional().default("#4f46e5"),
+});
+
+export type LabelCreate = z.infer<typeof labelCreateSchema>;

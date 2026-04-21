@@ -104,9 +104,9 @@
 1. From `apps/backend`, link the Supabase project and push migrations:
   - `supabase link --project-ref <project-ref>`
   - `supabase db push`
-   - Or local Docker loop: `pnpm db:reset` (same directory; applies all migrations including `20260422_*`).
+  - Or local Docker loop: `pnpm db:reset` (same directory; applies all migrations including `20260422_`*).
 2. Verify RLS with two test users (aligns with roadmap success criteria):
-   - cross-user reads/writes denied on `contacts` and on nested rows (emails/phones/addresses/labels) for contacts not owned by the session.
+  - cross-user reads/writes denied on `contacts` and on nested rows (emails/phones/addresses/labels) for contacts not owned by the session.
 
 ### Web and Mobile
 
