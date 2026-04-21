@@ -3,6 +3,8 @@
 This wiki is the structured source of truth for product, architecture, security, deployment, and business direction.
 
 ## Sections
+
+- [Decisions (ADR)](decisions.md)
 - [Architecture](architecture.md)
 - [Roadmap](roadmap.md)
 - [Security](security.md)
@@ -11,6 +13,7 @@ This wiki is the structured source of truth for product, architecture, security,
 - [Naming](naming.md)
 
 ## Locked Decisions
+
 - Brand: `WidadOS`
 - Stack: `Vite + React` (web), `Expo` (mobile), `Supabase` (backend)
 - Delivery: `Netlify + Supabase + EAS`
