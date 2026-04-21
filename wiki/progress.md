@@ -10,7 +10,7 @@
 
 ### 1) Monorepo and Shared Tooling
 
-- Initialized workspace structure for `apps/*` and `packages/*`.
+- Initialized workspace structure for `apps/`* and `packages/`*.
 - Added root workspace config:
   - `package.json` (turbo scripts)
   - `pnpm-workspace.yaml`
@@ -122,4 +122,3 @@
 - Supabase migration applied and RLS verified.
 - Web and mobile MVP flows function end-to-end.
 - Storybook builds and CI passes on pull requests.
-

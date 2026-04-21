@@ -26,4 +26,6 @@ jobs:
       - name: Build
         run: pnpm build
       - name: Supabase migration check
-        run: test -f apps/backend/supabase/migrations/20260421_initial_schema.sql
+        run: |
+          test -f apps/backend/supabase/migrations/20260421_initial_schema.sql
+          test -f apps/backend/supabase/migrations/20260422_rls_contact_children_hardening.sql
