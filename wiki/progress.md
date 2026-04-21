@@ -77,10 +77,14 @@
 - Converted `apps/ui-lib-docs` to Storybook (`@storybook/react-vite`).
 - Declared Storybook addons in `apps/ui-lib-docs/package.json`: `@storybook/addon-essentials`, `@storybook/addon-interactions` (matches `.storybook/main.ts`).
 - `Card` stories: **autodocs** tag, component description, **Default** and **Contact row example** (labels + actions layout); default preview layout **padded** for wider compositions.
-- Turbo `build` task outputs include `**storybook-static/**`** so Storybook builds cache correctly; `storybook-static` is gitignored for local runs.
+- Turbo `build` task outputs include `**storybook-static/`**** so Storybook builds cache correctly; `storybook-static` is gitignored for local runs.
 - CI workflow in `.github/workflows/ci.yml`:
   - install, lint, typecheck, build, **assert Storybook output** (`apps/ui-lib-docs/storybook-static/index.html`), migration presence checks for `20260421_initial_schema.sql` and `20260422_rls_contact_children_hardening.sql`
 - Added Netlify web deploy config: `apps/web/netlify.toml`.
+
+## Plan execution ([plan-roadmap-remainder](./plan-roadmap-remainder.md))
+
+- **IN PROGRESS (2026-04-21):** **A3** — workspace `pnpm typecheck` green after **A1** `pnpm install` (link `typescript` / tool binaries in packages).
 
 ## Known Gaps / Constraints
 
