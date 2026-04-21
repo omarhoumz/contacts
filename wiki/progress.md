@@ -131,3 +131,4 @@
 - Supabase migration applied and RLS verified.
 - Web and mobile MVP flows function end-to-end.
 - Storybook builds and CI passes on pull requests.
+
