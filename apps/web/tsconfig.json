@@ -1,0 +1,7 @@
+{
+  "extends": "@widados/ts-config/react.json",
+  "compilerOptions": {
+    "baseUrl": "."
+  },
+  "include": ["src", "vite.config.ts"]
+}

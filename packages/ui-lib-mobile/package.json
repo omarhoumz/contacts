@@ -1,0 +1,19 @@
+{
+  "name": "@widados/ui-lib-mobile",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "scripts": {
+    "build": "tsc -p tsconfig.json --noEmit",
+    "dev": "tsc -w -p tsconfig.json --noEmit",
+    "lint": "echo \"lint ui-lib-mobile\"",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "echo \"no tests yet\""
+  },
+  "peerDependencies": {
+    "react": "^18.0.0",
+    "react-native": "*"
+  }
+}

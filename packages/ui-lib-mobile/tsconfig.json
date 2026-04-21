@@ -1,0 +1,7 @@
+{
+  "extends": "@widados/ts-config/react.json",
+  "compilerOptions": {
+    "rootDir": "src"
+  },
+  "include": ["src"]
+}

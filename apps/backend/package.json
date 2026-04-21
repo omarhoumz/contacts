@@ -1,0 +1,12 @@
+{
+  "name": "@widados/backend",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "build": "echo \"Supabase backend has no build step\"",
+    "dev": "echo \"Use Supabase CLI for local backend\"",
+    "lint": "echo \"lint backend\"",
+    "typecheck": "echo \"no typecheck\"",
+    "test": "echo \"no tests yet\""
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "extends": "@widados/ts-config/base.json",
+  "compilerOptions": {
+    "rootDir": "src"
+  },
+  "include": ["src"]
+}
