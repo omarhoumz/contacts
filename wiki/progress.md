@@ -4,7 +4,7 @@
 
 - **Branch:** `main`
 - **Last updated:** 2026-04-21
-- **Status:** Phase 1 [roadmap](./roadmap.md) delivery through **step 5** for contacts: web and mobile support labels (create, list, assign via `contact_labels`), active vs **trash** (list soft-deleted, **restore**, **delete forever**), and **search** over display name plus assigned label names. Roadmap **step 6** (Storybook polish, release checks) and a fully confirmed `pnpm install` → lint → typecheck → build run remain open.
+- **Status:** Phase 1 [roadmap](./roadmap.md) through **step 5** is implemented in clients (labels, trash, search). **Step 6** in-repo work includes Storybook autodocs + an extra Card story, Turbo `storybook-static/**` outputs, `.gitignore` for local Storybook output, and a CI check that `storybook-static/index.html` exists after `pnpm build`. External release steps (Netlify/EAS project wiring, full green CI on your runner) still depend on environment setup.
 
 ## Completed Work
 
@@ -76,9 +76,10 @@
 
 - Converted `apps/ui-lib-docs` to Storybook (`@storybook/react-vite`).
 - Declared Storybook addons in `apps/ui-lib-docs/package.json`: `@storybook/addon-essentials`, `@storybook/addon-interactions` (matches `.storybook/main.ts`).
-- Added basic `Card` story and Storybook config files.
-- Added CI workflow in `.github/workflows/ci.yml`:
-  - install, lint, typecheck, build, migration presence checks for `20260421_initial_schema.sql` and `20260422_rls_contact_children_hardening.sql`
+- `Card` stories: **autodocs** tag, component description, **Default** and **Contact row example** (labels + actions layout); default preview layout **padded** for wider compositions.
+- Turbo `build` task outputs include **`storybook-static/**`** so Storybook builds cache correctly; `storybook-static` is gitignored for local runs.
+- CI workflow in `.github/workflows/ci.yml`:
+  - install, lint, typecheck, build, **assert Storybook output** (`apps/ui-lib-docs/storybook-static/index.html`), migration presence checks for `20260421_initial_schema.sql` and `20260422_rls_contact_children_hardening.sql`
 - Added Netlify web deploy config: `apps/web/netlify.toml`.
 
 ## Known Gaps / Constraints

@@ -2,6 +2,7 @@ node_modules
 .turbo
 dist
 build
+storybook-static
 .expo
 .DS_Store
 .env

@@ -25,6 +25,8 @@ jobs:
         run: pnpm typecheck
       - name: Build
         run: pnpm build
+      - name: Storybook static build present
+        run: test -f apps/ui-lib-docs/storybook-static/index.html
       - name: Supabase migration check
         run: |
           test -f apps/backend/supabase/migrations/20260421_initial_schema.sql
