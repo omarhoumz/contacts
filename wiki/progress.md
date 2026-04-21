@@ -10,7 +10,7 @@
 
 ### 1) Monorepo and Shared Tooling
 
-- Initialized workspace structure for `apps/`* and `packages/`*.
+- Initialized workspace structure for `apps/`_ and `packages/`_.
 - Added root workspace config:
   - `package.json` (turbo scripts)
   - `pnpm-workspace.yaml`
@@ -93,35 +93,47 @@
 ### Immediate
 
 1. Run dependency install locally (from repo root):
-  - `pnpm install`
-  - If needed: `PNPM_HOME="$PWD/.pnpm-home" pnpm install --store-dir "$PWD/.pnpm-store"`
+
+- `pnpm install`
+- If needed: `PNPM_HOME="$PWD/.pnpm-home" pnpm install --store-dir "$PWD/.pnpm-store"`
+
 2. Validate workspace:
-  - `pnpm lint`
-  - `pnpm typecheck`
-  - `pnpm build`
-  - When all pass, mark this section done in this file (or move to a dated “Verification log” section).
+
+- `pnpm lint`
+- `pnpm typecheck`
+- `pnpm build`
+- When all pass, mark this section done in this file (or move to a dated “Verification log” section).
 
 ### Backend
 
 1. From `apps/backend`, link the Supabase project and push migrations:
-  - `supabase link --project-ref <project-ref>`
-  - `supabase db push`
-  - Or local Docker loop: `pnpm db:reset` (same directory; applies all migrations including `20260422`_*).
+
+- `supabase link --project-ref <project-ref>`
+- `supabase db push`
+- Or local Docker loop: `pnpm db:reset` (same directory; applies all migrations including `20260422`\_\*).
+
 2. Verify RLS with two test users (aligns with roadmap success criteria):
-  - cross-user reads/writes denied on `contacts` and on nested rows (emails/phones/addresses/labels) for contacts not owned by the session.
+
+- cross-user reads/writes denied on `contacts` and on nested rows (emails/phones/addresses/labels) for contacts not owned by the session.
 
 ### Web and Mobile
 
 1. Web run and smoke test (labels + trash + search):
-  - `pnpm --filter @widados/web dev` (or `pnpm dev --filter=@widados/web` depending on pnpm version)
+
+- `pnpm --filter @widados/web dev` (or `pnpm dev --filter=@widados/web` depending on pnpm version)
+
 2. Mobile run and smoke test:
-  - `pnpm --filter @widados/mobile dev`
+
+- `pnpm --filter @widados/mobile dev`
+
 3. Add token persistence hardening for mobile (SecureStore adapter) if needed — `expo-secure-store` is already a dependency; wire Supabase auth storage when prioritized.
 
 ### Docs and Release Prep
 
 1. Build Storybook:
-  - `pnpm --filter @widados/ui-lib-docs build`
+
+- `pnpm --filter @widados/ui-lib-docs build`
+
 2. Configure Netlify site and environment variables.
 3. Configure EAS project and run preview build for Android/iOS.
 
@@ -131,4 +143,3 @@
 - Supabase migration applied and RLS verified.
 - Web and mobile MVP flows function end-to-end.
 - Storybook builds and CI passes on pull requests.
-
