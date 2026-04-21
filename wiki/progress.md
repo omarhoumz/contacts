@@ -4,7 +4,7 @@
 
 - **Branch:** `main`
 - **Last updated:** 2026-04-21
-- **Status:** MVP foundations in place per [roadmap](./roadmap.md) Phase 1 / delivery sequence (through step 4 for contacts; labels schema and seed exist, labels UI not fully wired in clients). Workspace install + full script verification still needs a confirmed green local or CI run.
+- **Status:** Phase 1 [roadmap](./roadmap.md) delivery through **step 5** for contacts: web and mobile support labels (create, list, assign via `contact_labels`), active vs **trash** (list soft-deleted, **restore**, **delete forever**), and **search** over display name plus assigned label names. Roadmap **step 6** (Storybook polish, release checks) and a fully confirmed `pnpm install` → lint → typecheck → build run remain open.
 
 ## Completed Work
 
@@ -25,7 +25,7 @@
 
 ### 2) Shared Domain and UI Libraries
 
-- Added `packages/shared` with zod-backed contact schema.
+- Added `packages/shared` with zod-backed contact schema and `labelCreateSchema` (name + hex color) for labels.
 - Added `packages/ui-lib` web component primitives.
 - Added `packages/ui-lib-mobile` React Native primitives.
 - Package entry fields (`main` / `types` / `exports`) point at `src/index.tsx` so Vite resolves workspace packages correctly.
@@ -35,11 +35,12 @@
 - Implemented `apps/web` with Vite + React.
 - Wired Supabase auth and contacts flow:
   - email/password sign-up + sign-in
-  - contact create
-  - contact list refresh
-  - contact search
+  - contact create (includes `user_id` from session)
+  - contact list refresh with nested `contact_labels` → `labels`
+  - contact search on display name **and** assigned label names (client-side filter)
   - contact update
-  - soft delete (via `deleted_at`)
+  - soft delete (`deleted_at`), **trash** view, **restore**, **permanent delete**
+  - labels: create, list, toggle assignment on a contact
 - Connected shared validation from `@widados/shared`.
 
 ### 4) Mobile MVP (Expo)
@@ -47,10 +48,11 @@
 - Implemented `apps/mobile` Expo app shell and entrypoints.
 - Wired Supabase auth and contacts flow:
   - sign-in
-  - create contact
-  - search + list refresh
+  - create contact (includes `user_id` from session)
+  - search (name + labels), list refresh with label joins
   - update
-  - soft delete
+  - soft delete, trash / restore / delete forever
+  - labels: create, toggle on contacts
 - Added `eas.json` for internal preview builds (APK/iOS internal flow).
 
 ### 5) Backend Secure Foundation (Supabase)
@@ -104,17 +106,17 @@
 1. From `apps/backend`, link the Supabase project and push migrations:
   - `supabase link --project-ref <project-ref>`
   - `supabase db push`
-  - Or local Docker loop: `pnpm db:reset` (same directory; applies all migrations including `20260422_`*).
+  - Or local Docker loop: `pnpm db:reset` (same directory; applies all migrations including `20260422`_*).
 2. Verify RLS with two test users (aligns with roadmap success criteria):
   - cross-user reads/writes denied on `contacts` and on nested rows (emails/phones/addresses/labels) for contacts not owned by the session.
 
 ### Web and Mobile
 
-1. Web run and smoke test:
+1. Web run and smoke test (labels + trash + search):
   - `pnpm --filter @widados/web dev` (or `pnpm dev --filter=@widados/web` depending on pnpm version)
 2. Mobile run and smoke test:
   - `pnpm --filter @widados/mobile dev`
-3. Add token persistence hardening for mobile (SecureStore adapter) if needed.
+3. Add token persistence hardening for mobile (SecureStore adapter) if needed — `expo-secure-store` is already a dependency; wire Supabase auth storage when prioritized.
 
 ### Docs and Release Prep
 
