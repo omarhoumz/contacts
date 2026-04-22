@@ -7,6 +7,7 @@
     "dev": "echo \"Run supabase start from apps/backend (see supabase/README.md)\"",
     "db:start": "supabase start",
     "db:stop": "supabase stop",
+    "db:status": "supabase status",
     "db:reset": "supabase db reset",
     "db:types": "supabase gen types typescript --local --schema public > supabase/database.types.ts",
     "lint": "eslint . --ext .ts,.tsx --no-error-on-unmatched-pattern --max-warnings 0 -c ../../.eslintrc.cjs",
