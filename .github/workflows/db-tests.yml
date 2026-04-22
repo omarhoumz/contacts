@@ -5,10 +5,12 @@ on:
     branches: ["main", "cursor/**"]
     paths:
       - "apps/backend/supabase/**"
+      - "apps/backend/scripts/**"
       - ".github/workflows/db-tests.yml"
   pull_request:
     paths:
       - "apps/backend/supabase/**"
+      - "apps/backend/scripts/**"
       - ".github/workflows/db-tests.yml"
 
 defaults:
