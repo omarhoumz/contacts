@@ -35,7 +35,9 @@ function parseEnvFile(text) {
 }
 
 function netlifyEnvSet(key, value, extraArgs) {
-  const args = ["env:set", key, value, "--context", "production", "deploy-preview", "--scope", "builds", ...extraArgs];
+  // Do not pass `--scope builds` here: with current Netlify CLI, `env:set` can
+  // exit 0 without persisting values. Default scopes include the build step.
+  const args = ["env:set", key, value, "--context", "production", "deploy-preview", "--force", ...extraArgs];
   execFileSync("netlify", args, { cwd: webDir, stdio: "inherit" });
 }
 
@@ -55,4 +57,4 @@ if (!url || !anon) {
 
 netlifyEnvSet("VITE_SUPABASE_URL", url, []);
 netlifyEnvSet("VITE_SUPABASE_ANON_KEY", anon, ["--secret"]);
-console.log("Netlify env updated for production + deploy-preview (builds scope). Run: pnpm netlify:env:list");
+console.log("Netlify env updated for production + deploy-preview. Run: pnpm netlify:env:list");
