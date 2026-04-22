@@ -5,9 +5,9 @@ This wiki is the structured source of truth for product, architecture, security,
 ## Sections
 
 - [Decisions (ADR)](decisions.md)
-- [Progress](progress.md)
 - [Architecture](architecture.md)
 - [Roadmap](roadmap.md)
+- [Operations Playbook](operations.md)
 - [Security](security.md)
 - [Deployment](deployment.md)
 - [Pricing](pricing.md)
