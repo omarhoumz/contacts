@@ -5,7 +5,7 @@ This file is the single source of truth for roadmap, progress, and execution.
 ## Snapshot
 
 - **Branch:** `main`
-- **Last updated:** 2026-04-23
+- **Last updated:** 2026-04-24
 - **Current focus:** Phase 1 closeout (verification + release readiness)
 - **Primary owner:** agents and maintainers using this board
 
@@ -76,7 +76,7 @@ This file is the single source of truth for roadmap, progress, and execution.
 | D6  | P2       | TODO   | external         | D5         | Build Android internal/preview and install on device.                                                                           | Build ID/artifact link.                                                                                                                                                                       |
 | D7  | P3       | TODO   | external         | D5         | Build iOS internal/simulator when Apple side ready.                                                                             | Build ID/TestFlight link.                                                                                                                                                                     |
 | D8  | P2       | TODO   | docs             | D4,D6      | Log Netlify URL + EAS build IDs and release smoke results.                                                                      | Entry in this file.                                                                                                                                                                           |
-| E1  | P3       | TODO   | research         | D6         | Review Supabase + Expo secure storage approach.                                                                                 | Notes linked in task evidence.                                                                                                                                                                |
+| E1  | P3       | DONE   | research         | B7         | Review Supabase + Expo secure storage approach.                                                                                 | `wiki/security.md` → **Expo + Supabase session storage (research, E1)**; adapter + E2/E3 follow-ups.                                                                                           |
 | E2  | P3       | TODO   | code             | E1         | Implement `expo-secure-store` auth storage adapter.                                                                             | Cold restart keeps session.                                                                                                                                                                   |
 | E3  | P3       | TODO   | manual           | E2         | Verify session persistence after cold app restart.                                                                              | Test note in verification log.                                                                                                                                                                |
 | E4  | P3       | DONE   | code             | B7         | Add mobile sign-up or explicitly defer with rationale.                                                                          | `signUp` + **Sign up** button in `apps/mobile/App.tsx` (mirrors web).                                                                                                                         |
@@ -127,6 +127,7 @@ Automated suite: `apps/backend/supabase/tests/database/contacts_rls.test.sql`. R
 - 2026-04-23: Local Supabase dev workflow (`enable_confirmations` local defaults, `wiki/operations.md`, `466a41e`); split `config.shared.toml` / `config.local.toml` merge + `pnpm env:supabase:local|cloud` (`4e91268`); `main` pushed through `4e91268`.
 - 2026-04-23: B8/B9 **DONE** (local stack): `apps/backend/scripts/smoke-local-b8.mjs`, `pnpm smoke:local-b8`, CI `db-tests` step after pgTAP.
 - 2026-04-23: **D2** done: root `netlify.toml` for monorepo web deploy; removed `apps/web/netlify.toml`; docs in `wiki/deployment.md` + `wiki/operations.md`.
+- 2026-04-24: **E1** done: Expo + Supabase session storage research in `wiki/security.md` (depends relaxed to B7).
 
 ## Notes and Constraints
 
