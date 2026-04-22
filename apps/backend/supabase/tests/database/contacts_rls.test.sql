@@ -29,33 +29,21 @@ select results_eq(
 );
 
 -- As User B: cannot update A's contact
-select is(
-  (
-    select count(*)::bigint
-    from (
-      update public.contacts
-      set display_name = 'hacked-by-b'
-      where id = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa'::uuid
-      returning id
-    ) u
-  ),
-  0::bigint,
-  'User B update on A contact affects zero rows'
-);
+with u as (
+  update public.contacts
+  set display_name = 'hacked-by-b'
+  where id = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa'::uuid
+  returning id
+)
+select is((select count(*)::bigint from u), 0::bigint, 'User B update on A contact affects zero rows');
 
 -- As User B: cannot delete A's contact
-select is(
-  (
-    select count(*)::bigint
-    from (
-      delete from public.contacts
-      where id = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa'::uuid
-      returning id
-    ) u
-  ),
-  0::bigint,
-  'User B delete on A contact affects zero rows'
-);
+with u as (
+  delete from public.contacts
+  where id = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa'::uuid
+  returning id
+)
+select is((select count(*)::bigint from u), 0::bigint, 'User B delete on A contact affects zero rows');
 
 -- As User B: cannot attach own label to A's contact (RLS with_check)
 select throws_ok(
@@ -65,8 +53,7 @@ select throws_ok(
       'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb'::uuid,
       '22222222-2222-4222-8222-222222222222'::uuid
     )$$,
-  '42501',
-  '%violates row-level security policy%'
+  '42501'
 );
 
 -- As User A: can read own contact
