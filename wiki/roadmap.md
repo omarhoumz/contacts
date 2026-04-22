@@ -5,7 +5,7 @@ This file is the single source of truth for roadmap, progress, and execution.
 ## Snapshot
 
 - **Branch:** `main`
-- **Last updated:** 2026-04-21
+- **Last updated:** 2026-04-22
 - **Current focus:** Phase 1 closeout (verification + release readiness)
 - **Primary owner:** agents and maintainers using this board
 
@@ -61,7 +61,7 @@ This file is the single source of truth for roadmap, progress, and execution.
 | B6  | P1       | DONE        | code/config      | B5         | Set `apps/web` Supabase env vars; verify names in `.env.example`.          | `apps/web/.env.local` created with URL and anon key; names match `.env.example`.                              |
 | B7  | P1       | DONE        | code/config      | B5         | Set mobile Supabase env vars.                                              | `apps/mobile/.env.local` created with URL and anon key.                                                       |
 | B8  | P1       | BLOCKED     | command/manual   | B6         | Web smoke (signup-first): sign-up -> sign-in -> confirm auth behavior, then create, label toggle, trash restore/delete, search. | Blocked: `POST /auth/v1/signup` returned 429 (`over_email_send_rate_limit`) during smoke run. |
-| B9  | P1       | TODO        | command/manual   | B7         | Mobile smoke matching B8.                                                  | Checklist with pass/fail notes.                                                                               |
+| B9  | P1       | BLOCKED     | command/manual   | B7         | Mobile smoke matching B8.                                                  | Auth API with `apps/mobile/.env.local` keys: `POST /auth/v1/signup` HTTP 200 (gmail-style email); `POST /auth/v1/token?grant_type=password` HTTP 400 `email_not_confirmed`. Full device smoke still pending confirmed session (same gate as B8). |
 | C1  | P1       | TODO        | manual           | B8         | Create User A and one contact; capture contact id.                         | Contact id noted in verification.                                                                             |
 | C2  | P1       | TODO        | manual           | C1         | Create User B and confirm session.                                         | User B session verified.                                                                                      |
 | C3  | P1       | TODO        | manual           | C2         | As B, attempt read of A's contact id (should fail/empty).                  | Result logged.                                                                                                |
@@ -107,8 +107,8 @@ This file is the single source of truth for roadmap, progress, and execution.
 - 2026-04-22: B5 complete: fetched project URL and publishable/legacy keys for `issiwryobnohfevlzyuu` via Supabase MCP.
 - 2026-04-22: B6/B7 complete: wrote local env files for web/mobile with Supabase URL and anon key.
 - 2026-04-22: B8 signup-first run: browser smoke reached Supabase; `POST /auth/v1/signup` returned HTTP 429 (`over_email_send_rate_limit`), blocking sign-up/sign-in validation.
-- 2026-04-22: B5 complete: fetched Supabase URL and publishable/legacy keys via MCP for project `issiwryobnohfevlzyuu`.
-- 2026-04-22: B6/B7 complete: wrote local env files for web and mobile with Supabase URL and anon key.
+- 2026-04-22: B9 probe (mobile env keys): signup HTTP 200; password grant HTTP 400 `email_not_confirmed`; disposable-style `@example.com` returned HTTP 400 `email_address_invalid`.
+- 2026-04-22: `pnpm typecheck` and `pnpm build` green at repo root (Turbo; includes Storybook static build).
 
 ## Notes and Constraints
 
