@@ -17,8 +17,14 @@
 4. Validate Supabase migrations and RLS policies
 5. Deploy target artifacts
 
+## Netlify (web)
+
+- Site connects to **this repository root** (not `apps/web` as the Netlify root directory).
+- Build config lives in **`netlify.toml`** at the repo root: installs workspace deps, runs `pnpm --filter @widados/web build`, publishes `apps/web/dist`.
+- Set **`VITE_SUPABASE_URL`** and **`VITE_SUPABASE_ANON_KEY`** in the Netlify UI (or team env) for each deploy context (staging/production). See `wiki/operations.md`.
+
 ## Service Responsibility Matrix
-- Netlify: `apps/web`, `apps/ui-lib-docs`
+- Netlify: `apps/web` (deploy); `apps/ui-lib-docs` optional separate site if needed later
 - Supabase: auth, database, storage, backend policies/functions
 - EAS: Android/iOS binaries for testing and release flows
 

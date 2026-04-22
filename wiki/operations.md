@@ -85,9 +85,11 @@ Guidelines:
 
 ## Release Operations
 
-- Netlify:
-  - Ensure env vars are set in dashboard
-  - Deploy and smoke web auth + one mutation
+- **Netlify (web, D1–D4)**:
+  1. **D1** — Netlify dashboard: **Add new site** → Import from Git → pick this repo. Leave **base directory** empty (repo root uses root `netlify.toml`).
+  2. **D2** — Build is defined in **`netlify.toml`** at repo root (`pnpm install --frozen-lockfile` + `pnpm --filter @widados/web build`, publish `apps/web/dist`).
+  3. **D3** — Site **Environment variables**: `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY` (per deploy context). Redeploy after changes.
+  4. **D4** — Open the deploy URL: sign-in (or sign-up per project policy), create one contact, confirm it lists.
 - EAS:
   - `eas login`
   - `eas build:configure`
