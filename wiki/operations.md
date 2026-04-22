@@ -93,7 +93,7 @@ Guidelines:
      - **Existing site instead:** `pnpm netlify:link` and choose the site (no `sites:create`).
      - **Git continuous deploy:** after D1, in the Netlify UI link this Git repository to the site (build settings already match root **`netlify.toml`**; leave base directory empty).
   2. **D2** — Build/publish in root **`netlify.toml`** (`pnpm install --frozen-lockfile` + `pnpm --filter @widados/web build`, `apps/web/dist`). Preview: `pnpm netlify:deploy` (draft deploy + build). Production: `pnpm netlify:deploy:prod`.
-  3. **D3** — `netlify env:set VITE_SUPABASE_URL 'https://…'` and `netlify env:set VITE_SUPABASE_ANON_KEY '…'` (use quotes). List: `netlify env:list`. Then redeploy (`pnpm netlify:deploy:prod` or trigger in UI).
+  3. **D3** — From **repo root**, ensure `apps/backend/supabase/.env.cloud` exists with **`SUPABASE_URL`** and **`SUPABASE_ANON_KEY`** (same file as `pnpm env:supabase:cloud`). Then run **`pnpm netlify:env:push`** (sets `VITE_*` on Netlify for **production** + **deploy-preview**, **builds** scope; anon key with **`--secret`**). Confirm with **`pnpm netlify:env:list`**. **Note:** run Netlify env commands via these scripts or **`cd apps/web`** — the repo root triggers a monorepo picker for some `netlify` subcommands. Manual alternative: `cd apps/web` then `netlify env:set …`. Then redeploy (`pnpm netlify:deploy:prod` or UI).
   4. **D4** — `pnpm netlify:open` (or `netlify open:site`) after deploy; smoke sign-in + one contact.
 - EAS:
   - `eas login`
