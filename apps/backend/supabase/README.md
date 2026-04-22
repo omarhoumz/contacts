@@ -39,4 +39,10 @@ Cross-user RLS checks live in `supabase/tests/database/contacts_rls.test.sql`.
 1. `pnpm db:start` from `apps/backend`
 2. `pnpm test:db`
 
-CI runs `pnpm prepare:config` before `supabase start` on changes under `apps/backend/supabase/`.
+## B8 local smoke (Auth + REST)
+
+From `apps/backend` with the stack running:
+
+- `pnpm smoke:local-b8` — signup, password sign-in, contact + label + trash restore + permanent delete via PostgREST (same backend surface as web/mobile clients).
+
+CI runs `pnpm prepare:config` before `supabase start`, then pgTAP, then this smoke (see `.github/workflows/db-tests.yml`) on changes under `apps/backend/supabase/` and `apps/backend/scripts/`.

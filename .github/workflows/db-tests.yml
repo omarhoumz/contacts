@@ -32,3 +32,5 @@ jobs:
         run: supabase start
       - name: pgTAP RLS tests
         run: supabase test db
+      - name: Local B8 smoke (Auth + REST)
+        run: node scripts/smoke-local-b8.mjs

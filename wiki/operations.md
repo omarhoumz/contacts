@@ -55,7 +55,7 @@ Use a **local** stack for sign-up / sign-in without hosted email rate limits. Au
 
 **Switch back to hosted Supabase:** copy `apps/backend/supabase/.env.cloud.example` to `.env.cloud`, fill `SUPABASE_URL` and `SUPABASE_ANON_KEY`, then from repo root run `pnpm env:supabase:cloud`.
 
-Database tests: from `apps/backend`, `pnpm test:db` (requires stack running).
+Database tests: from `apps/backend`, `pnpm test:db` (requires stack running). B8 local API smoke: `pnpm smoke:local-b8` (Auth + PostgREST; same surface as web/mobile clients).
 
 **Do not** run `supabase config push` after local-only auth tweaks unless you mean to change the **hosted** project’s Auth settings.
 

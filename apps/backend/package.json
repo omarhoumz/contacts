@@ -14,6 +14,7 @@
     "lint": "eslint . --ext .ts,.tsx --no-error-on-unmatched-pattern --max-warnings 0 -c ../../.eslintrc.cjs",
     "typecheck": "echo \"no typecheck\"",
     "test": "echo \"no tests yet\"",
-    "test:db": "pnpm prepare:config && supabase test db"
+    "test:db": "pnpm prepare:config && supabase test db",
+    "smoke:local-b8": "node scripts/smoke-local-b8.mjs"
   }
 }
