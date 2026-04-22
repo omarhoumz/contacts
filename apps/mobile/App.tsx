@@ -4,8 +4,9 @@ import { createClient } from "@supabase/supabase-js";
 import { contactSchema, labelCreateSchema } from "@widados/shared";
 import { MobileCard } from "@widados/ui-lib-mobile";
 
-const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL ?? "";
-const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY ?? "";
+const env = (globalThis as { process?: { env?: Record<string, string | undefined> } }).process?.env;
+const supabaseUrl = env?.EXPO_PUBLIC_SUPABASE_URL ?? "";
+const supabaseAnonKey = env?.EXPO_PUBLIC_SUPABASE_ANON_KEY ?? "";
 
 const CONTACT_SELECT = `
   id,
@@ -18,7 +19,7 @@ const CONTACT_SELECT = `
 `;
 
 type LabelRow = { id: string; name: string; color: string };
-type ContactLabelJoin = { label_id: string; labels: LabelRow | null };
+type ContactLabelJoin = { label_id: string; labels: LabelRow[] | null };
 type ContactRow = {
   id: string;
   display_name: string;
@@ -31,8 +32,10 @@ function contactMatchesQuery(c: ContactRow, q: string) {
   if (!needle) return true;
   if (c.display_name.toLowerCase().includes(needle)) return true;
   for (const cl of c.contact_labels ?? []) {
-    const name = cl.labels?.name?.toLowerCase();
-    if (name?.includes(needle)) return true;
+    for (const label of cl.labels ?? []) {
+      const name = label.name.toLowerCase();
+      if (name.includes(needle)) return true;
+    }
   }
   return false;
 }

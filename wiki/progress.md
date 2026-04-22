@@ -84,7 +84,8 @@
 
 ## Plan execution ([plan-roadmap-remainder](./plan-roadmap-remainder.md))
 
-- **IN PROGRESS (2026-04-21):** **A3** — workspace `pnpm typecheck` green after **A1** `pnpm install` (link `typescript` / tool binaries in packages).
+- **DONE (2026-04-21):** **A3** — `pnpm typecheck` exits 0 after linking workspace deps and fixing TS config/package resolution issues.
+- **IN PROGRESS (2026-04-21):** **A4** — run `pnpm build` and resolve remaining Vite/Storybook build issues once A3 is green.
 
 ## Known Gaps / Constraints
 

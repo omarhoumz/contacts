@@ -1,4 +1,7 @@
 {
   "extends": "@widados/ts-config/react.json",
+  "compilerOptions": {
+    "types": ["vite/client"]
+  },
   "include": ["src"]
 }

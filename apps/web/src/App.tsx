@@ -17,7 +17,7 @@ const CONTACT_SELECT = `
 `;
 
 type LabelRow = { id: string; name: string; color: string };
-type ContactLabelJoin = { label_id: string; labels: LabelRow | null };
+type ContactLabelJoin = { label_id: string; labels: LabelRow[] | null };
 type ContactRow = {
   id: string;
   display_name: string;
@@ -30,8 +30,9 @@ function contactMatchesQuery(c: ContactRow, q: string) {
   if (!needle) return true;
   if (c.display_name.toLowerCase().includes(needle)) return true;
   for (const cl of c.contact_labels ?? []) {
-    const name = cl.labels?.name?.toLowerCase();
-    if (name?.includes(needle)) return true;
+    for (const label of cl.labels ?? []) {
+      if (label.name.toLowerCase().includes(needle)) return true;
+    }
   }
   return false;
 }
@@ -345,22 +346,21 @@ export function App() {
                     </button>
                     <div style={{ marginTop: 6, fontSize: 13 }}>
                       {(contact.contact_labels ?? [])
-                        .map((cl) => cl.labels)
-                        .filter(Boolean)
+                        .flatMap((cl) => cl.labels ?? [])
                         .map((l) => (
                           <span
-                            key={l!.id}
+                            key={l.id}
                             style={{
                               display: "inline-block",
                               marginRight: 6,
                               marginBottom: 4,
                               padding: "2px 8px",
                               borderRadius: 999,
-                              background: `${l!.color}22`,
-                              border: `1px solid ${l!.color}`,
+                              background: `${l.color}22`,
+                              border: `1px solid ${l.color}`,
                             }}
                           >
-                            {l!.name}
+                            {l.name}
                           </span>
                         ))}
                       {labels.length ? (
