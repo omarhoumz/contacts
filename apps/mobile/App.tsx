@@ -3,6 +3,7 @@ import { Button, SafeAreaView, ScrollView, Text, TextInput, View } from "react-n
 import { createClient } from "@supabase/supabase-js";
 import { contactSchema, labelCreateSchema } from "@widados/shared";
 import { MobileCard } from "@widados/ui-lib-mobile";
+import { supabaseAuthStorage } from "./supabaseStorage";
 
 const env = (globalThis as { process?: { env?: Record<string, string | undefined> } }).process?.env;
 const supabaseUrl = env?.EXPO_PUBLIC_SUPABASE_URL ?? "";
@@ -53,7 +54,10 @@ export function App() {
   const [showTrash, setShowTrash] = useState(false);
   const [message, setMessage] = useState("");
   const client = useMemo(
-    () => createClient(supabaseUrl, supabaseAnonKey, { auth: { persistSession: true } }),
+    () =>
+      createClient(supabaseUrl, supabaseAnonKey, {
+        auth: { persistSession: true, storage: supabaseAuthStorage },
+      }),
     [],
   );
 

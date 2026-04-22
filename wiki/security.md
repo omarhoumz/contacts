@@ -35,7 +35,7 @@
 - [Expo SecureStore](https://docs.expo.dev/versions/latest/sdk/securestore/)
 - [Supabase + Expo guide](https://supabase.com/docs/guides/getting-started/tutorials/with-expo-react-native) — session patterns
 
-**Next implementation step (E2):** add `expo-secure-store`, implement the adapter module, wire `createClient` in `App.tsx`, then E3 manual cold-restart check.
+**Implementation (E2):** `apps/mobile/supabaseStorage.ts` implements `getItem` / `setItem` / `removeItem` with `expo-secure-store`; `App.tsx` passes `auth: { persistSession: true, storage: supabaseAuthStorage }` into `createClient`. **E3:** manual cold-restart session check remains.
 
 ## CI Security Gates
 - Migration and policy validation
