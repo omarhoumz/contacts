@@ -1,0 +1,7 @@
+# Committed Supabase settings merged into `config.toml` by
+# `pnpm --filter @widados/backend prepare:config` (runs before db:start / db:reset / test:db).
+#
+# After `supabase link`, the merge script keeps `project_id` from the existing generated
+# `config.toml` when present, so you can copy updates into `config.shared.toml` when ready.
+
+project_id = "issiwryobnohfevlzyuu"

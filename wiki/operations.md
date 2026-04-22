@@ -44,19 +44,20 @@ Current project ref used by roadmap tasks:
 
 ## Local Supabase (development)
 
-Use a **local** stack for sign-up / sign-in without hosted email rate limits. Auth email is captured in **Mailpit** at `http://127.0.0.1:54324` when confirmations are on; with `enable_confirmations = false` in `apps/backend/supabase/config.toml`, new users can sign in immediately after sign-up (local only).
+Use a **local** stack for sign-up / sign-in without hosted email rate limits. Auth email is captured in **Mailpit** at `http://127.0.0.1:54324` when confirmations are on. Default local auth behavior comes from merging `config.shared.toml` + `config.local.toml.example` (or optional gitignored `config.local.toml`) into generated `supabase/config.toml` — see `apps/backend/supabase/README.md`.
 
 1. **Docker** running.
-2. From `apps/backend`: `pnpm db:start` (or `npx supabase@latest start`). First run pulls images.
-3. `pnpm db:status` — copy **Project URL** and **Publishable** key (or legacy anon JWT if your client expects JWT format; `supabase status -o env` lists all).
-4. Put them in **`apps/web/.env.local`** and **`apps/mobile/.env.local`** as `VITE_SUPABASE_*` / `EXPO_PUBLIC_SUPABASE_*` (see root `.env.example`).
-5. Apply schema locally: `pnpm db:reset` (resets DB + runs migrations + `seed.sql`) or rely on migrations from a clean start.
-6. **Web**: `pnpm --filter @widados/web dev` — use Studio `http://127.0.0.1:54323` for tables/auth.
-7. **Stop**: `pnpm db:stop` from `apps/backend`.
+2. From `apps/backend`: `pnpm db:start` (runs `prepare:config` then `supabase start`). First run pulls images.
+3. From **repo root**: `pnpm env:supabase:local` — writes `VITE_*` / `EXPO_PUBLIC_*` into `apps/web/.env.local` and `apps/mobile/.env.local` from `supabase status -o env` (requires the stack running).
+4. Apply schema locally: from `apps/backend`, `pnpm db:reset` when you need a clean DB + `seed.sql`.
+5. **Web**: `pnpm --filter @widados/web dev` — Studio `http://127.0.0.1:54323`.
+6. **Stop**: from `apps/backend`, `pnpm db:stop`.
 
-Database tests: `pnpm test:db` (requires stack running). See `apps/backend/supabase/README.md`.
+**Switch back to hosted Supabase:** copy `apps/backend/supabase/.env.cloud.example` to `.env.cloud`, fill `SUPABASE_URL` and `SUPABASE_ANON_KEY`, then from repo root run `pnpm env:supabase:cloud`.
 
-**Do not** run `supabase config push` after editing local-only auth in `config.toml` unless you mean to change the **hosted** project’s Auth settings.
+Database tests: from `apps/backend`, `pnpm test:db` (requires stack running).
+
+**Do not** run `supabase config push` after local-only auth tweaks unless you mean to change the **hosted** project’s Auth settings.
 
 ## Environment Variables
 

@@ -5,14 +5,15 @@
   "scripts": {
     "build": "echo \"Supabase backend has no build step\"",
     "dev": "echo \"Run supabase start from apps/backend (see supabase/README.md)\"",
-    "db:start": "supabase start",
+    "prepare:config": "node scripts/write-supabase-config.cjs",
+    "db:start": "pnpm prepare:config && supabase start",
     "db:stop": "supabase stop",
-    "db:status": "supabase status",
-    "db:reset": "supabase db reset",
+    "db:status": "pnpm prepare:config && supabase status",
+    "db:reset": "pnpm prepare:config && supabase db reset",
     "db:types": "supabase gen types typescript --local --schema public > supabase/database.types.ts",
     "lint": "eslint . --ext .ts,.tsx --no-error-on-unmatched-pattern --max-warnings 0 -c ../../.eslintrc.cjs",
     "typecheck": "echo \"no typecheck\"",
     "test": "echo \"no tests yet\"",
-    "test:db": "supabase test db"
+    "test:db": "pnpm prepare:config && supabase test db"
   }
 }

@@ -24,6 +24,8 @@ jobs:
       - uses: supabase/setup-cli@v1
         with:
           version: latest
+      - name: Generate supabase/config.toml
+        run: node scripts/write-supabase-config.cjs
       - name: Start local Supabase
         run: supabase start
       - name: pgTAP RLS tests

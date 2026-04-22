@@ -1,0 +1,5 @@
+# Optional: copy to `config.local.toml` in this folder (gitignored) to override the
+# defaults below without editing committed files.
+
+[auth.email]
+enable_confirmations = false

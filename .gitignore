@@ -42,3 +42,6 @@ apps/mobile/ios
 # Supabase local artifacts
 **/supabase/.branches
 **/supabase/.temp
+apps/backend/supabase/config.toml
+apps/backend/supabase/config.local.toml
+apps/backend/supabase/.env.cloud
