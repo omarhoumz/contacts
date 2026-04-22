@@ -51,9 +51,9 @@ This file is the single source of truth for roadmap, progress, and execution.
 | A2  | P0       | DONE    | code             | A1         | Replace placeholder lint scripts with real ESLint commands.                | Committed in `32c3320`.                                                             |
 | A3  | P0       | DONE    | code+command     | A1         | Make `pnpm typecheck` green across workspace.                              | `pnpm typecheck` exits 0; committed in `dfd1f18`.                                   |
 | A4  | P0       | DONE    | command+code     | A3         | Run `pnpm build`; fix Vite/Storybook/build script failures until green.    | `pnpm build` exits 0 locally on 2026-04-21 (Turbo build + Storybook static output). |
-| A5  | P0       | BLOCKED | command/external | A4         | Confirm `.github/workflows/ci.yml` passes on PR/branch.                    | Blocked: local repo has no git remote configured, so no PR/CI run is available.     |
-| A6  | P1       | TODO    | docs             | A5         | Add verification log (date + SHA + lint/typecheck/build/CI).               | Entry in this file under Verification Log.                                          |
-| B1  | P1       | TODO    | external         | A6         | Create/choose Supabase project (staging recommended).                      | Project ref recorded (non-secret).                                                  |
+| A5  | P0       | DONE    | command/external | A4         | Confirm `.github/workflows/ci.yml` passes on PR/branch.                    | CI run `24793452426` on `main` passed after workflow fix commit `05693b4`.          |
+| A6  | P1       | DONE        | docs         | A5         | Add verification log (date + SHA + lint/typecheck/build/CI).               | Verification log entry added with lint/typecheck/build/CI evidence and commit refs. |
+| B1  | P1       | IN_PROGRESS | external         | A6         | Create/choose Supabase project (staging recommended).                      | Pending project ref selection.                                                      |
 | B2  | P1       | TODO    | command          | B1         | Run `supabase link --project-ref <ref>` in `apps/backend`.                 | CLI output confirms linked project.                                                 |
 | B3  | P1       | TODO    | code/docs        | B2         | Align `apps/backend/supabase/config.toml` `project_id`.                    | File updated or documented exception.                                               |
 | B4  | P1       | TODO    | command          | B3         | Apply schema (`supabase db push` or local `pnpm db:reset`).                | Migration apply output.                                                             |
@@ -97,7 +97,8 @@ This file is the single source of truth for roadmap, progress, and execution.
 
 - 2026-04-21: A3 complete, `pnpm typecheck` green after TS config/dependency fixes (`dfd1f18`).
 - 2026-04-21: A4 complete, `pnpm build` green locally after typecheck fixes.
-- 2026-04-21: A5 blocked: `gh run list` fails with "no git remotes found"; needs remote + CI run URL.
+- 2026-04-21: A5 complete: CI run `24793452426` passed on `main` after workflow fix commit `05693b4`.
+- 2026-04-21: A6 complete: `pnpm lint` green; `pnpm typecheck` green (`dfd1f18`), `pnpm build` green (`3d543e0`), CI green (`24793452426`).
 
 ## Notes and Constraints
 
@@ -105,4 +106,3 @@ This file is the single source of truth for roadmap, progress, and execution.
   - `PNPM_HOME="$PWD/.pnpm-home" pnpm install --store-dir "$PWD/.pnpm-store"`
 - External tasks (Supabase/Netlify/EAS) require human credentials and dashboard access.
 - Do not fabricate secrets, URLs, or build IDs; leave task as **BLOCKED** with what is needed.
-
