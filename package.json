@@ -9,7 +9,14 @@
     "typecheck": "turbo run typecheck",
     "test": "turbo run test",
     "env:supabase:local": "node tooling/set-supabase-env.cjs local",
-    "env:supabase:cloud": "node tooling/set-supabase-env.cjs cloud"
+    "env:supabase:cloud": "node tooling/set-supabase-env.cjs cloud",
+    "netlify": "netlify",
+    "netlify:deploy": "netlify deploy --build",
+    "netlify:deploy:prod": "netlify deploy --prod --build",
+    "netlify:dev": "netlify dev",
+    "netlify:link": "netlify link",
+    "netlify:open": "netlify open:site",
+    "netlify:status": "netlify status"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^7.18.0",

@@ -21,7 +21,7 @@
 
 - Site connects to **this repository root** (not `apps/web` as the Netlify root directory).
 - Build config lives in **`netlify.toml`** at the repo root: installs workspace deps, runs `pnpm --filter @widados/web build`, publishes `apps/web/dist`.
-- Set **`VITE_SUPABASE_URL`** and **`VITE_SUPABASE_ANON_KEY`** in the Netlify UI (or team env) for each deploy context (staging/production). See `wiki/operations.md`.
+- Use the **global Netlify CLI** from the repo root (`pnpm netlify:link`, `pnpm netlify:deploy`, … — see `wiki/operations.md`). Set secrets with **`netlify env:set`** (or the dashboard); `.netlify/` is gitignored.
 
 ## Service Responsibility Matrix
 - Netlify: `apps/web` (deploy); `apps/ui-lib-docs` optional separate site if needed later

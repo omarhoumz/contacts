@@ -39,6 +39,9 @@ expo-env.d.ts
 apps/mobile/android
 apps/mobile/ios
 
+# Netlify CLI (link / local state; not committed)
+.netlify
+
 # Supabase local artifacts
 **/supabase/.branches
 **/supabase/.temp

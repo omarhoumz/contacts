@@ -1,4 +1,5 @@
 # Monorepo web deploy: connect the Netlify site to this repo root (no base-directory override).
+# Use the global Netlify CLI from repo root: `pnpm netlify:link`, `pnpm netlify:deploy`, etc.
 # See wiki/operations.md → Netlify.
 
 [build]

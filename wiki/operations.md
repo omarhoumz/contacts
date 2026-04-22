@@ -85,11 +85,11 @@ Guidelines:
 
 ## Release Operations
 
-- **Netlify (web, D1–D4)**:
-  1. **D1** — Netlify dashboard: **Add new site** → Import from Git → pick this repo. Leave **base directory** empty (repo root uses root `netlify.toml`).
-  2. **D2** — Build is defined in **`netlify.toml`** at repo root (`pnpm install --frozen-lockfile` + `pnpm --filter @widados/web build`, publish `apps/web/dist`).
-  3. **D3** — Site **Environment variables**: `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY` (per deploy context). Redeploy after changes.
-  4. **D4** — Open the deploy URL: sign-in (or sign-up per project policy), create one contact, confirm it lists.
+- **Netlify (web, D1–D4)** — requires **[Netlify CLI](https://docs.netlify.com/cli/get-started/)** installed globally (`netlify` on your `PATH`). Repo root scripts wrap the same commands (`pnpm netlify:*`).
+  1. **D1** — From repo root: `pnpm netlify:link` (or `netlify init` / dashboard **Add site** → Git, base directory **empty**). This writes `.netlify/` (gitignored).
+  2. **D2** — Build/publish in root **`netlify.toml`** (`pnpm install --frozen-lockfile` + `pnpm --filter @widados/web build`, `apps/web/dist`). Preview: `pnpm netlify:deploy` (draft deploy + build). Production: `pnpm netlify:deploy:prod`.
+  3. **D3** — `netlify env:set VITE_SUPABASE_URL 'https://…'` and `netlify env:set VITE_SUPABASE_ANON_KEY '…'` (use quotes). List: `netlify env:list`. Then redeploy (`pnpm netlify:deploy:prod` or trigger in UI).
+  4. **D4** — `pnpm netlify:open` (or `netlify open:site`) after deploy; smoke sign-in + one contact.
 - EAS:
   - `eas login`
   - `eas build:configure`
