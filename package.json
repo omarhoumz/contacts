@@ -15,6 +15,7 @@
     "netlify:deploy:prod": "netlify deploy --prod --build",
     "netlify:dev": "netlify dev",
     "netlify:link": "netlify link",
+    "netlify:sites:create": "netlify sites:create",
     "netlify:open": "netlify open:site",
     "netlify:status": "netlify status"
   },

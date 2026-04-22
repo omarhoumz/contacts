@@ -86,7 +86,11 @@ Guidelines:
 ## Release Operations
 
 - **Netlify (web, D1–D4)** — requires **[Netlify CLI](https://docs.netlify.com/cli/get-started/)** installed globally (`netlify` on your `PATH`). Repo root scripts wrap the same commands (`pnpm netlify:*`).
-  1. **D1** — From repo root: `pnpm netlify:link` (or `netlify init` / dashboard **Add site** → Git, base directory **empty**). This writes `.netlify/` (gitignored).
+  1. **D1 (create site + link this repo on disk)** — Authenticate, then create from repo root (writes gitignored **`.netlify/`**):
+     - **Login:** `netlify login` (browser), **or** non-interactive/agent flow: `netlify login --request "D1 contacts" --json` → open the returned **`url`** in a browser → `netlify login --check <ticket_id>` (repeat `--check` until it succeeds). Alternatively set **`NETLIFY_AUTH_TOKEN`** (User settings → Applications → Personal access tokens) for the same session.
+     - **New site:** `pnpm netlify:sites:create -- -n <unique-subdomain-name> --json` (passes through to `netlify sites:create`). Copy **`ssl_url`** / **`url`** from the JSON for `wiki/roadmap.md` D1 evidence. If the name is taken, pick another `-n`.
+     - **Existing site instead:** `pnpm netlify:link` and choose the site (no `sites:create`).
+     - **Git continuous deploy:** after D1, in the Netlify UI link this Git repository to the site (build settings already match root **`netlify.toml`**; leave base directory empty).
   2. **D2** — Build/publish in root **`netlify.toml`** (`pnpm install --frozen-lockfile` + `pnpm --filter @widados/web build`, `apps/web/dist`). Preview: `pnpm netlify:deploy` (draft deploy + build). Production: `pnpm netlify:deploy:prod`.
   3. **D3** — `netlify env:set VITE_SUPABASE_URL 'https://…'` and `netlify env:set VITE_SUPABASE_ANON_KEY '…'` (use quotes). List: `netlify env:list`. Then redeploy (`pnpm netlify:deploy:prod` or trigger in UI).
   4. **D4** — `pnpm netlify:open` (or `netlify open:site`) after deploy; smoke sign-in + one contact.
