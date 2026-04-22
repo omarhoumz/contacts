@@ -12,3 +12,33 @@ coverage
 .pnpm-home
 .pnpm-store
 .worktrees
+
+# Logs / debug
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# TypeScript / lint caches
+*.tsbuildinfo
+.eslintcache
+
+# Common bundler caches
+.cache
+.parcel-cache
+
+# Vite / local env variants
+*.local
+.env.*.local
+
+# Expo / React Native generated files
+web-build
+expo-env.d.ts
+.expo-shared
+apps/mobile/android
+apps/mobile/ios
+
+# Supabase local artifacts
+**/supabase/.branches
+**/supabase/.temp

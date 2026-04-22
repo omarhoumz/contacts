@@ -53,9 +53,9 @@ This file is the single source of truth for roadmap, progress, and execution.
 | A4  | P0       | DONE    | command+code     | A3         | Run `pnpm build`; fix Vite/Storybook/build script failures until green.    | `pnpm build` exits 0 locally on 2026-04-21 (Turbo build + Storybook static output). |
 | A5  | P0       | DONE    | command/external | A4         | Confirm `.github/workflows/ci.yml` passes on PR/branch.                    | CI run `24793452426` on `main` passed after workflow fix commit `05693b4`.          |
 | A6  | P1       | DONE        | docs         | A5         | Add verification log (date + SHA + lint/typecheck/build/CI).               | Verification log entry added with lint/typecheck/build/CI evidence and commit refs. |
-| B1  | P1       | IN_PROGRESS | external         | A6         | Create/choose Supabase project (staging recommended).                      | Pending project ref selection.                                                      |
-| B2  | P1       | TODO    | command          | B1         | Run `supabase link --project-ref <ref>` in `apps/backend`.                 | CLI output confirms linked project.                                                 |
-| B3  | P1       | TODO    | code/docs        | B2         | Align `apps/backend/supabase/config.toml` `project_id`.                    | File updated or documented exception.                                               |
+| B1  | P1       | DONE        | external         | A6         | Create/choose Supabase project (staging recommended).                      | Created Supabase project `contacts` (`issiwryobnohfevlzyuu`, ref `issiwryobnohfevlzyuu`, region `eu-west-1`). |
+| B2  | P1       | DONE    | command          | B1         | Run `supabase link --project-ref <ref>` in `apps/backend`.                 | `npx supabase link --project-ref issiwryobnohfevlzyuu` completed successfully.     |
+| B3  | P1       | IN_PROGRESS | code/docs    | B2         | Align `apps/backend/supabase/config.toml` `project_id`.                    | `config.toml` still has placeholder; update to project ref.                        |
 | B4  | P1       | TODO    | command          | B3         | Apply schema (`supabase db push` or local `pnpm db:reset`).                | Migration apply output.                                                             |
 | B5  | P1       | TODO    | external         | B4         | Capture anon URL + anon key from Supabase dashboard.                       | Values set in env locations.                                                        |
 | B6  | P1       | TODO    | code/config      | B5         | Set `apps/web` Supabase env vars; verify names in `.env.example`.          | Web auth request succeeds.                                                          |
@@ -99,6 +99,9 @@ This file is the single source of truth for roadmap, progress, and execution.
 - 2026-04-21: A4 complete, `pnpm build` green locally after typecheck fixes.
 - 2026-04-21: A5 complete: CI run `24793452426` passed on `main` after workflow fix commit `05693b4`.
 - 2026-04-21: A6 complete: `pnpm lint` green; `pnpm typecheck` green (`dfd1f18`), `pnpm build` green (`3d543e0`), CI green (`24793452426`).
+- 2026-04-22: B1 complete: created Supabase project `contacts` (ref `issiwryobnohfevlzyuu`) in `eu-west-1` via MCP.
+- 2026-04-22: B2 blocked: `supabase link --project-ref issiwryobnohfevlzyuu` requires CLI auth token (`supabase login` or `SUPABASE_ACCESS_TOKEN`).
+- 2026-04-22: B2 complete: `npx supabase link --project-ref issiwryobnohfevlzyuu` succeeded after CLI login.
 
 ## Notes and Constraints
 
