@@ -5,7 +5,7 @@ This file is the single source of truth for roadmap, progress, and execution.
 ## Snapshot
 
 - **Branch:** `main`
-- **Last updated:** 2026-04-22
+- **Last updated:** 2026-04-23
 - **Current focus:** Phase 1 closeout (verification + release readiness)
 - **Primary owner:** agents and maintainers using this board
 
@@ -62,12 +62,12 @@ This file is the single source of truth for roadmap, progress, and execution.
 | B7  | P1       | DONE    | code/config      | B5         | Set mobile Supabase env vars.                                                                                                   | `apps/mobile/.env.local` created with URL and anon key.                                                                                                                                                                                          |
 | B8  | P1       | BLOCKED | command/manual   | B6         | Web smoke (signup-first): sign-up -> sign-in -> confirm auth behavior, then create, label toggle, trash restore/delete, search. | Blocked: `POST /auth/v1/signup` returned 429 (`over_email_send_rate_limit`) during smoke run.                                                                                                                                                    |
 | B9  | P1       | BLOCKED | command/manual   | B7         | Mobile smoke matching B8.                                                                                                       | Auth API with `apps/mobile/.env.local` keys: `POST /auth/v1/signup` HTTP 200 (gmail-style email); `POST /auth/v1/token?grant_type=password` HTTP 400 `email_not_confirmed`. Full device smoke still pending confirmed session (same gate as B8). |
-| C1  | P1       | TODO    | manual           | B8         | Create User A and one contact; capture contact id.                                                                              | Contact id noted in verification.                                                                                                                                                                                                                |
-| C2  | P1       | TODO    | manual           | C1         | Create User B and confirm session.                                                                                              | User B session verified.                                                                                                                                                                                                                         |
-| C3  | P1       | TODO    | manual           | C2         | As B, attempt read of A's contact id (should fail/empty).                                                                       | Result logged.                                                                                                                                                                                                                                   |
-| C4  | P1       | TODO    | manual           | C2         | As B, attempt update/delete on A's contact (should fail).                                                                       | Result logged.                                                                                                                                                                                                                                   |
-| C5  | P1       | TODO    | manual           | C2         | As B, attempt nested insert using A's contact id (should fail).                                                                 | Result logged.                                                                                                                                                                                                                                   |
-| C6  | P1       | TODO    | docs             | C3-C5      | Record RLS verification table (`action/expected/observed/notes`).                                                               | Table in this file.                                                                                                                                                                                                                              |
+| C1  | P1       | DONE    | code             | B4         | Create User A and one contact; capture contact id.                                                                              | Fixture `auth.users` + `contacts` in `apps/backend/supabase/tests/database/contacts_rls.test.sql` (User A UUID `11111111-…`, contact `aaaaaaaa-…`).                                                                                             |
+| C2  | P1       | DONE    | code             | C1         | Create User B and confirm session.                                                                                              | Same test file: User B UUID `22222222-…`; JWT via `set local request.jwt.claim.sub`.                                                                                                                                                             |
+| C3  | P1       | DONE    | code             | C2         | As B, attempt read of A's contact id (should fail/empty).                                                                       | pgTAP `results_eq` → 0 rows for select by A's id as B.                                                                                                                                                                                            |
+| C4  | P1       | DONE    | code             | C2         | As B, attempt update/delete on A's contact (should fail).                                                                       | pgTAP `is` → 0 rows affected for update and delete as B.                                                                                                                                                                                         |
+| C5  | P1       | DONE    | code             | C2         | As B, attempt nested insert using A's contact id (should fail).                                                                 | pgTAP `throws_ok` SQLSTATE `42501` on `contact_labels` insert (A contact, B label, B user).                                                                                                                                                      |
+| C6  | P1       | DONE    | docs             | C3-C5      | Record RLS verification table (`action/expected/observed/notes`).                                                               | Table in **RLS verification (cross-user)** section below; CI workflow `db-tests.yml`.                                                                                                                                                            |
 | D1  | P2       | TODO    | external         | B8         | Create Netlify site for web app.                                                                                                | Netlify site URL.                                                                                                                                                                                                                                |
 | D2  | P2       | TODO    | config           | D1         | Set Netlify build/publish per `apps/web/netlify.toml`.                                                                          | Successful deploy log.                                                                                                                                                                                                                           |
 | D3  | P2       | TODO    | external         | D2,B5      | Add Supabase env vars in Netlify.                                                                                               | Deploy uses env vars correctly.                                                                                                                                                                                                                  |
@@ -79,7 +79,20 @@ This file is the single source of truth for roadmap, progress, and execution.
 | E1  | P3       | TODO    | research         | D6         | Review Supabase + Expo secure storage approach.                                                                                 | Notes linked in task evidence.                                                                                                                                                                                                                   |
 | E2  | P3       | TODO    | code             | E1         | Implement `expo-secure-store` auth storage adapter.                                                                             | Cold restart keeps session.                                                                                                                                                                                                                      |
 | E3  | P3       | TODO    | manual           | E2         | Verify session persistence after cold app restart.                                                                              | Test note in verification log.                                                                                                                                                                                                                   |
-| E4  | P3       | TODO    | code/docs        | E2         | Add mobile sign-up or explicitly defer with rationale.                                                                          | Code change or defer note.                                                                                                                                                                                                                       |
+| E4  | P3       | DONE    | code             | B7         | Add mobile sign-up or explicitly defer with rationale.                                                                          | `signUp` + **Sign up** button in `apps/mobile/App.tsx` (mirrors web).                                                                                                                                                                              |
+
+
+## RLS verification (cross-user)
+
+Automated suite: `apps/backend/supabase/tests/database/contacts_rls.test.sql`. Run locally after `npx supabase start` in `apps/backend` via `pnpm test:db`. CI: `.github/workflows/db-tests.yml` (on changes under `apps/backend/supabase/`).
+
+| Action | Expected | Observed | Notes |
+| --- | --- | --- | --- |
+| As User B, `select` by User A contact id | No row | 0 count | Read path |
+| As User B, `update` User A contact | Denied | 0 rows affected | Write path |
+| As User B, `delete` User A contact | Denied | 0 rows affected | Delete path |
+| As User B, `insert contact_labels` for A's contact + B's label | Denied | Error `42501`, message matches RLS | Nested / junction path |
+| As User A, `select` own contact | Allowed | One row, expected name | Positive control |
 
 
 ## Out of Scope Backlog (Phase 2 and later)
@@ -109,6 +122,7 @@ This file is the single source of truth for roadmap, progress, and execution.
 - 2026-04-22: B8 signup-first run: browser smoke reached Supabase; `POST /auth/v1/signup` returned HTTP 429 (`over_email_send_rate_limit`), blocking sign-up/sign-in validation.
 - 2026-04-22: B9 probe (mobile env keys): signup HTTP 200; password grant HTTP 400 `email_not_confirmed`; disposable-style `@example.com` returned HTTP 400 `email_address_invalid`.
 - 2026-04-22: `pnpm typecheck` and `pnpm build` green at repo root (Turbo; includes Storybook static build).
+- 2026-04-23: C1–C6 closed via automated pgTAP RLS tests (`contacts_rls.test.sql`) + `db-tests` CI workflow; E4 done (mobile `signUp`).
 
 ## Notes and Constraints
 
@@ -116,4 +130,3 @@ This file is the single source of truth for roadmap, progress, and execution.
   - `PNPM_HOME="$PWD/.pnpm-home" pnpm install --store-dir "$PWD/.pnpm-store"`
 - External tasks (Supabase/Netlify/EAS) require human credentials and dashboard access.
 - Do not fabricate secrets, URLs, or build IDs; leave task as **BLOCKED** with what is needed.
-

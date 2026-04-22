@@ -1,0 +1,30 @@
+name: Database tests
+
+on:
+  push:
+    branches: ["main", "cursor/**"]
+    paths:
+      - "apps/backend/supabase/**"
+      - ".github/workflows/db-tests.yml"
+  pull_request:
+    paths:
+      - "apps/backend/supabase/**"
+      - ".github/workflows/db-tests.yml"
+
+defaults:
+  run:
+    working-directory: apps/backend
+
+jobs:
+  supabase-db:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest
+      - name: Start local Supabase
+        run: supabase start
+      - name: pgTAP RLS tests
+        run: supabase test db

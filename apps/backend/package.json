@@ -11,6 +11,7 @@
     "db:types": "supabase gen types typescript --local --schema public > supabase/database.types.ts",
     "lint": "eslint . --ext .ts,.tsx --no-error-on-unmatched-pattern --max-warnings 0 -c ../../.eslintrc.cjs",
     "typecheck": "echo \"no typecheck\"",
-    "test": "echo \"no tests yet\""
+    "test": "echo \"no tests yet\"",
+    "test:db": "supabase test db"
   }
 }
