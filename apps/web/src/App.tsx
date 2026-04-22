@@ -49,6 +49,7 @@ export function App() {
   const [newLabelColor, setNewLabelColor] = useState("#4f46e5");
   const [showTrash, setShowTrash] = useState(false);
   const [error, setError] = useState("");
+  const [authNotice, setAuthNotice] = useState("");
   const client = useMemo(
     () => createClient(supabaseUrl, supabaseAnonKey, { auth: { persistSession: true } }),
     [],
@@ -86,12 +87,18 @@ export function App() {
 
   const signUp = async () => {
     setError("");
+    setAuthNotice("");
     const { error: signError } = await client.auth.signUp({ email, password });
-    if (signError) setError(signError.message);
+    if (signError) {
+      setError(signError.message);
+      return;
+    }
+    setAuthNotice("Check your email to confirm the address if your project requires it, then sign in.");
   };
 
   const signIn = async () => {
     setError("");
+    setAuthNotice("");
     const { error: signError } = await client.auth.signInWithPassword({ email, password });
     if (signError) setError(signError.message);
     await refreshData();
@@ -218,6 +225,7 @@ export function App() {
       <h1>WidadOS</h1>
       <p>Email/password auth, contacts, labels, and trash.</p>
       {error ? <p style={{ color: "crimson" }}>{error}</p> : null}
+      {authNotice ? <p style={{ color: "#166534" }}>{authNotice}</p> : null}
       <Card>
         <h3>Auth</h3>
         <input

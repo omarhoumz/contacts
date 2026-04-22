@@ -77,7 +77,18 @@ export function App() {
     await Promise.all([loadContacts(trashMode), loadLabels()]);
   };
 
+  const signUp = async () => {
+    setMessage("");
+    const { error } = await client.auth.signUp({ email, password });
+    if (error) {
+      setMessage(error.message);
+      return;
+    }
+    setMessage("Account created. Confirm your email if required, then sign in.");
+  };
+
   const signIn = async () => {
+    setMessage("");
     const { error } = await client.auth.signInWithPassword({ email, password });
     if (error) {
       setMessage(error.message);
@@ -210,6 +221,7 @@ export function App() {
             secureTextEntry
             onChangeText={setPassword}
           />
+          <Button title="Sign up" onPress={signUp} />
           <Button title="Sign in" onPress={signIn} />
         </View>
         <View style={{ flexDirection: "row", gap: 16 }}>
