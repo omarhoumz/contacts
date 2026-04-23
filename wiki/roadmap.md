@@ -11,8 +11,8 @@ This file is the single source of truth for roadmap, progress, and execution.
 
 ### Now / Next / Later
 
-- **Now:** `R3` contacts modular rewrite.
-- **Next:** `R4` labels modular rewrite, then `R5` visual system baseline.
+- **Now:** `R4` labels modular rewrite.
+- **Next:** `R5` visual system baseline, then `R6` rewrite regression expansion.
 - **Later:** `R6`-`R8` regression expansion, web acceptance, docs closeout; then re-enter deferred cloud/mobile tasks (`D4`-`D8`, `E3`).
 
 ## Status Definitions (for agents)
@@ -70,8 +70,8 @@ This file is the single source of truth for roadmap, progress, and execution.
 | L5  | P2       | OUT_OF_SCOPE | docs        | L3         | Capture local-first design decisions and remaining UX backlog for post-local cloud rollout.                                      | Superseded by rewrite closeout task `R8` (single canonical closeout doc update).                                                                                                |
 | R1  | P1       | DONE         | design+docs | L1         | Define rewrite blueprint (information architecture, state boundaries, component map, acceptance criteria) for web+mobile parity. | Completed in **R1 Concrete design spec + component inventory** under **Rewrite Program (local-first)**.                                                                         |
 | R2  | P1       | DONE         | code        | R1,L2,L4   | Rewrite auth and session shell into isolated feature modules (status, actions, feedback) with no behavior regression.            | Added isolated auth/session modules: `apps/web/src/auth-section.tsx` and `apps/mobile/auth-section.tsx`; both apps typecheck and maintain signed-in/signed-out gating behavior. |
-| R3  | P1       | IN_PROGRESS  | code        | R1,L2,L4   | Rewrite contacts domain (queries/mutations/forms/list/search/trash) into modular hooks/components with explicit busy states.     | Search stable, contacts auto-load after auth, busy state scoped per contacts interactions, local contacts smoke passes.                                                         |
-| R4  | P1       | TODO         | code        | R1,L2,L4   | Rewrite labels domain (CRUD + assignment UX) with contact-flow integration and isolated loading/error handling.                  | Labels create/assign/remove flows work without blocking unrelated forms; local parity checks pass on web and mobile (when mobile rewrite starts).                               |
+| R3  | P1       | DONE         | code        | R1,L2,L4   | Rewrite contacts domain (queries/mutations/forms/list/search/trash) into modular hooks/components with explicit busy states.     | Completed with modular contacts sections and domain hooks on web/mobile (`contacts-section.tsx`, `use-web-contacts-domain.ts`, `use-mobile-contacts-domain.ts`), plus automated checks and required manual Cursor-browser QA gates. |
+| R4  | P1       | IN_PROGRESS  | code        | R1,L2,L4   | Rewrite labels domain (CRUD + assignment UX) with contact-flow integration and isolated loading/error handling.                  | Labels create/assign/remove flows work without blocking unrelated forms; local parity checks pass on web and mobile (when mobile rewrite starts).                               |
 | R5  | P1       | TODO         | code+design | R2,R3,R4   | Rewrite primary UI layout and visual system baseline using Tailwind + shadcn patterns where applicable (web-first).              | Web uses consistent spacing/typography/states across auth, labels, contacts, trash; no regressions in core tasks; design tokens documented.                                     |
 | R6  | P1       | TODO         | code+test   | R5         | Expand rewrite regression coverage for auth gating, contacts search/filter, trash restore/delete, and labels assignment.         | Automated critical-flow coverage passes locally/CI, including rewritten UI paths.                                                                                               |
 | R7  | P1       | TODO         | manual      | R5,R6      | Run end-to-end local UX acceptance pass for rewrite (web mandatory, mobile deferred).                                            | Signed-out/onboarding, signed-in CRUD, labels, search, trash, feedback states validated with evidence in Verification Log; web accepted as stable baseline.                     |
@@ -317,6 +317,7 @@ This section is the authoritative rewrite blueprint for R1.
 - 2026-04-23: Agent workflow explicitly updated with mandatory Cursor-browser manual web QA (mobile manual QA skipped by default), commit+push after each completed task/slice, and automatic no-confirmation progression to next priority task.
 - 2026-04-23: R3 progress slice landed: extracted web contacts state/actions into `apps/web/src/use-web-contacts-domain.ts` and rewired `apps/web/src/use-web-app-state.ts` to compose domain hook + auth/labels shell; validated via `pnpm --filter @widados/web typecheck`, `pnpm --filter @widados/web test`, and manual Cursor-browser localhost QA (signed-out gating, sign-in, contacts CRUD/trash, label create, no blocking console errors).
 - 2026-04-23: R3 progress slice landed: extracted mobile contacts state/actions into `apps/mobile/use-mobile-contacts-domain.ts` and rewired `apps/mobile/use-mobile-app-state.ts` to compose domain hook + auth/labels shell; validated via `pnpm --filter @widados/mobile typecheck`, `pnpm --filter @widados/web typecheck`, `pnpm --filter @widados/web test`, and required manual Cursor-browser localhost QA gate (auth gating, signed-in sections, search/toggle responsiveness, no blocking console errors).
+- 2026-04-23: PM end-check closed `R3` as **DONE** and advanced active execution to `R4` (**IN_PROGRESS**) based on completed modular contacts extraction across web/mobile plus passing automated and required manual web QA evidence.
 
 ## Notes and Constraints
 
