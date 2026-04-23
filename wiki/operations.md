@@ -53,7 +53,7 @@ Use a **local** stack for sign-up / sign-in without hosted email rate limits. Au
 5. **Web**: `pnpm --filter @widados/web dev` — Studio `http://127.0.0.1:54323`.
 6. **Stop**: from `apps/backend`, `pnpm db:stop`.
 
-**Switch back to hosted Supabase:** copy `apps/backend/supabase/.env.cloud.example` to `.env.cloud`, fill `SUPABASE_URL` and `SUPABASE_ANON_KEY`, then from repo root run `pnpm env:supabase:cloud`.
+**Switch back to hosted Supabase:** copy `apps/backend/supabase/.env.cloud.example` to `.env.cloud`, fill `SUPABASE_URL` and `SUPABASE_PUBLISHABLE_KEY`, then from repo root run `pnpm env:supabase:cloud`.
 
 Database tests: from `apps/backend`, `pnpm test:db` (requires stack running). B8 local API smoke: `pnpm smoke:local-b8` (Auth + PostgREST; same surface as web/mobile clients).
 
@@ -64,15 +64,15 @@ Database tests: from `apps/backend`, `pnpm test:db` (requires stack running). B8
 Canonical variable names (also in `.env.example`):
 
 - `VITE_SUPABASE_URL`
-- `VITE_SUPABASE_ANON_KEY`
+- `VITE_SUPABASE_PUBLISHABLE_KEY`
 - `EXPO_PUBLIC_SUPABASE_URL`
-- `EXPO_PUBLIC_SUPABASE_ANON_KEY`
+- `EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
 
 Guidelines:
 
 - Put real values only in local ignored env files (`.env.local`, `.env.*.local`)
 - Never commit secrets
-- Prefer publishable keys for new clients; keep legacy anon key only for compatibility
+- Use publishable keys in client apps (`VITE_*`, `EXPO_PUBLIC_*`).
 
 ## GitHub / CI Operations
 
@@ -93,7 +93,7 @@ Guidelines:
      - **Existing site instead:** `pnpm netlify:link` and choose the site (no `sites:create`).
      - **Git continuous deploy:** after D1, in the Netlify UI link this Git repository to the site (build settings already match root **`netlify.toml`**; leave base directory empty).
   2. **D2** — Build/publish in root **`netlify.toml`** (`pnpm install --frozen-lockfile` + `pnpm --filter @widados/web build`, `apps/web/dist`). Preview: `pnpm netlify:deploy` (draft deploy + build). Production: `pnpm netlify:deploy:prod`. Both pass **`--filter @widados/web`** to Netlify CLI so the monorepo project prompt does not block; raw CLI: `netlify deploy --prod --build --filter @widados/web`.
-  3. **D3** — From **repo root**, ensure `apps/backend/supabase/.env.cloud` exists with **`SUPABASE_URL`** and **`SUPABASE_ANON_KEY`** (same file as `pnpm env:supabase:cloud`). Run **`pnpm netlify:env:check`** (read-only: local file + Netlify key names). Then **`pnpm netlify:env:push`** (sets `VITE_*` on Netlify for **production** + **deploy-preview** with **`--force`**; anon key with **`--secret`** — default scopes include the build step). Confirm with **`pnpm netlify:env:list`** or **`pnpm netlify:env:check`** (exit 0). **Note:** run Netlify env commands via these scripts or **`cd apps/web`** — the repo root triggers a monorepo picker for some `netlify` subcommands. Manual alternative: `cd apps/web` then `netlify env:set …`. Then redeploy (`pnpm netlify:deploy:prod` or UI).
+  3. **D3** — From **repo root**, ensure `apps/backend/supabase/.env.cloud` exists with **`SUPABASE_URL`** and **`SUPABASE_PUBLISHABLE_KEY`** (same file as `pnpm env:supabase:cloud`). Run **`pnpm netlify:env:check`** (read-only: local file + Netlify key names). Then **`pnpm netlify:env:push`** (sets `VITE_*` on Netlify for **production** + **deploy-preview** with **`--force`**; publishable key with **`--secret`** — default scopes include the build step). Confirm with **`pnpm netlify:env:list`** or **`pnpm netlify:env:check`** (exit 0). **Note:** run Netlify env commands via these scripts or **`cd apps/web`** — the repo root triggers a monorepo picker for some `netlify` subcommands. Manual alternative: `cd apps/web` then `netlify env:set …`. Then redeploy (`pnpm netlify:deploy:prod` or UI).
   4. **D4** — `pnpm netlify:open` (or `netlify open:site`) after deploy. **Smoke:** sign-in + one contact mutation on the production URL. Optional quick check: **`pnpm smoke:netlify-home`** (HTTP 200 + HTML contains app shell marker only; not a substitute for auth/API smoke).
 - EAS:
   - `eas login`

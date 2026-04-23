@@ -54,14 +54,14 @@ function upsertEnvFile(filePath, pairs) {
   console.log("Updated", path.relative(root, filePath));
 }
 
-function applyToApps(url, anon) {
+function applyToApps(url, publishable) {
   upsertEnvFile(webEnvPath, {
     VITE_SUPABASE_URL: url,
-    VITE_SUPABASE_ANON_KEY: anon,
+    VITE_SUPABASE_PUBLISHABLE_KEY: publishable,
   });
   upsertEnvFile(mobileEnvPath, {
     EXPO_PUBLIC_SUPABASE_URL: url,
-    EXPO_PUBLIC_SUPABASE_ANON_KEY: anon,
+    EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY: publishable,
   });
 }
 
@@ -81,12 +81,12 @@ if (mode === "local") {
   }
   const st = parseStatusEnv(raw);
   const url = st.API_URL;
-  const anon = st.ANON_KEY || st.PUBLISHABLE_KEY;
-  if (!url || !anon) {
-    console.error("Missing API_URL or ANON_KEY in supabase status -o env output.");
+  const publishable = st.PUBLISHABLE_KEY;
+  if (!url || !publishable) {
+    console.error("Missing API_URL or PUBLISHABLE_KEY in supabase status -o env output.");
     process.exit(1);
   }
-  applyToApps(url, anon);
+  applyToApps(url, publishable);
   console.log("Set web + mobile env to local stack.");
 } else if (mode === "cloud") {
   if (!fs.existsSync(cloudEnvPath)) {
@@ -96,12 +96,12 @@ if (mode === "local") {
   }
   const cloud = parseEnvFile(fs.readFileSync(cloudEnvPath, "utf8"));
   const url = cloud.SUPABASE_URL;
-  const anon = cloud.SUPABASE_ANON_KEY;
-  if (!url || !anon) {
-    console.error(".env.cloud must define SUPABASE_URL and SUPABASE_ANON_KEY.");
+  const publishable = cloud.SUPABASE_PUBLISHABLE_KEY;
+  if (!url || !publishable) {
+    console.error(".env.cloud must define SUPABASE_URL and SUPABASE_PUBLISHABLE_KEY.");
     process.exit(1);
   }
-  applyToApps(url, anon);
+  applyToApps(url, publishable);
   console.log("Set web + mobile env from .env.cloud.");
 } else {
   console.error("Usage: node tooling/set-supabase-env.cjs <local|cloud>");

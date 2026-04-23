@@ -22,14 +22,14 @@ After **`supabase link`** updates `project_id` inside the generated `config.toml
 From the **repository root**:
 
 - **`pnpm env:supabase:local`** — reads `npx supabase status -o env` from `apps/backend` and updates `VITE_*` / `EXPO_PUBLIC_*` in `apps/web/.env.local` and `apps/mobile/.env.local`. Requires a running local stack (`pnpm db:start` in `apps/backend`).
-- **`pnpm env:supabase:cloud`** — copies `SUPABASE_URL` and `SUPABASE_ANON_KEY` from **`apps/backend/supabase/.env.cloud`** (gitignored) into the same app env files. Copy `supabase/.env.cloud.example` → `.env.cloud` and fill values from the Supabase dashboard.
+- **`pnpm env:supabase:cloud`** — copies `SUPABASE_URL` and `SUPABASE_PUBLISHABLE_KEY` from **`apps/backend/supabase/.env.cloud`** (gitignored) into the same app env files. Copy `supabase/.env.cloud.example` → `.env.cloud` and fill values from the Supabase dashboard.
 
 ## Local development stack
 
 From `apps/backend`:
 
 1. `pnpm db:start` — generates `config.toml`, then starts Docker (Postgres, GoTrue, Mailpit, Studio, …).
-2. From repo root: `pnpm env:supabase:local` — point web/mobile at the local API + anon key.
+2. From repo root: `pnpm env:supabase:local` — point web/mobile at the local API + publishable key.
 3. `pnpm db:reset` — reapply migrations and `seed.sql` when schema changes.
 
 ## Database tests (pgTAP)

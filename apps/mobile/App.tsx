@@ -7,7 +7,7 @@ import { supabaseAuthStorage } from "./supabaseStorage";
 
 const env = (globalThis as { process?: { env?: Record<string, string | undefined> } }).process?.env;
 const supabaseUrl = env?.EXPO_PUBLIC_SUPABASE_URL ?? "";
-const supabaseAnonKey = env?.EXPO_PUBLIC_SUPABASE_ANON_KEY ?? "";
+const supabasePublishableKey = env?.EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY ?? "";
 
 const CONTACT_SELECT = `
   id,
@@ -55,7 +55,7 @@ export function App() {
   const [message, setMessage] = useState("");
   const client = useMemo(
     () =>
-      createClient(supabaseUrl, supabaseAnonKey, {
+      createClient(supabaseUrl, supabasePublishableKey, {
         auth: { persistSession: true, storage: supabaseAuthStorage },
       }),
     [],

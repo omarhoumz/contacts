@@ -4,7 +4,7 @@ import { contactSchema, labelCreateSchema } from "@widados/shared";
 import { Card } from "@widados/ui-lib";
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL ?? "";
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY ?? "";
+const supabasePublishableKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY ?? "";
 
 const CONTACT_SELECT = `
   id,
@@ -51,7 +51,7 @@ export function App() {
   const [error, setError] = useState("");
   const [authNotice, setAuthNotice] = useState("");
   const client = useMemo(
-    () => createClient(supabaseUrl, supabaseAnonKey, { auth: { persistSession: true } }),
+    () => createClient(supabaseUrl, supabasePublishableKey, { auth: { persistSession: true } }),
     [],
   );
 

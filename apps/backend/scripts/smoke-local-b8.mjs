@@ -1,7 +1,7 @@
 /**
  * Local B8-style smoke: signup → sign-in → contact CRUD, label, trash, list (search proxy = filter client-side N/A).
  * Requires: `pnpm db:start` and local stack on API_URL (default http://127.0.0.1:54321).
- * If ANON_KEY / API_URL are unset, reads them from `supabase status -o env` (apps/backend cwd).
+ * If publishable key / API_URL are unset, reads them from `supabase status -o env` (apps/backend cwd).
  */
 import { execFileSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
@@ -25,9 +25,16 @@ function statusEnv() {
   return out;
 }
 
-const fromStatus = !process.env.ANON_KEY && !process.env.SUPABASE_ANON_KEY ? statusEnv() : {};
+const fromStatus =
+  !process.env.PUBLISHABLE_KEY &&
+  !process.env.SUPABASE_PUBLISHABLE_KEY
+    ? statusEnv()
+    : {};
 const API_URL = process.env.API_URL ?? fromStatus.API_URL ?? "http://127.0.0.1:54321";
-const ANON_KEY = process.env.ANON_KEY ?? process.env.SUPABASE_ANON_KEY ?? fromStatus.ANON_KEY;
+const PUBLISHABLE_KEY =
+  process.env.PUBLISHABLE_KEY ??
+  process.env.SUPABASE_PUBLISHABLE_KEY ??
+  fromStatus.PUBLISHABLE_KEY;
 
 function must(cond, msg) {
   if (!cond) {
@@ -40,8 +47,8 @@ async function auth(path, body) {
   const r = await fetch(`${API_URL}/auth/v1/${path}`, {
     method: "POST",
     headers: {
-      apikey: ANON_KEY,
-      Authorization: `Bearer ${ANON_KEY}`,
+      apikey: PUBLISHABLE_KEY,
+      Authorization: `Bearer ${PUBLISHABLE_KEY}`,
       "Content-Type": "application/json",
     },
     body: JSON.stringify(body),
@@ -58,7 +65,7 @@ async function auth(path, body) {
 
 async function rest(method, path, { token, body, prefer } = {}) {
   const headers = {
-    apikey: ANON_KEY,
+    apikey: PUBLISHABLE_KEY,
     Authorization: `Bearer ${token}`,
     "Content-Type": "application/json",
   };
@@ -79,7 +86,10 @@ async function rest(method, path, { token, body, prefer } = {}) {
 }
 
 async function main() {
-  must(ANON_KEY, "Set ANON_KEY or SUPABASE_ANON_KEY (e.g. from `supabase status -o env`).");
+  must(
+    PUBLISHABLE_KEY,
+    "Set PUBLISHABLE_KEY or SUPABASE_PUBLISHABLE_KEY.",
+  );
 
   const email = `b8smoke${Date.now()}@test.local`;
   const password = "SmokeTestPass123!";
