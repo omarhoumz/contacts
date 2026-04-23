@@ -1,9 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { createClient } from "@supabase/supabase-js";
-import { labelCreateSchema } from "@widados/shared";
 import { supabaseAuthStorage } from "./supabase-storage";
-import type { LabelRow } from "./mobile-contact-search";
 import { useMobileContactsDomain } from "./use-mobile-contacts-domain";
+import { useMobileLabelsDomain } from "./use-mobile-labels-domain";
 
 const env = (globalThis as { process?: { env?: Record<string, string | undefined> } }).process?.env;
 const supabaseUrl = env?.EXPO_PUBLIC_SUPABASE_URL ?? "";
@@ -14,13 +13,9 @@ type Feedback = { tone: "error" | "success" | "info"; text: string };
 export function useMobileAppState() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [labels, setLabels] = useState<LabelRow[]>([]);
-  const [newLabelName, setNewLabelName] = useState("");
-  const [newLabelColor, setNewLabelColor] = useState("#4f46e5");
   const [feedback, setFeedback] = useState<Feedback | null>(null);
   const [sessionEmail, setSessionEmail] = useState<string | null>(null);
   const [authBusy, setAuthBusy] = useState(false);
-  const [labelBusy, setLabelBusy] = useState(false);
 
   const client = useMemo(
     () =>
@@ -39,16 +34,12 @@ export function useMobileAppState() {
     setSessionEmail(data.user.email ?? null);
   };
 
-  const loadLabels = async () => {
-    const { data, error } = await client.from("labels").select("id,name,color").order("name");
-    if (error) throw new Error(error.message);
-    setLabels((data ?? []) as LabelRow[]);
-  };
+  const labelsDomain = useMobileLabelsDomain({ client, setFeedback });
 
   const contacts = useMobileContactsDomain({
     client,
     sessionEmail,
-    loadLabels,
+    loadLabels: labelsDomain.loadLabels,
     setFeedback,
   });
 
@@ -66,7 +57,7 @@ export function useMobileAppState() {
 
   useEffect(() => {
     if (!sessionEmail) {
-      setLabels([]);
+      labelsDomain.clearLabels();
     }
   }, [sessionEmail]);
 
@@ -109,40 +100,9 @@ export function useMobileAppState() {
       return;
     }
     await syncSession();
-    setLabels([]);
+    labelsDomain.clearLabels();
     setFeedback({ tone: "info", text: "Signed out." });
     setAuthBusy(false);
-  };
-
-  const createLabel = async () => {
-    setLabelBusy(true);
-    try {
-      const parsed = labelCreateSchema.safeParse({ name: newLabelName, color: newLabelColor });
-      if (!parsed.success) {
-        setFeedback({ tone: "error", text: parsed.error.issues.map((e) => e.message).join("; ") });
-        return;
-      }
-      const { data: userData, error: userError } = await client.auth.getUser();
-      if (userError || !userData.user) {
-        setFeedback({ tone: "error", text: userError?.message ?? "Sign in required." });
-        return;
-      }
-      const { error } = await client.from("labels").insert({
-        name: parsed.data.name,
-        color: parsed.data.color,
-        user_id: userData.user.id,
-      });
-      if (error) {
-        setFeedback({ tone: "error", text: error.message });
-        return;
-      }
-      setFeedback({ tone: "success", text: "Label created." });
-      setNewLabelName("");
-      setNewLabelColor("#4f46e5");
-      await loadLabels();
-    } finally {
-      setLabelBusy(false);
-    }
   };
 
   return {
@@ -151,23 +111,23 @@ export function useMobileAppState() {
     displayName: contacts.displayName,
     query: contacts.query,
     editingId: contacts.editingId,
-    labels,
-    newLabelName,
-    newLabelColor,
+    labels: labelsDomain.labels,
+    newLabelName: labelsDomain.newLabelName,
+    newLabelColor: labelsDomain.newLabelColor,
     showTrash: contacts.showTrash,
     feedback,
     sessionEmail,
     authBusy,
     dataBusy: contacts.dataBusy,
-    mutationBusy: contacts.mutationBusy || labelBusy,
+    mutationBusy: contacts.mutationBusy || labelsDomain.labelBusy,
     displayedContacts: contacts.displayedContacts,
     setEmail,
     setPassword,
     setDisplayName: contacts.setDisplayName,
     setQuery: contacts.setQuery,
     setEditingId: contacts.setEditingId,
-    setNewLabelName,
-    setNewLabelColor,
+    setNewLabelName: labelsDomain.setNewLabelName,
+    setNewLabelColor: labelsDomain.setNewLabelColor,
     setShowTrash: contacts.setShowTrash,
     signUp,
     signIn,
@@ -177,7 +137,7 @@ export function useMobileAppState() {
     softDeleteContact: contacts.softDeleteContact,
     restoreContact: contacts.restoreContact,
     permanentlyDeleteContact: contacts.permanentlyDeleteContact,
-    createLabel,
+    createLabel: labelsDomain.createLabel,
     toggleContactLabel: contacts.toggleContactLabel,
     refreshData: contacts.refreshData,
   };
