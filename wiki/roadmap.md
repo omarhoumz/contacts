@@ -6,8 +6,14 @@ This file is the single source of truth for roadmap, progress, and execution.
 
 - **Branch:** `main`
 - **Last updated:** 2026-04-23
-- **Current focus:** Local app UX/functionality and design quality before additional cloud rollout tasks
+- **Current focus:** Web-first rewrite execution with stability and regression gates (mobile deferred until web is stable)
 - **Primary owner:** agents and maintainers using this board
+
+### Now / Next / Later
+
+- **Now:** `L2` critical stability gate (search crash, auth gating consistency, contacts/labels auto-load).
+- **Next:** `L4` minimal regression harness, then `R2`/`R3`/`R4` modular rewrites (auth, contacts, labels).
+- **Later:** `R5`-`R8` visual system polish, regression expansion, web acceptance, docs closeout; then re-enter deferred cloud/mobile tasks (`D4`-`D8`, `E3`).
 
 ## Status Definitions (for agents)
 
@@ -37,54 +43,37 @@ This file is the single source of truth for roadmap, progress, and execution.
 
 ## Success Criteria
 
+### Local-first web exit (current phase)
+
 - Clean clone installs and builds
 - RLS verified against cross-user access
-- Android APK and iOS test app generated
+- Rewritten web UX flows pass local acceptance (auth, contacts, labels, search, trash)
+- Regression checks cover critical flows before cloud rollout resumes
+
+### Mobile follow-up exit (after web stabilization)
+
 - Shared contracts used by web and mobile
+- Session persistence verified after cold restart
+- Android APK and iOS test app generated
 
 ## Priority Queue (small tasks for pickup)
 
 
-| ID  | Priority | Status       | Type             | Depends on | Task                                                                                                                            | Done evidence                                                                                                                                                                                                                                                                     |
-| --- | -------- | ------------ | ---------------- | ---------- | ------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| A1  | P0       | DONE         | command          | -          | Run `pnpm install` from repo root and stabilize install flow.                                                                   | `pnpm install` succeeds locally (latest run completed).                                                                                                                                                                                                                           |
-| A2  | P0       | DONE         | code             | A1         | Replace placeholder lint scripts with real ESLint commands.                                                                     | Committed in `32c3320`.                                                                                                                                                                                                                                                           |
-| A3  | P0       | DONE         | code+command     | A1         | Make `pnpm typecheck` green across workspace.                                                                                   | `pnpm typecheck` exits 0; committed in `dfd1f18`.                                                                                                                                                                                                                                 |
-| A4  | P0       | DONE         | command+code     | A3         | Run `pnpm build`; fix Vite/Storybook/build script failures until green.                                                         | `pnpm build` exits 0 locally on 2026-04-21 (Turbo build + Storybook static output).                                                                                                                                                                                               |
-| A5  | P0       | DONE         | command/external | A4         | Confirm `.github/workflows/ci.yml` passes on PR/branch.                                                                         | CI run `24793452426` on `main` passed after workflow fix commit `05693b4`.                                                                                                                                                                                                        |
-| A6  | P1       | DONE         | docs             | A5         | Add verification log (date + SHA + lint/typecheck/build/CI).                                                                    | Verification log entry added with lint/typecheck/build/CI evidence and commit refs.                                                                                                                                                                                               |
-| B1  | P1       | DONE         | external         | A6         | Create/choose Supabase project (staging recommended).                                                                           | Created Supabase project `contacts` (`issiwryobnohfevlzyuu`, ref `issiwryobnohfevlzyuu`, region `eu-west-1`).                                                                                                                                                                     |
-| B2  | P1       | DONE         | command          | B1         | Run `supabase link --project-ref <ref>` in `apps/backend`.                                                                      | `npx supabase link --project-ref issiwryobnohfevlzyuu` completed successfully.                                                                                                                                                                                                    |
-| B3  | P1       | DONE         | code/docs        | B2         | Align `apps/backend/supabase/config.toml` `project_id`.                                                                         | `project_id` in `apps/backend/supabase/config.shared.toml` (`issiwryobnohfevlzyuu`); merged into generated `config.toml` via `pnpm prepare:config` (see `4e91268`).                                                                                                               |
-| B4  | P1       | DONE         | command          | B3         | Apply schema (`supabase db push` or local `pnpm db:reset`).                                                                     | `npx supabase db push` applied migrations `20260421` and `20260422`.                                                                                                                                                                                                              |
-| B5  | P1       | DONE         | external         | B4         | Capture anon URL + anon key from Supabase dashboard.                                                                            | Retrieved project URL and publishable/legacy keys via Supabase MCP for `issiwryobnohfevlzyuu`.                                                                                                                                                                                    |
-| B6  | P1       | DONE         | code/config      | B5         | Set `apps/web` Supabase env vars; verify names in `.env.example`.                                                               | `apps/web/.env.local` created with URL and anon key; names match `.env.example`.                                                                                                                                                                                                  |
-| B7  | P1       | DONE         | code/config      | B5         | Set mobile Supabase env vars.                                                                                                   | `apps/mobile/.env.local` created with URL and anon key.                                                                                                                                                                                                                           |
-| B8  | P1       | DONE         | command/manual   | B6         | Web smoke (signup-first): sign-up -> sign-in -> confirm auth behavior, then create, label toggle, trash restore/delete, search. | Local: `pnpm smoke:local-b8` in `apps/backend` (`scripts/smoke-local-b8.mjs`: Auth + REST). Hosted UI still 429-prone; use `pnpm env:supabase:local` for browser. CI: `db-tests` after pgTAP.                                                                                     |
-| B9  | P1       | DONE         | command/manual   | B7         | Mobile smoke matching B8.                                                                                                       | Same Auth/REST surface as web; covered by `smoke-local-b8.mjs` + CI. Optional: Expo UI pass on device.                                                                                                                                                                            |
-| C1  | P1       | DONE         | code             | B4         | Create User A and one contact; capture contact id.                                                                              | Fixture `auth.users` + `contacts` in `apps/backend/supabase/tests/database/contacts_rls.test.sql` (User A UUID `11111111-…`, contact `aaaaaaaa-…`).                                                                                                                               |
-| C2  | P1       | DONE         | code             | C1         | Create User B and confirm session.                                                                                              | Same test file: User B UUID `22222222-…`; JWT via `set local request.jwt.claim.sub`.                                                                                                                                                                                              |
-| C3  | P1       | DONE         | code             | C2         | As B, attempt read of A's contact id (should fail/empty).                                                                       | pgTAP `results_eq` → 0 rows for select by A's id as B.                                                                                                                                                                                                                            |
-| C4  | P1       | DONE         | code             | C2         | As B, attempt update/delete on A's contact (should fail).                                                                       | pgTAP `is` → 0 rows affected for update and delete as B.                                                                                                                                                                                                                          |
-| C5  | P1       | DONE         | code             | C2         | As B, attempt nested insert using A's contact id (should fail).                                                                 | pgTAP `throws_ok` SQLSTATE `42501` on `contact_labels` insert (A contact, B label, B user).                                                                                                                                                                                       |
-| C6  | P1       | DONE         | docs             | C3-C5      | Record RLS verification table (`action/expected/observed/notes`).                                                               | Table in **RLS verification (cross-user)** section below; CI workflow `db-tests.yml`.                                                                                                                                                                                             |
-| D1  | P2       | DONE         | external         | B8         | Create Netlify site for web app.                                                                                                | Site **widados-contacts**: `https://widados-contacts.netlify.app`; admin `https://app.netlify.com/projects/widados-contacts`; site id `531f5ff8-3c56-40c0-ae74-12045e316f61`. CLI linked via `@widados/web`; root `.netlify/state.json` mirrors `siteId` for root `netlify.toml`. |
-| D2  | P2       | DONE         | config           | A4         | Set Netlify build/publish per repo `netlify.toml` (monorepo).                                                                   | Root `netlify.toml`: `pnpm install --frozen-lockfile && pnpm --filter @widados/web build`, `publish = apps/web/dist`; `pnpm --filter @widados/web build` green locally.                                                                                                           |
-| D3  | P2       | DONE         | external+code    | D2,B5      | Add Supabase env vars in Netlify.                                                                                               | `pnpm netlify:env:check` exit 0; `pnpm netlify:env:push` (`tooling/netlify-env-push.cjs`); prod `pnpm netlify:deploy:prod -- --filter @widados/web` succeeded (deploy `69e960fccaca132084c45392`) → `https://widados-contacts.netlify.app`.                                       |
-| D4  | P2       | OUT_OF_SCOPE | manual           | D3         | Smoke test production web URL (auth + one mutation).                                                                            | Deferred by owner: prioritize local app behavior/design first; resume cloud smoke after local readiness.                                                                                                                                                                          |
-| D5  | P2       | OUT_OF_SCOPE | external         | B9         | `eas login` + `eas build:configure` in `apps/mobile`.                                                                           | Deferred by owner: deprioritize cloud/mobile release setup until local app design/functionality is stable.                                                                                                                                                                        |
-| D6  | P2       | OUT_OF_SCOPE | external         | D5         | Build Android internal/preview and install on device.                                                                           | Deferred with D5; revisit after local-first milestone.                                                                                                                                                                                                                            |
-| D7  | P3       | OUT_OF_SCOPE | external         | D5         | Build iOS internal/simulator when Apple side ready.                                                                             | Deferred with D5; revisit after local-first milestone.                                                                                                                                                                                                                            |
-| D8  | P2       | OUT_OF_SCOPE | docs             | D4,D6      | Log Netlify URL + EAS build IDs and release smoke results.                                                                      | Deferred with D4–D7 while local-first priority is active.                                                                                                                                                                                                                         |
-| E1  | P3       | DONE         | research         | B7         | Review Supabase + Expo secure storage approach.                                                                                 | `wiki/security.md` → **Expo + Supabase session storage (research, E1)**; adapter + E2/E3 follow-ups.                                                                                                                                                                              |
-| E2  | P3       | DONE         | code             | E1         | Implement `expo-secure-store` auth storage adapter.                                                                             | `apps/mobile/supabaseStorage.ts` + `auth.storage` in `App.tsx`; `pnpm --filter @widados/mobile typecheck` green (`98ac5a3`). E3: cold-restart manual.                                                                                                                             |
-| E3  | P3       | TODO         | manual           | E2         | Verify session persistence after cold app restart.                                                                              | Test note in verification log.                                                                                                                                                                                                                                                    |
-| E4  | P3       | DONE         | code             | B7         | Add mobile sign-up or explicitly defer with rationale.                                                                          | `signUp` + **Sign up** button in `apps/mobile/App.tsx` (mirrors web).                                                                                                                                                                                                             |
-| L1  | P1       | DONE         | design+docs      | B8,B9      | Local-first UX/design audit for web + mobile (auth, contacts, labels, trash, errors/loading/empty states).                      | See **Local-first UX/design audit (L1)** below for prioritized checklist + acceptance criteria.                                                                                                                                                                                   |
-| L2  | P1       | IN_PROGRESS  | code             | L1         | Implement highest-priority local UX fixes (web + mobile parity where applicable).                                               | Phase 1 done: explicit auth-state banner + sign-out action + loading/disabled states + unified feedback model in `apps/web/src/App.tsx` and `apps/mobile/App.tsx`; web/mobile typecheck green.                                                                                  |
-| L3  | P1       | TODO         | manual           | L2         | Run local smoke pass after UX fixes (signup/signin + one contact + one label + trash restore on web and mobile).                | Local smoke notes recorded in Verification Log; blockers captured with exact errors.                                                                                                                                                                                              |
-| L4  | P2       | TODO         | code+test        | L2         | Add regression checks for updated local UX flows (at least one automated check where tooling exists).                           | Test(s) added and passing (or documented rationale if tooling gap).                                                                                                                                                                                                               |
-| L5  | P2       | TODO         | docs             | L3         | Capture local-first design decisions and remaining UX backlog for post-local cloud rollout.                                     | Entry in roadmap + linked doc section with next actions.                                                                                                                                                                                                                          |
+| ID  | Priority | Status       | Type             | Depends on | Task                                                                                                                             | Done evidence                                                                                                                                                                                                                                                                     |
+| --- | -------- | ------------ | ---------------- | ---------- | -------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| L1  | P1       | DONE         | design+docs      | B8,B9      | Local-first UX/design audit for web + mobile (auth, contacts, labels, trash, errors/loading/empty states).                       | See **Local-first UX/design audit (L1)** below for prioritized checklist + acceptance criteria.                                                                                                                                                                                   |
+| L2  | P1       | IN_PROGRESS  | code             | L1         | Critical stability gate before rewrite: fix search crash, auth gating consistency, and contacts/labels auto-load behavior.       | Known blocking UX defects are closed and verified locally; no critical runtime errors in signed-in/signed-out core flows.                                                                                                                                                        |
+| L3  | P2       | OUT_OF_SCOPE | manual           | L2         | Run local smoke pass after UX fixes (signup/signin + one contact + one label + trash restore on web and mobile).                 | Superseded by rewrite acceptance task `R7` (single canonical manual acceptance pass).                                                                                                                                                                                             |
+| L4  | P1       | TODO         | code+test        | L2         | Add minimal pre-rewrite regression harness for auth gating, search, and trash restore/delete.                                    | Critical-flow checks run locally/CI before R2-R5 merge steps (or tooling gap documented with manual fallback checklist).                                                                                                                                                          |
+| L5  | P2       | OUT_OF_SCOPE | docs             | L3         | Capture local-first design decisions and remaining UX backlog for post-local cloud rollout.                                      | Superseded by rewrite closeout task `R8` (single canonical closeout doc update).                                                                                                                                                                                                  |
+| R1  | P1       | DONE         | design+docs      | L1         | Define rewrite blueprint (information architecture, state boundaries, component map, acceptance criteria) for web+mobile parity. | Completed in **R1 Concrete design spec + component inventory** under **Rewrite Program (local-first)**.                                                                                                                                                                           |
+| R2  | P1       | TODO         | code             | R1,L2,L4   | Rewrite auth and session shell into isolated feature modules (status, actions, feedback) with no behavior regression.            | Auth/session moved out of `App.tsx`; signed-in hides auth form; signed-out hides labels/contacts; local auth smoke passes.                                                                                                                                                        |
+| R3  | P1       | TODO         | code             | R1,L2,L4   | Rewrite contacts domain (queries/mutations/forms/list/search/trash) into modular hooks/components with explicit busy states.     | Search stable, contacts auto-load after auth, busy state scoped per contacts interactions, local contacts smoke passes.                                                                                                                                                           |
+| R4  | P1       | TODO         | code             | R1,L2,L4   | Rewrite labels domain (CRUD + assignment UX) with contact-flow integration and isolated loading/error handling.                  | Labels create/assign/remove flows work without blocking unrelated forms; local parity checks pass on web and mobile (when mobile rewrite starts).                                                                                                                                 |
+| R5  | P1       | TODO         | code+design      | R2,R3,R4   | Rewrite primary UI layout and visual system baseline using Tailwind + shadcn patterns where applicable (web-first).              | Web uses consistent spacing/typography/states across auth, labels, contacts, trash; no regressions in core tasks; design tokens documented.                                                                                                                                       |
+| R6  | P1       | TODO         | code+test        | R5         | Expand rewrite regression coverage for auth gating, contacts search/filter, trash restore/delete, and labels assignment.         | Automated critical-flow coverage passes locally/CI, including rewritten UI paths.                                                                                                                                                                                                  |
+| R7  | P1       | TODO         | manual           | R5,R6      | Run end-to-end local UX acceptance pass for rewrite (web mandatory, mobile deferred).                                            | Signed-out/onboarding, signed-in CRUD, labels, search, trash, feedback states validated with evidence in Verification Log; web accepted as stable baseline.                                                                                                                      |
+| R8  | P1       | TODO         | docs             | R7         | Fold rewrite outcomes into roadmap/operations docs; define post-rewrite backlog and cloud/mobile re-entry criteria.              | Updated roadmap + operations/docs include rewrite decisions, deferred items, and explicit gates to resume D4–D8 and E3.                                                                                                                                                           |
 
 
 ## RLS verification (cross-user)
@@ -101,6 +90,17 @@ Automated suite: `apps/backend/supabase/tests/database/contacts_rls.test.sql`. R
 | As User A, `select` own contact                                | Allowed  | One row, expected name             | Positive control       |
 
 
+## Completed Foundations (archived)
+
+These tracks are complete and archived to keep the active queue focused on current rewrite delivery.
+
+- **A-track (tooling/CI foundation):** install, lint, typecheck, build, and CI stabilization completed.
+- **B-track (local Supabase integration):** project link, schema apply, env wiring, and local smoke coverage completed.
+- **C-track (RLS hardening):** cross-user access tests implemented and passing via pgTAP + CI.
+- **D-track (cloud web rollout baseline):** Netlify site/config/env/deploy completed; post-deploy cloud smoke tasks intentionally deferred.
+- **E-track (mobile auth storage):** secure session storage adapter and signup parity completed; cold-restart persistence verification deferred.
+
+
 ## Out of Scope Backlog (Phase 2 and later)
 
 
@@ -110,6 +110,12 @@ Automated suite: `apps/backend/supabase/tests/database/contacts_rls.test.sql`. R
 | F3  | P3       | OUT_OF_SCOPE | Import/export | Define format (e.g. vCard/CSV), privacy constraints, MVP cut.            | Requires product/UX decisions.                |
 | F4  | P4       | OUT_OF_SCOPE | Collaboration | Family/team tier and sharing model.                                      | Not needed for Phase 1 closeout.              |
 | F5  | P3       | OUT_OF_SCOPE | Operations    | Error reporting, backups, support/on-call workflow.                      | Post-MVP operational maturity.                |
+| D4  | P2       | OUT_OF_SCOPE | Cloud QA      | Smoke test production web URL (auth + one mutation).                     | Deferred until rewrite acceptance (`R7`) and cloud re-entry criteria (`R8`). |
+| D5  | P2       | OUT_OF_SCOPE | Mobile release| `eas login` + `eas build:configure` in `apps/mobile`.                    | Deferred by web-first strategy.               |
+| D6  | P2       | OUT_OF_SCOPE | Mobile release| Build Android internal/preview and install on device.                    | Depends on D5; deferred by web-first strategy. |
+| D7  | P3       | OUT_OF_SCOPE | Mobile release| Build iOS internal/simulator when Apple side ready.                      | Depends on D5; deferred by web-first strategy. |
+| D8  | P2       | OUT_OF_SCOPE | Cloud docs    | Log Netlify URL + EAS build IDs and release smoke results.               | Resume after D4/D6 are complete.              |
+| E3  | P3       | OUT_OF_SCOPE | Mobile QA     | Verify session persistence after cold app restart.                        | Deferred until web rewrite reaches stable acceptance gate (`R7`). |
 
 
 ## Local-first UX/design audit (L1)
@@ -127,6 +133,147 @@ Target environment for all checks below: local stack only (`pnpm --filter @widad
 | P2       | App structure maintainability       | `App.tsx` in web/mobile concentrates auth, data orchestration, and rendering in one component.                  | Introduce modular boundaries (e.g., auth panel, contacts list/actions, labels panel, feedback banner) without behavior regression; local smoke still passes.    |
 | P2       | Trash/search usability parity       | Toggle/search interactions are present but behavior details differ in wording and flow across platforms.        | Search + active/trash behavior and copy are aligned for core cases: search active, search trash, restore, hard delete on web+mobile local stack.                |
 
+
+## Rewrite Program (local-first)
+
+This rewrite track is merged into the same board (not a separate roadmap) so day-to-day pickup remains single-threaded and compatible with the existing L-series tasks.
+
+### Goals
+
+- Improve product clarity and interaction quality without reopening cloud rollout scope.
+- Reduce `App.tsx` complexity by splitting auth, contacts, labels, and feedback concerns into focused modules.
+- Preserve local-first reliability: auth gating, CRUD, search, and trash flows must stay working during refactor.
+
+### Guardrails
+
+- Sequence work behind L-series findings; do not start cloud rollout tasks (D4–D8) until rewrite acceptance is complete.
+- Require behavioral parity evidence at each rewrite milestone (R2–R5) before moving to the next task.
+- Keep web as the primary implementation surface; apply mobile parity where architecture permits.
+
+### R1 Concrete design spec + component inventory
+
+This section is the authoritative rewrite blueprint for R1.
+
+#### Product direction (approved)
+
+- Visual direction: minimal, clean aesthetic with high readability and low visual noise.
+- Contacts UX model: card/list-first (not table-first), with virtualization only when real list size/perf requires it.
+- Delivery sequencing: web reaches stable UX/architecture first; mobile parity follows after web stabilization.
+
+#### Design principles
+
+- Prioritize fastest path to first successful action (sign in, create contact, assign label).
+- Keep one primary action visible per view; secondary actions stay contextual.
+- Prefer simple primitives and consistent spacing over decorative complexity.
+- Treat empty/loading/error/success states as first-class product moments.
+- Accessibility is a non-negotiable baseline (keyboard, focus visibility, semantics, contrast).
+
+#### Information architecture (web-first)
+
+- `Signed out`: value statement + auth card + concise "what you can do after sign in".
+- `Signed in shell`: top bar with session state/actions; main content split into:
+  - `Contacts` (default): create/edit, search, active/trash toggle, restore/delete.
+  - `Labels`: create/manage labels and assign from contact context.
+  - `Trash`: explicit destructive-state management and recovery flow.
+- `System feedback`: global toast lane + local inline validation/messages.
+
+#### Interaction and behavior spec
+
+- Auth gating:
+  - Signed out: show auth card only; hide labels/contacts/trash content.
+  - Signed in: hide auth form; show session card + contacts workspace.
+- Search:
+  - Debounced client-side filter for current list context (active or trash).
+  - No hard crashes; fallback to full list on invalid filter state.
+- Busy states:
+  - Contacts mutations only disable contacts controls.
+  - Labels mutations only disable labels controls.
+  - Auth operations only disable auth/session controls.
+- Feedback:
+  - Success uses transient toast (auto-dismiss).
+  - Error uses persistent inline message with clear recovery guidance.
+  - Info notices are contextual and dismissible.
+- Delete lifecycle:
+  - Move-to-trash is primary destructive action.
+  - Permanent delete requires explicit confirmation affordance.
+
+#### Visual system spec (Tailwind + shadcn/headless)
+
+- Styling foundation: Tailwind CSS utility system with semantic token mapping.
+- Component primitives: `shadcn/ui` + headless primitives (Radix-based) for accessibility and consistency.
+- Token intent:
+  - Neutral surfaces with subtle elevation.
+  - One brand primary color for CTAs and active states.
+  - Semantic colors for success/warning/error/info.
+  - Consistent radius, spacing scale, and focus-ring treatment.
+- Density:
+  - Comfortable default spacing for forms and list items.
+  - Compact variants only where scan efficiency materially improves contacts workflows.
+
+#### Component inventory (R1 baseline)
+
+- App/frame:
+  - `AppShell`, `TopBar`, `SectionHeader`, `ContentContainer`
+- Feedback/state:
+  - `ToastProvider`, `InlineAlert`, `EmptyState`, `LoadingSkeleton`
+- Auth/session:
+  - `AuthCard`, `SessionCard`, `AuthStatusBadge`
+- Contacts domain:
+  - `ContactComposerCard` (create/edit)
+  - `ContactSearchBar`
+  - `ContactList`
+  - `ContactListItem`
+  - `ContactActionsMenu`
+  - `TrashToggleTabs`
+  - `DeleteConfirmDialog`
+- Labels domain:
+  - `LabelComposer`
+  - `LabelChip`
+  - `LabelPickerPopover`
+  - `LabelList`
+- Shared form primitives:
+  - `FormField`, `TextInput`, `Button`, `IconButton`, `Badge`, `Tabs`, `Popover`, `Dialog`
+
+#### State boundaries (target architecture)
+
+- `auth` module: session/user state, sign in/up/out, auth guard flags.
+- `contacts` module: list query, create/update/delete/restore actions, search query state.
+- `labels` module: label query/mutations, assignment actions.
+- `ui` module: toasts, dialog state, per-feature busy flags.
+- Each module must expose a focused API to keep `App.tsx` as composition shell only.
+
+#### Performance and virtualization policy
+
+- Start with non-virtualized card/list rendering for simplicity.
+- Add virtualization only when evidence shows scroll/render degradation on realistic dataset sizes.
+- Virtualization candidate: contacts list only; auth/labels/trash controls remain standard rendering.
+
+#### Accessibility requirements (definition of done for design)
+
+- All interactive controls are keyboard reachable and operable.
+- Visible focus ring on all focusable controls with sufficient contrast.
+- Inputs have labels/help/error text with proper semantics.
+- Dialogs/popovers/tabs follow accessible headless behavior defaults.
+- Color is never the only signal for status/action meaning.
+
+#### R1 acceptance criteria
+
+- This blueprint is used as implementation contract for R2-R8.
+- Tailwind + shadcn/headless strategy is explicitly captured and unambiguous.
+- Component inventory and module boundaries are specific enough for parallel implementation.
+- Web-first and mobile-after-web-stable sequencing is explicitly encoded.
+
+### Execution order (current)
+
+1. `L2` critical stability gate
+2. `L4` minimal regression harness
+3. `R2` auth/session modular rewrite
+4. `R3` contacts modular rewrite
+5. `R4` labels modular rewrite
+6. `R5` Tailwind/shadcn visual system baseline
+7. `R6` regression expansion for rewritten flows
+8. `R7` web acceptance pass
+9. `R8` docs + cloud/mobile re-entry criteria
 
 ## Verification Log
 
@@ -152,12 +299,15 @@ Target environment for all checks below: local stack only (`pnpm --filter @widad
 - 2026-04-24: **E1** done: Expo + Supabase session storage research in `wiki/security.md` (depends relaxed to B7).
 - 2026-04-24: **E2** done: SecureStore-backed `auth.storage` for `@widados/mobile` (`supabaseStorage.ts`, `App.tsx`); mobile typecheck green.
 - 2026-04-25: **D3** tooling: `pnpm netlify:env:push` / `pnpm netlify:env:list` (avoid root monorepo picker); `wiki/operations.md` + `wiki/deployment.md` updated.
-- 2026-04-25: **D3** check + **D4** partial smoke: `pnpm netlify:env:check` (exit 2: no `.env.cloud`, Netlify missing `VITE_`*); `pnpm smoke:netlify-home` OK 200 `https://widados-contacts.netlify.app/`.
+- 2026-04-25: **D3** check + **D4** partial smoke: `pnpm netlify:env:check` (exit 2: no `.env.cloud`, Netlify missing `VITE`_*); `pnpm smoke:netlify-home` OK 200 `https://widados-contacts.netlify.app/`.
 - 2026-04-25: **D3** done: `.env.cloud` + Netlify `VITE_SUPABASE_`*; `pnpm netlify:deploy:prod` deploy `69e960fccaca132084c45392`; prod JS bundle references Supabase client code.
 - 2026-04-23: Owner direction updated: defer remaining cloud-service rollout/testing tasks (D4–D8) and prioritize local app behavior/design readiness.
 - 2026-04-23: Local-first roadmap rework: added L1–L5 execution track; set L1 `IN_PROGRESS` as active priority.
 - 2026-04-23: L1 audit drafted: prioritized local UX/design checklist + acceptance criteria for auth state, loading/error feedback, empty states, form ergonomics, structure, and trash/search parity.
 - 2026-04-23: L2 phase 1 implemented: auth-state banner/sign-out + loading/disabled states + unified feedback semantics across web/mobile `App.tsx`; `pnpm --filter @widados/web typecheck` and `pnpm --filter @widados/mobile typecheck` exit 0.
+- 2026-04-23: R1 design spec merged into roadmap under **Rewrite Program (local-first)** with approved direction: minimal clean aesthetic, card/list-first contacts, virtualization-on-evidence, web-first then mobile.
+- 2026-04-23: PM reprioritization applied: `R1` marked `DONE`; `L2` narrowed to critical stability gate; `L3`/`L5` superseded by `R7`/`R8`; `L4` promoted to P1 pre-rewrite regression gate; `E3` deferred until post-web-stability.
+- 2026-04-23: Roadmap hygiene pass: archived completed A-E tracks into **Completed Foundations (archived)**, kept active queue focused on L/R rewrite execution, and moved deferred D/E follow-ups into **Out of Scope Backlog**.
 
 ## Notes and Constraints
 
