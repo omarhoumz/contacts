@@ -26,12 +26,14 @@ This file is the single source of truth for roadmap, progress, and execution.
 ## Agent Workflow
 
 1. Pick the highest-priority task with status **TODO** (or continue **IN_PROGRESS**).
-2. Set status to **IN_PROGRESS** with date and short owner note.
-3. Execute the task and verification steps.
-4. Commit code/docs changes with a concise message.
-5. Set task to **DONE** and add evidence.
-6. If new work appears, add it to this file with priority and status.
-7. If a task belongs to a later phase, mark **OUT_OF_SCOPE** with rationale.
+2. PM check: confirm the task still matches current focus, dependencies, and success criteria; re-prioritize if needed before execution.
+3. Set status to **IN_PROGRESS** with date and short owner note.
+4. Execute the task and verification steps.
+5. Commit code/docs changes with a concise message.
+6. End PM check: verify outcome quality, roadmap impact, and whether priorities should shift based on what was learned.
+7. Set task to **DONE** and add evidence.
+8. If new work appears, add it to this file with priority and status.
+9. If a task belongs to a later phase, mark **OUT_OF_SCOPE** with rationale.
 
 ## Phase 1 Scope (MVP)
 
