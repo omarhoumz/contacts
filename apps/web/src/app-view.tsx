@@ -1,7 +1,7 @@
 import { Card } from "@widados/ui-lib";
-import { normalizeLabels } from "./contact-search";
 import { useWebAppState } from "./use-web-app-state";
 import { AuthSection } from "./auth-section";
+import { ContactsSection } from "./contacts-section";
 
 export function App() {
   const s = useWebAppState();
@@ -35,55 +35,27 @@ export function App() {
             </div>
             <ul style={{ paddingLeft: 18, margin: 0 }}>{s.labels.map((l) => <li key={l.id} style={{ marginBottom: 4 }}>{l.name}</li>)}</ul>
           </Card>
-          <Card>
-            <h3>Contacts</h3>
-            <div style={{ marginBottom: 8, display: "flex", gap: 12, alignItems: "center" }}>
-              <label><input type="radio" checked={!s.showTrash} onChange={() => { s.setShowTrash(false); s.setEditingId(null); void s.refreshData(false); }} /> Active</label>
-              <label><input type="radio" checked={s.showTrash} onChange={() => { s.setShowTrash(true); s.setEditingId(null); void s.refreshData(true); }} /> Trash</label>
-            </div>
-            <input placeholder="Search by name or label" value={s.query} onChange={(e) => s.setQuery(e.target.value)} disabled={s.dataBusy} style={{ width: "100%", marginBottom: 8 }} />
-            {!s.showTrash ? (
-              <>
-                <input placeholder="Display name" value={s.displayName} onChange={(e) => s.setDisplayName(e.target.value)} disabled={s.mutationBusy} style={{ width: "100%", marginBottom: 8 }} />
-                {s.editingId ? <button onClick={s.updateContact} disabled={s.mutationBusy || s.dataBusy}>{s.mutationBusy ? "Saving..." : "Update contact"}</button> : <button onClick={s.createContact} disabled={s.mutationBusy || s.dataBusy}>{s.mutationBusy ? "Saving..." : "Create contact"}</button>}
-              </>
-            ) : null}
-            <button onClick={() => s.refreshData()} style={{ marginLeft: 8 }} disabled={s.dataBusy}>{s.dataBusy ? "Refreshing..." : "Refresh"}</button>
-            <ul>
-              {s.displayedContacts.map((contact) => {
-                const assignedIds = new Set((contact.contact_labels ?? []).map((cl) => cl.label_id));
-                return (
-                  <li key={contact.id} style={{ marginBottom: 12 }}>
-                    <strong>{contact.display_name}</strong>
-                    {!s.showTrash ? (
-                      <>
-                        <button onClick={() => { s.setEditingId(contact.id); s.setDisplayName(contact.display_name); }} style={{ marginLeft: 8 }}>Edit</button>
-                        <button onClick={() => s.softDeleteContact(contact.id)} style={{ marginLeft: 8 }}>Move to trash</button>
-                        <div style={{ marginTop: 6, fontSize: 13 }}>
-                          {(contact.contact_labels ?? []).flatMap((cl) => normalizeLabels(cl.labels)).map((l) => <span key={l.id} style={{ marginRight: 6 }}>{l.name}</span>)}
-                          {s.labels.length ? (
-                            <div style={{ marginTop: 6 }}>
-                              <span style={{ color: "#666" }}>Labels: </span>
-                              {s.labels.map((l) => (
-                                <button key={l.id} type="button" onClick={() => s.toggleContactLabel(contact.id, l.id, assignedIds.has(l.id))} style={{ marginRight: 6 }}>
-                                  {assignedIds.has(l.id) ? "✓ " : "+ "}{l.name}
-                                </button>
-                              ))}
-                            </div>
-                          ) : null}
-                        </div>
-                      </>
-                    ) : (
-                      <span style={{ marginLeft: 8 }}>
-                        <button onClick={() => s.restoreContact(contact.id)}>Restore</button>
-                        <button onClick={() => s.permanentlyDeleteContact(contact.id)} style={{ marginLeft: 8 }}>Delete forever</button>
-                      </span>
-                    )}
-                  </li>
-                );
-              })}
-            </ul>
-          </Card>
+          <ContactsSection
+            showTrash={s.showTrash}
+            setShowTrash={s.setShowTrash}
+            setEditingId={s.setEditingId}
+            query={s.query}
+            setQuery={s.setQuery}
+            dataBusy={s.dataBusy}
+            displayName={s.displayName}
+            setDisplayName={s.setDisplayName}
+            mutationBusy={s.mutationBusy}
+            editingId={s.editingId}
+            createContact={s.createContact}
+            updateContact={s.updateContact}
+            refreshData={s.refreshData}
+            displayedContacts={s.displayedContacts}
+            labels={s.labels}
+            softDeleteContact={s.softDeleteContact}
+            restoreContact={s.restoreContact}
+            permanentlyDeleteContact={s.permanentlyDeleteContact}
+            toggleContactLabel={s.toggleContactLabel}
+          />
         </>
       ) : s.authResolved ? (
         <Card>
