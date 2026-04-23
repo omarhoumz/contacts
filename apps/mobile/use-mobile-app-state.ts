@@ -1,9 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
-import { Button, SafeAreaView, ScrollView, Text, TextInput, View } from "react-native";
 import { createClient } from "@supabase/supabase-js";
 import { contactSchema, labelCreateSchema } from "@widados/shared";
-import { MobileCard } from "@widados/ui-lib-mobile";
-import { supabaseAuthStorage } from "./supabaseStorage";
+import { supabaseAuthStorage } from "./supabase-storage";
+import { contactMatchesQuery, type ContactRow, type LabelRow } from "./mobile-contact-search";
 
 const env = (globalThis as { process?: { env?: Record<string, string | undefined> } }).process?.env;
 const supabaseUrl = env?.EXPO_PUBLIC_SUPABASE_URL ?? "";
@@ -19,31 +18,9 @@ const CONTACT_SELECT = `
   )
 `;
 
-type LabelRow = { id: string; name: string; color: string };
-type ContactLabelJoin = { label_id: string; labels: LabelRow[] | null };
-type ContactRow = {
-  id: string;
-  display_name: string;
-  deleted_at: string | null;
-  contact_labels: ContactLabelJoin[] | null;
-};
-
 type Feedback = { tone: "error" | "success" | "info"; text: string };
 
-function contactMatchesQuery(c: ContactRow, q: string) {
-  const needle = q.trim().toLowerCase();
-  if (!needle) return true;
-  if (c.display_name.toLowerCase().includes(needle)) return true;
-  for (const cl of c.contact_labels ?? []) {
-    for (const label of cl.labels ?? []) {
-      const name = label.name.toLowerCase();
-      if (name.includes(needle)) return true;
-    }
-  }
-  return false;
-}
-
-export function App() {
+export function useMobileAppState() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [displayName, setDisplayName] = useState("");
@@ -59,6 +36,7 @@ export function App() {
   const [authBusy, setAuthBusy] = useState(false);
   const [dataBusy, setDataBusy] = useState(false);
   const [mutationBusy, setMutationBusy] = useState(false);
+
   const client = useMemo(
     () =>
       createClient(supabaseUrl, supabasePublishableKey, {
@@ -70,17 +48,13 @@ export function App() {
   const displayedContacts = contactRows.filter((c) => contactMatchesQuery(c, query));
 
   const syncSession = async () => {
-    const { data, error } = await client.auth.getSession();
-    if (error) {
+    const { data, error } = await client.auth.getUser();
+    if (error || !data.user) {
       setSessionEmail(null);
       return;
     }
-    setSessionEmail(data.session?.user?.email ?? null);
+    setSessionEmail(data.user.email ?? null);
   };
-
-  useEffect(() => {
-    void syncSession();
-  }, []);
 
   const loadLabels = async () => {
     const { data, error } = await client.from("labels").select("id,name,color").order("name");
@@ -96,7 +70,7 @@ export function App() {
     setContactRows((data ?? []) as ContactRow[]);
   };
 
-  const refreshData = async (trashMode: boolean) => {
+  const refreshData = async (trashMode = showTrash) => {
     setDataBusy(true);
     try {
       await Promise.all([loadContacts(trashMode), loadLabels()]);
@@ -106,6 +80,27 @@ export function App() {
       setDataBusy(false);
     }
   };
+
+  useEffect(() => {
+    void syncSession();
+    const {
+      data: { subscription },
+    } = client.auth.onAuthStateChange(() => {
+      void syncSession();
+    });
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, []);
+
+  useEffect(() => {
+    if (sessionEmail) {
+      void refreshData(showTrash);
+      return;
+    }
+    setContactRows([]);
+    setLabels([]);
+  }, [sessionEmail]);
 
   const signUp = async () => {
     setAuthBusy(true);
@@ -186,10 +181,10 @@ export function App() {
     await refreshData(showTrash);
     setMutationBusy(false);
   };
-    setMutationBusy(true);
 
   const updateContact = async () => {
     if (!editingId) return;
+    setMutationBusy(true);
     const parsed = contactSchema.safeParse({ display_name: displayName });
     if (!parsed.success) {
       setFeedback({ tone: "error", text: "Display name required." });
@@ -253,9 +248,9 @@ export function App() {
     await refreshData(showTrash);
     setMutationBusy(false);
   };
-    setMutationBusy(true);
 
   const createLabel = async () => {
+    setMutationBusy(true);
     const parsed = labelCreateSchema.safeParse({ name: newLabelName, color: newLabelColor });
     if (!parsed.success) {
       setFeedback({ tone: "error", text: parsed.error.issues.map((e) => e.message).join("; ") });
@@ -322,139 +317,40 @@ export function App() {
     setMutationBusy(false);
   };
 
-  return (
-    <SafeAreaView style={{ flex: 1 }}>
-      <ScrollView contentContainerStyle={{ padding: 16, gap: 12, paddingBottom: 32 }}>
-        <Text style={{ fontSize: 26, fontWeight: "700" }}>WidadOS Mobile</Text>
-        <MobileCard label="Auth, contacts, labels, and trash" />
-        <Text style={{ color: sessionEmail ? "#166534" : "#6b7280" }}>
-          Auth: {sessionEmail ? `signed in as ${sessionEmail}` : "signed out"}
-        </Text>
-        {feedback ? (
-          <Text style={{ color: feedback.tone === "error" ? "crimson" : feedback.tone === "success" ? "#166534" : "#0f766e" }}>
-            {feedback.text}
-          </Text>
-        ) : null}
-        {!sessionEmail ? (
-          <View style={{ gap: 8 }}>
-            <TextInput placeholder="Email" value={email} onChangeText={setEmail} autoCapitalize="none" editable={!authBusy} />
-            <TextInput
-              placeholder="Password"
-              value={password}
-              secureTextEntry
-              onChangeText={setPassword}
-              editable={!authBusy}
-            />
-            <Button title={authBusy ? "Working..." : "Sign up"} onPress={signUp} disabled={authBusy} />
-            <Button title={authBusy ? "Working..." : "Sign in"} onPress={signIn} disabled={authBusy} />
-          </View>
-        ) : (
-          <View style={{ gap: 8 }}>
-            <Text style={{ color: "#555" }}>You are signed in.</Text>
-            <Button title={authBusy ? "Working..." : "Sign out"} onPress={signOut} disabled={authBusy} />
-          </View>
-        )}
-        {sessionEmail ? (
-          <>
-            <View style={{ flexDirection: "row", gap: 16 }}>
-              <Button
-                title="Active"
-                onPress={() => {
-                  setShowTrash(false);
-                  setEditingId(null);
-                  void refreshData(false);
-                }}
-              />
-              <Button
-                title="Trash"
-                onPress={() => {
-                  setShowTrash(true);
-                  setEditingId(null);
-                  void refreshData(true);
-                }}
-              />
-            </View>
-            <Text style={{ fontWeight: "600" }}>Labels</Text>
-            <View style={{ flexDirection: "row", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
-              <TextInput
-                placeholder="New label"
-                value={newLabelName}
-                onChangeText={setNewLabelName}
-                style={{ flex: 1, minWidth: 120, borderWidth: 1, borderColor: "#ccc", padding: 8, borderRadius: 6 }}
-              />
-              <TextInput
-                placeholder="#hex"
-                value={newLabelColor}
-                onChangeText={setNewLabelColor}
-                autoCapitalize="characters"
-                style={{ width: 88, borderWidth: 1, borderColor: "#ccc", padding: 8, borderRadius: 6 }}
-              />
-              <Button title={mutationBusy ? "Saving..." : "Add label"} onPress={createLabel} disabled={mutationBusy || dataBusy} />
-            </View>
-            <TextInput
-              placeholder="Search name or label"
-              value={query}
-              onChangeText={setQuery}
-              style={{ borderWidth: 1, borderColor: "#ccc", padding: 8, borderRadius: 6 }}
-            />
-            {!showTrash ? (
-              <>
-                <TextInput
-                  placeholder="Display name"
-                  value={displayName}
-                  onChangeText={setDisplayName}
-                  style={{ borderWidth: 1, borderColor: "#ccc", padding: 8, borderRadius: 6 }}
-                />
-                {editingId ? (
-                  <Button title={mutationBusy ? "Saving..." : "Update contact"} onPress={updateContact} disabled={mutationBusy || dataBusy} />
-                ) : (
-                  <Button title={mutationBusy ? "Saving..." : "Create contact"} onPress={createContact} disabled={mutationBusy || dataBusy} />
-                )}
-              </>
-            ) : null}
-            <Button title={dataBusy ? "Refreshing..." : "Refresh"} onPress={() => refreshData(showTrash)} disabled={dataBusy} />
-            {displayedContacts.map((contact) => {
-              const assignedIds = new Set((contact.contact_labels ?? []).map((cl) => cl.label_id));
-              return (
-                <View key={contact.id} style={{ marginTop: 8, paddingBottom: 8, borderBottomWidth: 1, borderBottomColor: "#eee" }}>
-                  <Text style={{ fontSize: 17, fontWeight: "600" }}>{contact.display_name}</Text>
-                  {!showTrash ? (
-                    <>
-                      <Button
-                        title="Edit"
-                        onPress={() => {
-                          setEditingId(contact.id);
-                          setDisplayName(contact.display_name);
-                        }}
-                      />
-                      <Button title="Move to trash" onPress={() => softDeleteContact(contact.id)} />
-                      <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 6, marginTop: 6 }}>
-                        {labels.map((l) => (
-                          <Button
-                            key={l.id}
-                            title={`${assignedIds.has(l.id) ? "✓ " : "+ "}${l.name}`}
-                            onPress={() => toggleContactLabel(contact.id, l.id, assignedIds.has(l.id))}
-                          />
-                        ))}
-                      </View>
-                    </>
-                  ) : (
-                    <View style={{ flexDirection: "row", gap: 8, marginTop: 6 }}>
-                      <Button title="Restore" onPress={() => restoreContact(contact.id)} />
-                      <Button title="Delete forever" onPress={() => permanentlyDeleteContact(contact.id)} />
-                    </View>
-                  )}
-                </View>
-              );
-            })}
-          </>
-        ) : (
-          <View style={{ padding: 12, borderWidth: 1, borderColor: "#e5e7eb", borderRadius: 8 }}>
-            <Text style={{ fontWeight: "600", marginBottom: 6 }}>Sign in to manage contacts</Text>
-            <Text style={{ color: "#555" }}>Labels and contacts are hidden until you are signed in.</Text>
-          </View>
-        )}
-      </ScrollView>
-    </SafeAreaView>
-  );
+  return {
+    email,
+    password,
+    displayName,
+    query,
+    editingId,
+    labels,
+    newLabelName,
+    newLabelColor,
+    showTrash,
+    feedback,
+    sessionEmail,
+    authBusy,
+    dataBusy,
+    mutationBusy,
+    displayedContacts,
+    setEmail,
+    setPassword,
+    setDisplayName,
+    setQuery,
+    setEditingId,
+    setNewLabelName,
+    setNewLabelColor,
+    setShowTrash,
+    signUp,
+    signIn,
+    signOut,
+    createContact,
+    updateContact,
+    softDeleteContact,
+    restoreContact,
+    permanentlyDeleteContact,
+    createLabel,
+    toggleContactLabel,
+    refreshData,
+  };
 }

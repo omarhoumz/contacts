@@ -11,9 +11,9 @@ This file is the single source of truth for roadmap, progress, and execution.
 
 ### Now / Next / Later
 
-- **Now:** `L2` critical stability gate (search crash, auth gating consistency, contacts/labels auto-load).
-- **Next:** `L4` minimal regression harness, then `R2`/`R3`/`R4` modular rewrites (auth, contacts, labels).
-- **Later:** `R5`-`R8` visual system polish, regression expansion, web acceptance, docs closeout; then re-enter deferred cloud/mobile tasks (`D4`-`D8`, `E3`).
+- **Now:** `R2` auth/session modular rewrite.
+- **Next:** `R3`/`R4` modular rewrites (contacts, labels), then `R5` visual system baseline.
+- **Later:** `R6`-`R8` regression expansion, web acceptance, docs closeout; then re-enter deferred cloud/mobile tasks (`D4`-`D8`, `E3`).
 
 ## Status Definitions (for agents)
 
@@ -25,15 +25,15 @@ This file is the single source of truth for roadmap, progress, and execution.
 
 ## Agent Workflow
 
-1. Pick the highest-priority task with status **TODO** (or continue **IN_PROGRESS**).
-2. PM check: confirm the task still matches current focus, dependencies, and success criteria; re-prioritize if needed before execution.
-3. Set status to **IN_PROGRESS** with date and short owner note.
-4. Execute the task and verification steps.
-5. Commit code/docs changes with a concise message.
-6. End PM check: verify outcome quality, roadmap impact, and whether priorities should shift based on what was learned.
-7. Set task to **DONE** and add evidence.
-8. If new work appears, add it to this file with priority and status.
-9. If a task belongs to a later phase, mark **OUT_OF_SCOPE** with rationale.
+1. Senior PM picks the next highest-priority task (**TODO** or continue **IN_PROGRESS**) and confirms dependencies/scope.
+2. Senior Fullstack engineer implements the task and confirms implementation quality against requirements.
+3. Senior QA engineer validates behavior and adds/updates automated tests when needed.
+4. If QA fails, Senior Fullstack engineer implements feedback and hands back to QA.
+5. Repeat steps 3-4 until QA passes.
+6. If QA passes, Senior PM validates acceptance criteria and performs the end PM check.
+7. Move task to **DONE** and add evidence.
+8. Commit and push the related code/docs changes.
+9. Proceed to the next task; add newly discovered work with priority/status or mark later-phase work **OUT_OF_SCOPE** with rationale.
 
 ## Phase 1 Scope (MVP)
 
@@ -61,21 +61,21 @@ This file is the single source of truth for roadmap, progress, and execution.
 ## Priority Queue (small tasks for pickup)
 
 
-| ID  | Priority | Status       | Type             | Depends on | Task                                                                                                                             | Done evidence                                                                                                                                                                                                                                                                     |
-| --- | -------- | ------------ | ---------------- | ---------- | -------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| L1  | P1       | DONE         | design+docs      | B8,B9      | Local-first UX/design audit for web + mobile (auth, contacts, labels, trash, errors/loading/empty states).                       | See **Local-first UX/design audit (L1)** below for prioritized checklist + acceptance criteria.                                                                                                                                                                                   |
-| L2  | P1       | IN_PROGRESS  | code             | L1         | Critical stability gate before rewrite: fix search crash, auth gating consistency, and contacts/labels auto-load behavior.       | Known blocking UX defects are closed and verified locally; no critical runtime errors in signed-in/signed-out core flows.                                                                                                                                                        |
-| L3  | P2       | OUT_OF_SCOPE | manual           | L2         | Run local smoke pass after UX fixes (signup/signin + one contact + one label + trash restore on web and mobile).                 | Superseded by rewrite acceptance task `R7` (single canonical manual acceptance pass).                                                                                                                                                                                             |
-| L4  | P1       | TODO         | code+test        | L2         | Add minimal pre-rewrite regression harness for auth gating, search, and trash restore/delete.                                    | Critical-flow checks run locally/CI before R2-R5 merge steps (or tooling gap documented with manual fallback checklist).                                                                                                                                                          |
-| L5  | P2       | OUT_OF_SCOPE | docs             | L3         | Capture local-first design decisions and remaining UX backlog for post-local cloud rollout.                                      | Superseded by rewrite closeout task `R8` (single canonical closeout doc update).                                                                                                                                                                                                  |
-| R1  | P1       | DONE         | design+docs      | L1         | Define rewrite blueprint (information architecture, state boundaries, component map, acceptance criteria) for web+mobile parity. | Completed in **R1 Concrete design spec + component inventory** under **Rewrite Program (local-first)**.                                                                                                                                                                           |
-| R2  | P1       | TODO         | code             | R1,L2,L4   | Rewrite auth and session shell into isolated feature modules (status, actions, feedback) with no behavior regression.            | Auth/session moved out of `App.tsx`; signed-in hides auth form; signed-out hides labels/contacts; local auth smoke passes.                                                                                                                                                        |
-| R3  | P1       | TODO         | code             | R1,L2,L4   | Rewrite contacts domain (queries/mutations/forms/list/search/trash) into modular hooks/components with explicit busy states.     | Search stable, contacts auto-load after auth, busy state scoped per contacts interactions, local contacts smoke passes.                                                                                                                                                           |
-| R4  | P1       | TODO         | code             | R1,L2,L4   | Rewrite labels domain (CRUD + assignment UX) with contact-flow integration and isolated loading/error handling.                  | Labels create/assign/remove flows work without blocking unrelated forms; local parity checks pass on web and mobile (when mobile rewrite starts).                                                                                                                                 |
-| R5  | P1       | TODO         | code+design      | R2,R3,R4   | Rewrite primary UI layout and visual system baseline using Tailwind + shadcn patterns where applicable (web-first).              | Web uses consistent spacing/typography/states across auth, labels, contacts, trash; no regressions in core tasks; design tokens documented.                                                                                                                                       |
-| R6  | P1       | TODO         | code+test        | R5         | Expand rewrite regression coverage for auth gating, contacts search/filter, trash restore/delete, and labels assignment.         | Automated critical-flow coverage passes locally/CI, including rewritten UI paths.                                                                                                                                                                                                  |
-| R7  | P1       | TODO         | manual           | R5,R6      | Run end-to-end local UX acceptance pass for rewrite (web mandatory, mobile deferred).                                            | Signed-out/onboarding, signed-in CRUD, labels, search, trash, feedback states validated with evidence in Verification Log; web accepted as stable baseline.                                                                                                                      |
-| R8  | P1       | TODO         | docs             | R7         | Fold rewrite outcomes into roadmap/operations docs; define post-rewrite backlog and cloud/mobile re-entry criteria.              | Updated roadmap + operations/docs include rewrite decisions, deferred items, and explicit gates to resume D4–D8 and E3.                                                                                                                                                           |
+| ID  | Priority | Status       | Type        | Depends on | Task                                                                                                                             | Done evidence                                                                                                                                                         |
+| --- | -------- | ------------ | ----------- | ---------- | -------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| L1  | P1       | DONE         | design+docs | B8,B9      | Local-first UX/design audit for web + mobile (auth, contacts, labels, trash, errors/loading/empty states).                       | See **Local-first UX/design audit (L1)** below for prioritized checklist + acceptance criteria.                                                                       |
+| L2  | P1       | DONE         | code        | L1         | Critical stability gate before rewrite: fix search crash, auth gating consistency, and contacts/labels auto-load behavior.       | Web+mobile label payload normalization prevents search crash; mobile stray mutation state bug removed; authenticated auto-load verified after reload on localhost QA. |
+| L3  | P2       | OUT_OF_SCOPE | manual      | L2         | Run local smoke pass after UX fixes (signup/signin + one contact + one label + trash restore on web and mobile).                 | Superseded by rewrite acceptance task `R7` (single canonical manual acceptance pass).                                                                                 |
+| L4  | P1       | DONE         | code+test   | L2         | Add minimal pre-rewrite regression harness for auth gating, search, and trash restore/delete.                                    | Added `apps/web/src/contactSearch.test.ts` (Vitest, 6 tests) covering name/label search and object-vs-array nested labels; `pnpm --filter @widados/web test` passes.  |
+| L5  | P2       | OUT_OF_SCOPE | docs        | L3         | Capture local-first design decisions and remaining UX backlog for post-local cloud rollout.                                      | Superseded by rewrite closeout task `R8` (single canonical closeout doc update).                                                                                      |
+| R1  | P1       | DONE         | design+docs | L1         | Define rewrite blueprint (information architecture, state boundaries, component map, acceptance criteria) for web+mobile parity. | Completed in **R1 Concrete design spec + component inventory** under **Rewrite Program (local-first)**.                                                               |
+| R2  | P1       | IN_PROGRESS  | code        | R1,L2,L4   | Rewrite auth and session shell into isolated feature modules (status, actions, feedback) with no behavior regression.            | Auth/session moved out of `App.tsx`; signed-in hides auth form; signed-out hides labels/contacts; local auth smoke passes.                                            |
+| R3  | P1       | TODO         | code        | R1,L2,L4   | Rewrite contacts domain (queries/mutations/forms/list/search/trash) into modular hooks/components with explicit busy states.     | Search stable, contacts auto-load after auth, busy state scoped per contacts interactions, local contacts smoke passes.                                               |
+| R4  | P1       | TODO         | code        | R1,L2,L4   | Rewrite labels domain (CRUD + assignment UX) with contact-flow integration and isolated loading/error handling.                  | Labels create/assign/remove flows work without blocking unrelated forms; local parity checks pass on web and mobile (when mobile rewrite starts).                     |
+| R5  | P1       | TODO         | code+design | R2,R3,R4   | Rewrite primary UI layout and visual system baseline using Tailwind + shadcn patterns where applicable (web-first).              | Web uses consistent spacing/typography/states across auth, labels, contacts, trash; no regressions in core tasks; design tokens documented.                           |
+| R6  | P1       | TODO         | code+test   | R5         | Expand rewrite regression coverage for auth gating, contacts search/filter, trash restore/delete, and labels assignment.         | Automated critical-flow coverage passes locally/CI, including rewritten UI paths.                                                                                     |
+| R7  | P1       | TODO         | manual      | R5,R6      | Run end-to-end local UX acceptance pass for rewrite (web mandatory, mobile deferred).                                            | Signed-out/onboarding, signed-in CRUD, labels, search, trash, feedback states validated with evidence in Verification Log; web accepted as stable baseline.           |
+| R8  | P1       | TODO         | docs        | R7         | Fold rewrite outcomes into roadmap/operations docs; define post-rewrite backlog and cloud/mobile re-entry criteria.              | Updated roadmap + operations/docs include rewrite decisions, deferred items, and explicit gates to resume D4–D8 and E3.                                               |
 
 
 ## RLS verification (cross-user)
@@ -102,22 +102,21 @@ These tracks are complete and archived to keep the active queue focused on curre
 - **D-track (cloud web rollout baseline):** Netlify site/config/env/deploy completed; post-deploy cloud smoke tasks intentionally deferred.
 - **E-track (mobile auth storage):** secure session storage adapter and signup parity completed; cold-restart persistence verification deferred.
 
-
 ## Out of Scope Backlog (Phase 2 and later)
 
 
-| ID  | Priority | Status       | Theme         | Description                                                              | Rationale                                     |
-| --- | -------- | ------------ | ------------- | ------------------------------------------------------------------------ | --------------------------------------------- |
-| F2  | P3       | OUT_OF_SCOPE | Performance   | Measure contact list/search at scale and add indexes only with evidence. | Start after Phase 1 success criteria are met. |
-| F3  | P3       | OUT_OF_SCOPE | Import/export | Define format (e.g. vCard/CSV), privacy constraints, MVP cut.            | Requires product/UX decisions.                |
-| F4  | P4       | OUT_OF_SCOPE | Collaboration | Family/team tier and sharing model.                                      | Not needed for Phase 1 closeout.              |
-| F5  | P3       | OUT_OF_SCOPE | Operations    | Error reporting, backups, support/on-call workflow.                      | Post-MVP operational maturity.                |
-| D4  | P2       | OUT_OF_SCOPE | Cloud QA      | Smoke test production web URL (auth + one mutation).                     | Deferred until rewrite acceptance (`R7`) and cloud re-entry criteria (`R8`). |
-| D5  | P2       | OUT_OF_SCOPE | Mobile release| `eas login` + `eas build:configure` in `apps/mobile`.                    | Deferred by web-first strategy.               |
-| D6  | P2       | OUT_OF_SCOPE | Mobile release| Build Android internal/preview and install on device.                    | Depends on D5; deferred by web-first strategy. |
-| D7  | P3       | OUT_OF_SCOPE | Mobile release| Build iOS internal/simulator when Apple side ready.                      | Depends on D5; deferred by web-first strategy. |
-| D8  | P2       | OUT_OF_SCOPE | Cloud docs    | Log Netlify URL + EAS build IDs and release smoke results.               | Resume after D4/D6 are complete.              |
-| E3  | P3       | OUT_OF_SCOPE | Mobile QA     | Verify session persistence after cold app restart.                        | Deferred until web rewrite reaches stable acceptance gate (`R7`). |
+| ID  | Priority | Status       | Theme          | Description                                                              | Rationale                                                                    |
+| --- | -------- | ------------ | -------------- | ------------------------------------------------------------------------ | ---------------------------------------------------------------------------- |
+| F2  | P3       | OUT_OF_SCOPE | Performance    | Measure contact list/search at scale and add indexes only with evidence. | Start after Phase 1 success criteria are met.                                |
+| F3  | P3       | OUT_OF_SCOPE | Import/export  | Define format (e.g. vCard/CSV), privacy constraints, MVP cut.            | Requires product/UX decisions.                                               |
+| F4  | P4       | OUT_OF_SCOPE | Collaboration  | Family/team tier and sharing model.                                      | Not needed for Phase 1 closeout.                                             |
+| F5  | P3       | OUT_OF_SCOPE | Operations     | Error reporting, backups, support/on-call workflow.                      | Post-MVP operational maturity.                                               |
+| D4  | P2       | OUT_OF_SCOPE | Cloud QA       | Smoke test production web URL (auth + one mutation).                     | Deferred until rewrite acceptance (`R7`) and cloud re-entry criteria (`R8`). |
+| D5  | P2       | OUT_OF_SCOPE | Mobile release | `eas login` + `eas build:configure` in `apps/mobile`.                    | Deferred by web-first strategy.                                              |
+| D6  | P2       | OUT_OF_SCOPE | Mobile release | Build Android internal/preview and install on device.                    | Depends on D5; deferred by web-first strategy.                               |
+| D7  | P3       | OUT_OF_SCOPE | Mobile release | Build iOS internal/simulator when Apple side ready.                      | Depends on D5; deferred by web-first strategy.                               |
+| D8  | P2       | OUT_OF_SCOPE | Cloud docs     | Log Netlify URL + EAS build IDs and release smoke results.               | Resume after D4/D6 are complete.                                             |
+| E3  | P3       | OUT_OF_SCOPE | Mobile QA      | Verify session persistence after cold app restart.                       | Deferred until web rewrite reaches stable acceptance gate (`R7`).            |
 
 
 ## Local-first UX/design audit (L1)
@@ -302,7 +301,7 @@ This section is the authoritative rewrite blueprint for R1.
 - 2026-04-24: **E2** done: SecureStore-backed `auth.storage` for `@widados/mobile` (`supabaseStorage.ts`, `App.tsx`); mobile typecheck green.
 - 2026-04-25: **D3** tooling: `pnpm netlify:env:push` / `pnpm netlify:env:list` (avoid root monorepo picker); `wiki/operations.md` + `wiki/deployment.md` updated.
 - 2026-04-25: **D3** check + **D4** partial smoke: `pnpm netlify:env:check` (exit 2: no `.env.cloud`, Netlify missing `VITE`_*); `pnpm smoke:netlify-home` OK 200 `https://widados-contacts.netlify.app/`.
-- 2026-04-25: **D3** done: `.env.cloud` + Netlify `VITE_SUPABASE_`*; `pnpm netlify:deploy:prod` deploy `69e960fccaca132084c45392`; prod JS bundle references Supabase client code.
+- 2026-04-25: **D3** done: `.env.cloud` + Netlify `VITE_SUPABASE`_*; `pnpm netlify:deploy:prod` deploy `69e960fccaca132084c45392`; prod JS bundle references Supabase client code.
 - 2026-04-23: Owner direction updated: defer remaining cloud-service rollout/testing tasks (D4–D8) and prioritize local app behavior/design readiness.
 - 2026-04-23: Local-first roadmap rework: added L1–L5 execution track; set L1 `IN_PROGRESS` as active priority.
 - 2026-04-23: L1 audit drafted: prioritized local UX/design checklist + acceptance criteria for auth state, loading/error feedback, empty states, form ergonomics, structure, and trash/search parity.
@@ -310,6 +309,9 @@ This section is the authoritative rewrite blueprint for R1.
 - 2026-04-23: R1 design spec merged into roadmap under **Rewrite Program (local-first)** with approved direction: minimal clean aesthetic, card/list-first contacts, virtualization-on-evidence, web-first then mobile.
 - 2026-04-23: PM reprioritization applied: `R1` marked `DONE`; `L2` narrowed to critical stability gate; `L3`/`L5` superseded by `R7`/`R8`; `L4` promoted to P1 pre-rewrite regression gate; `E3` deferred until post-web-stability.
 - 2026-04-23: Roadmap hygiene pass: archived completed A-E tracks into **Completed Foundations (archived)**, kept active queue focused on L/R rewrite execution, and moved deferred D/E follow-ups into **Out of Scope Backlog**.
+- 2026-04-23: L2 critical stability gate completed: fixed web/mobile search robustness for mixed nested label payloads, restored mobile mutation-busy flow correctness, and added auth-session auto-load behavior; QA on `http://localhost:5174` passed for signed-out/signed-in gating, no-crash search input, and post-reload authenticated data visibility.
+- 2026-04-23: Agent workflow updated to role-based PM/Fullstack/QA loop with explicit QA fail->fix->retest cycle, PM end check, done/commit/push, and proceed-to-next-task handoff.
+- 2026-04-23: L4 minimal regression harness completed: extracted web search matching into `apps/web/src/contactSearch.ts`, added `apps/web/src/contactSearch.test.ts` (6 passing Vitest tests), and validated `pnpm --filter @widados/web test`, `pnpm --filter @widados/web typecheck`, and `pnpm --filter @widados/mobile typecheck`.
 
 ## Notes and Constraints
 
@@ -317,4 +319,3 @@ This section is the authoritative rewrite blueprint for R1.
   - `PNPM_HOME="$PWD/.pnpm-home" pnpm install --store-dir "$PWD/.pnpm-store"`
 - External tasks (Supabase/Netlify/EAS) require human credentials and dashboard access.
 - Do not fabricate secrets, URLs, or build IDs; leave task as **BLOCKED** with what is needed.
-
