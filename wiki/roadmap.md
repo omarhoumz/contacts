@@ -315,6 +315,7 @@ This section is the authoritative rewrite blueprint for R1.
 - 2026-04-23: R2 completed with auth/session modularization: introduced `apps/web/src/auth-section.tsx` and `apps/mobile/auth-section.tsx`, wired through kebab-case app views (`app-view.tsx`), and verified with web/mobile typecheck plus web regression tests.
 - 2026-04-23: R3 progress slice landed: extracted contacts/trash/search/assignment UI into dedicated domain components (`apps/web/src/contacts-section.tsx`, `apps/mobile/contacts-section.tsx`) and rewired app views to composition-only flow; QA passed with `pnpm --filter @widados/web typecheck`, `pnpm --filter @widados/mobile typecheck`, and `pnpm --filter @widados/web test`.
 - 2026-04-23: Agent workflow explicitly updated with mandatory Cursor-browser manual web QA (mobile manual QA skipped by default), commit+push after each completed task/slice, and automatic no-confirmation progression to next priority task.
+- 2026-04-23: R3 progress slice landed: extracted web contacts state/actions into `apps/web/src/use-web-contacts-domain.ts` and rewired `apps/web/src/use-web-app-state.ts` to compose domain hook + auth/labels shell; validated via `pnpm --filter @widados/web typecheck`, `pnpm --filter @widados/web test`, and manual Cursor-browser localhost QA (signed-out gating, sign-in, contacts CRUD/trash, label create, no blocking console errors).
 
 ## Notes and Constraints
 
