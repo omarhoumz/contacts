@@ -11,8 +11,8 @@ This file is the single source of truth for roadmap, progress, and execution.
 
 ### Now / Next / Later
 
-- **Now:** `R2` auth/session modular rewrite.
-- **Next:** `R3`/`R4` modular rewrites (contacts, labels), then `R5` visual system baseline.
+- **Now:** `R3` contacts modular rewrite.
+- **Next:** `R4` labels modular rewrite, then `R5` visual system baseline.
 - **Later:** `R6`-`R8` regression expansion, web acceptance, docs closeout; then re-enter deferred cloud/mobile tasks (`D4`-`D8`, `E3`).
 
 ## Status Definitions (for agents)
@@ -69,8 +69,8 @@ This file is the single source of truth for roadmap, progress, and execution.
 | L4  | P1       | DONE         | code+test   | L2         | Add minimal pre-rewrite regression harness for auth gating, search, and trash restore/delete.                                    | Added `apps/web/src/contactSearch.test.ts` (Vitest, 6 tests) covering name/label search and object-vs-array nested labels; `pnpm --filter @widados/web test` passes.  |
 | L5  | P2       | OUT_OF_SCOPE | docs        | L3         | Capture local-first design decisions and remaining UX backlog for post-local cloud rollout.                                      | Superseded by rewrite closeout task `R8` (single canonical closeout doc update).                                                                                      |
 | R1  | P1       | DONE         | design+docs | L1         | Define rewrite blueprint (information architecture, state boundaries, component map, acceptance criteria) for web+mobile parity. | Completed in **R1 Concrete design spec + component inventory** under **Rewrite Program (local-first)**.                                                               |
-| R2  | P1       | IN_PROGRESS  | code        | R1,L2,L4   | Rewrite auth and session shell into isolated feature modules (status, actions, feedback) with no behavior regression.            | Auth/session moved out of `App.tsx`; signed-in hides auth form; signed-out hides labels/contacts; local auth smoke passes.                                            |
-| R3  | P1       | TODO         | code        | R1,L2,L4   | Rewrite contacts domain (queries/mutations/forms/list/search/trash) into modular hooks/components with explicit busy states.     | Search stable, contacts auto-load after auth, busy state scoped per contacts interactions, local contacts smoke passes.                                               |
+| R2  | P1       | DONE         | code        | R1,L2,L4   | Rewrite auth and session shell into isolated feature modules (status, actions, feedback) with no behavior regression.            | Added isolated auth/session modules: `apps/web/src/auth-section.tsx` and `apps/mobile/auth-section.tsx`; both apps typecheck and maintain signed-in/signed-out gating behavior. |
+| R3  | P1       | IN_PROGRESS  | code        | R1,L2,L4   | Rewrite contacts domain (queries/mutations/forms/list/search/trash) into modular hooks/components with explicit busy states.     | Search stable, contacts auto-load after auth, busy state scoped per contacts interactions, local contacts smoke passes.                                               |
 | R4  | P1       | TODO         | code        | R1,L2,L4   | Rewrite labels domain (CRUD + assignment UX) with contact-flow integration and isolated loading/error handling.                  | Labels create/assign/remove flows work without blocking unrelated forms; local parity checks pass on web and mobile (when mobile rewrite starts).                     |
 | R5  | P1       | TODO         | code+design | R2,R3,R4   | Rewrite primary UI layout and visual system baseline using Tailwind + shadcn patterns where applicable (web-first).              | Web uses consistent spacing/typography/states across auth, labels, contacts, trash; no regressions in core tasks; design tokens documented.                           |
 | R6  | P1       | TODO         | code+test   | R5         | Expand rewrite regression coverage for auth gating, contacts search/filter, trash restore/delete, and labels assignment.         | Automated critical-flow coverage passes locally/CI, including rewritten UI paths.                                                                                     |
@@ -311,7 +311,8 @@ This section is the authoritative rewrite blueprint for R1.
 - 2026-04-23: Roadmap hygiene pass: archived completed A-E tracks into **Completed Foundations (archived)**, kept active queue focused on L/R rewrite execution, and moved deferred D/E follow-ups into **Out of Scope Backlog**.
 - 2026-04-23: L2 critical stability gate completed: fixed web/mobile search robustness for mixed nested label payloads, restored mobile mutation-busy flow correctness, and added auth-session auto-load behavior; QA on `http://localhost:5174` passed for signed-out/signed-in gating, no-crash search input, and post-reload authenticated data visibility.
 - 2026-04-23: Agent workflow updated to role-based PM/Fullstack/QA loop with explicit QA fail->fix->retest cycle, PM end check, done/commit/push, and proceed-to-next-task handoff.
-- 2026-04-23: L4 minimal regression harness completed: extracted web search matching into `apps/web/src/contactSearch.ts`, added `apps/web/src/contactSearch.test.ts` (6 passing Vitest tests), and validated `pnpm --filter @widados/web test`, `pnpm --filter @widados/web typecheck`, and `pnpm --filter @widados/mobile typecheck`.
+- 2026-04-23: L4 minimal regression harness completed: extracted web search matching into `apps/web/src/contact-search.ts`, added `apps/web/src/contact-search.test.ts` (6 passing Vitest tests), and validated `pnpm --filter @widados/web test`, `pnpm --filter @widados/web typecheck`, and `pnpm --filter @widados/mobile typecheck`.
+- 2026-04-23: R2 completed with auth/session modularization: introduced `apps/web/src/auth-section.tsx` and `apps/mobile/auth-section.tsx`, wired through kebab-case app views (`app-view.tsx`), and verified with web/mobile typecheck plus web regression tests.
 
 ## Notes and Constraints
 

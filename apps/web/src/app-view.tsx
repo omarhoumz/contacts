@@ -1,6 +1,7 @@
 import { Card } from "@widados/ui-lib";
 import { normalizeLabels } from "./contact-search";
 import { useWebAppState } from "./use-web-app-state";
+import { AuthSection } from "./auth-section";
 
 export function App() {
   const s = useWebAppState();
@@ -8,25 +9,20 @@ export function App() {
     <main style={{ maxWidth: 720, margin: "24px auto", fontFamily: "Inter, sans-serif" }}>
       <h1>WidadOS</h1>
       <p>Email/password auth, contacts, labels, and trash.</p>
-      <p style={{ color: s.isAuthenticated ? "#166534" : "#6b7280", marginBottom: 8 }}>
-        Auth: {s.isAuthenticated ? `signed in as ${s.sessionEmail}` : s.authResolved ? "signed out" : "checking session..."}
-      </p>
-      {s.feedback ? <p style={{ color: s.feedback.tone === "error" ? "crimson" : s.feedback.tone === "success" ? "#166534" : "#0f766e" }}>{s.feedback.text}</p> : null}
-      {!s.isAuthenticated && s.authResolved ? (
-        <Card>
-          <h3>Sign in / Sign up</h3>
-          <input placeholder="Email" value={s.email} onChange={(e) => s.setEmail(e.target.value)} disabled={s.authBusy} style={{ width: "100%", marginBottom: 8 }} />
-          <input placeholder="Password" type="password" value={s.password} onChange={(e) => s.setPassword(e.target.value)} disabled={s.authBusy} style={{ width: "100%", marginBottom: 8 }} />
-          <button onClick={s.signUp} disabled={s.authBusy}>{s.authBusy ? "Working..." : "Sign up"}</button>
-          <button onClick={s.signIn} style={{ marginLeft: 8 }} disabled={s.authBusy}>{s.authBusy ? "Working..." : "Sign in"}</button>
-        </Card>
-      ) : s.isAuthenticated ? (
-        <Card>
-          <h3>Session</h3>
-          <p style={{ marginTop: 0, color: "#555" }}>You are signed in.</p>
-          <button onClick={s.signOut} disabled={s.authBusy}>{s.authBusy ? "Working..." : "Sign out"}</button>
-        </Card>
-      ) : null}
+      <AuthSection
+        isAuthenticated={s.isAuthenticated}
+        authResolved={s.authResolved}
+        sessionEmail={s.sessionEmail}
+        authBusy={s.authBusy}
+        email={s.email}
+        password={s.password}
+        feedback={s.feedback}
+        onEmailChange={s.setEmail}
+        onPasswordChange={s.setPassword}
+        onSignUp={s.signUp}
+        onSignIn={s.signIn}
+        onSignOut={s.signOut}
+      />
       {s.isAuthenticated ? (
         <>
           <Card>

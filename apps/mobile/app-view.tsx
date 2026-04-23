@@ -1,6 +1,7 @@
 import { Button, SafeAreaView, ScrollView, Text, TextInput, View } from "react-native";
 import { MobileCard } from "@widados/ui-lib-mobile";
 import { useMobileAppState } from "./use-mobile-app-state";
+import { AuthSection } from "./auth-section";
 
 export function App() {
   const s = useMobileAppState();
@@ -9,21 +10,18 @@ export function App() {
       <ScrollView contentContainerStyle={{ padding: 16, gap: 12, paddingBottom: 32 }}>
         <Text style={{ fontSize: 26, fontWeight: "700" }}>WidadOS Mobile</Text>
         <MobileCard label="Auth, contacts, labels, and trash" />
-        <Text style={{ color: s.sessionEmail ? "#166534" : "#6b7280" }}>Auth: {s.sessionEmail ? `signed in as ${s.sessionEmail}` : "signed out"}</Text>
-        {s.feedback ? <Text style={{ color: s.feedback.tone === "error" ? "crimson" : s.feedback.tone === "success" ? "#166534" : "#0f766e" }}>{s.feedback.text}</Text> : null}
-        {!s.sessionEmail ? (
-          <View style={{ gap: 8 }}>
-            <TextInput placeholder="Email" value={s.email} onChangeText={s.setEmail} autoCapitalize="none" editable={!s.authBusy} />
-            <TextInput placeholder="Password" value={s.password} secureTextEntry onChangeText={s.setPassword} editable={!s.authBusy} />
-            <Button title={s.authBusy ? "Working..." : "Sign up"} onPress={s.signUp} disabled={s.authBusy} />
-            <Button title={s.authBusy ? "Working..." : "Sign in"} onPress={s.signIn} disabled={s.authBusy} />
-          </View>
-        ) : (
-          <View style={{ gap: 8 }}>
-            <Text style={{ color: "#555" }}>You are signed in.</Text>
-            <Button title={s.authBusy ? "Working..." : "Sign out"} onPress={s.signOut} disabled={s.authBusy} />
-          </View>
-        )}
+        <AuthSection
+          sessionEmail={s.sessionEmail}
+          authBusy={s.authBusy}
+          email={s.email}
+          password={s.password}
+          feedback={s.feedback}
+          onEmailChange={s.setEmail}
+          onPasswordChange={s.setPassword}
+          onSignUp={s.signUp}
+          onSignIn={s.signIn}
+          onSignOut={s.signOut}
+        />
         {s.sessionEmail ? (
           <>
             <View style={{ flexDirection: "row", gap: 16 }}>
