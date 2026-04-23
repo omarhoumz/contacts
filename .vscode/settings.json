@@ -1,3 +1,6 @@
 {
-  "cSpell.words": ["supabase", "Supabase", "SUPABASE"]
+  "cSpell.words": ["supabase", "Supabase", "SUPABASE"],
+  "files.readonlyInclude": { "**/routeTree.gen.ts": true },
+  "files.watcherExclude": { "**/routeTree.gen.ts": true },
+  "search.exclude": { "**/routeTree.gen.ts": true }
 }

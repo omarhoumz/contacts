@@ -1,5 +1,6 @@
 import { Card } from "@widados/ui-lib";
 import type { LabelRow } from "./contact-search";
+import { ui } from "./ui-styles";
 
 type LabelsSectionProps = {
   labels: LabelRow[];
@@ -16,32 +17,25 @@ export function LabelsSection(props: LabelsSectionProps) {
   return (
     <Card>
       <h3>Labels</h3>
-      <p style={{ fontSize: 13, color: "#555", marginTop: 0 }}>
+      <p style={ui.sectionHint}>
         Create labels, then assign them to contacts from the list below.
       </p>
-      <div
-        style={{
-          display: "flex",
-          gap: 8,
-          alignItems: "center",
-          flexWrap: "wrap",
-          marginBottom: 8,
-        }}
-      >
+      <div style={{ ...ui.row, marginBottom: 8 }}>
         <input
           placeholder="New label name"
           value={props.newLabelName}
           onChange={(e) => props.setNewLabelName(e.target.value)}
           disabled={props.labelBusy}
-          style={{ flex: 1, minWidth: 120 }}
+          style={{ ...ui.compactInput, flex: 1, minWidth: 120 }}
         />
         <input
           type="color"
           value={props.newLabelColor}
           onChange={(e) => props.setNewLabelColor(e.target.value)}
           disabled={props.labelBusy}
+          style={{ ...ui.compactInput, width: 42, padding: 4 }}
         />
-        <button onClick={props.createLabel} disabled={props.labelBusy || props.dataBusy}>
+        <button onClick={props.createLabel} disabled={props.labelBusy || props.dataBusy} style={ui.primaryButton}>
           {props.labelBusy ? "Saving..." : "Add label"}
         </button>
       </div>

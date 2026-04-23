@@ -1,4 +1,5 @@
 import { Card } from "@widados/ui-lib";
+import { feedbackColor, ui } from "./ui-styles";
 
 type Feedback = { tone: "error" | "success" | "info"; text: string } | null;
 
@@ -24,7 +25,7 @@ export function AuthSection(props: AuthSectionProps) {
         Auth: {props.isAuthenticated ? `signed in as ${props.sessionEmail}` : props.authResolved ? "signed out" : "checking session..."}
       </p>
       {props.feedback ? (
-        <p style={{ color: props.feedback.tone === "error" ? "crimson" : props.feedback.tone === "success" ? "#166534" : "#0f766e" }}>
+        <p style={{ color: feedbackColor(props.feedback.tone), marginTop: 0, marginBottom: 10 }}>
           {props.feedback.text}
         </p>
       ) : null}
@@ -36,7 +37,7 @@ export function AuthSection(props: AuthSectionProps) {
             value={props.email}
             onChange={(e) => props.onEmailChange(e.target.value)}
             disabled={props.authBusy}
-            style={{ width: "100%", marginBottom: 8 }}
+            style={{ ...ui.input, marginBottom: 8 }}
           />
           <input
             placeholder="Password"
@@ -44,12 +45,12 @@ export function AuthSection(props: AuthSectionProps) {
             value={props.password}
             onChange={(e) => props.onPasswordChange(e.target.value)}
             disabled={props.authBusy}
-            style={{ width: "100%", marginBottom: 8 }}
+            style={{ ...ui.input, marginBottom: 8 }}
           />
-          <button onClick={props.onSignUp} disabled={props.authBusy}>
+          <button onClick={props.onSignUp} disabled={props.authBusy} style={ui.primaryButton}>
             {props.authBusy ? "Working..." : "Sign up"}
           </button>
-          <button onClick={props.onSignIn} style={{ marginLeft: 8 }} disabled={props.authBusy}>
+          <button onClick={props.onSignIn} style={{ ...ui.secondaryButton, marginLeft: 8 }} disabled={props.authBusy}>
             {props.authBusy ? "Working..." : "Sign in"}
           </button>
         </Card>
@@ -57,7 +58,7 @@ export function AuthSection(props: AuthSectionProps) {
         <Card>
           <h3>Session</h3>
           <p style={{ marginTop: 0, color: "#555" }}>You are signed in.</p>
-          <button onClick={props.onSignOut} disabled={props.authBusy}>
+          <button onClick={props.onSignOut} disabled={props.authBusy} style={ui.secondaryButton}>
             {props.authBusy ? "Working..." : "Sign out"}
           </button>
         </Card>

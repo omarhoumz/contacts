@@ -12,6 +12,9 @@
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.49.4",
+    "@tanstack/react-router": "^1.168.23",
+    "@tanstack/router-plugin": "^1.167.22",
+    "@vitejs/plugin-react": "^4.7.0",
     "@widados/shared": "workspace:*",
     "@widados/ui-lib": "workspace:*",
     "react": "^18.3.1",
