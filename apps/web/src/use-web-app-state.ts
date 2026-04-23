@@ -1,8 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { createClient } from "@supabase/supabase-js";
-import { labelCreateSchema } from "@widados/shared";
-import type { LabelRow } from "./contact-search";
 import { useWebContactsDomain } from "./use-web-contacts-domain";
+import { useWebLabelsDomain } from "./use-web-labels-domain";
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL ?? "";
 const supabasePublishableKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY ?? "";
@@ -12,14 +11,10 @@ type Feedback = { tone: "error" | "success" | "info"; text: string };
 export function useWebAppState() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [labels, setLabels] = useState<LabelRow[]>([]);
-  const [newLabelName, setNewLabelName] = useState("");
-  const [newLabelColor, setNewLabelColor] = useState("#4f46e5");
   const [feedback, setFeedback] = useState<Feedback | null>(null);
   const [sessionEmail, setSessionEmail] = useState<string | null>(null);
   const [authResolved, setAuthResolved] = useState(false);
   const [authBusy, setAuthBusy] = useState(false);
-  const [labelBusy, setLabelBusy] = useState(false);
   const client = useMemo(
     () => createClient(supabaseUrl, supabasePublishableKey, { auth: { persistSession: true } }),
     [],
@@ -49,23 +44,19 @@ export function useWebAppState() {
     };
   }, []);
 
-  const loadLabels = async () => {
-    const { data, error: err } = await client.from("labels").select("id,name,color").order("name");
-    if (err) throw new Error(err.message);
-    setLabels((data ?? []) as LabelRow[]);
-  };
+  const labelsDomain = useWebLabelsDomain({ client, setFeedback });
 
   const contacts = useWebContactsDomain({
     client,
     isAuthenticated,
     sessionEmail,
-    loadLabels,
+    loadLabels: labelsDomain.loadLabels,
     setFeedback,
   });
 
   useEffect(() => {
     if (!sessionEmail) {
-      setLabels([]);
+      labelsDomain.clearLabels();
     }
   }, [sessionEmail]);
 
@@ -109,40 +100,8 @@ export function useWebAppState() {
     }
     await syncSession();
     setFeedback({ tone: "info", text: "Signed out." });
-    setLabels([]);
+    labelsDomain.clearLabels();
     setAuthBusy(false);
-  };
-
-  const createLabel = async () => {
-    setLabelBusy(true);
-    setFeedback(null);
-    try {
-      const parsed = labelCreateSchema.safeParse({ name: newLabelName, color: newLabelColor });
-      if (!parsed.success) {
-        setFeedback({ tone: "error", text: parsed.error.issues.map((e) => e.message).join("; ") });
-        return;
-      }
-      const { data: userData, error: userError } = await client.auth.getUser();
-      if (userError || !userData.user) {
-        setFeedback({ tone: "error", text: userError?.message ?? "Sign in required." });
-        return;
-      }
-      const { error: insertError } = await client.from("labels").insert({
-        name: parsed.data.name,
-        color: parsed.data.color,
-        user_id: userData.user.id,
-      });
-      if (insertError) {
-        setFeedback({ tone: "error", text: insertError.message });
-        return;
-      }
-      setFeedback({ tone: "success", text: "Label created." });
-      setNewLabelName("");
-      setNewLabelColor("#4f46e5");
-      await loadLabels();
-    } finally {
-      setLabelBusy(false);
-    }
   };
 
   return {
@@ -151,16 +110,17 @@ export function useWebAppState() {
     displayName: contacts.displayName,
     query: contacts.query,
     editingId: contacts.editingId,
-    labels,
-    newLabelName,
-    newLabelColor,
+    labels: labelsDomain.labels,
+    newLabelName: labelsDomain.newLabelName,
+    newLabelColor: labelsDomain.newLabelColor,
     showTrash: contacts.showTrash,
     feedback,
     sessionEmail,
     authResolved,
     authBusy,
     dataBusy: contacts.dataBusy,
-    mutationBusy: contacts.mutationBusy || labelBusy,
+    mutationBusy: contacts.mutationBusy,
+    labelBusy: labelsDomain.labelBusy,
     displayedContacts: contacts.displayedContacts,
     isAuthenticated,
     setEmail,
@@ -168,8 +128,8 @@ export function useWebAppState() {
     setDisplayName: contacts.setDisplayName,
     setQuery: contacts.setQuery,
     setEditingId: contacts.setEditingId,
-    setNewLabelName,
-    setNewLabelColor,
+    setNewLabelName: labelsDomain.setNewLabelName,
+    setNewLabelColor: labelsDomain.setNewLabelColor,
     setShowTrash: contacts.setShowTrash,
     signUp,
     signIn,
@@ -179,7 +139,7 @@ export function useWebAppState() {
     softDeleteContact: contacts.softDeleteContact,
     restoreContact: contacts.restoreContact,
     permanentlyDeleteContact: contacts.permanentlyDeleteContact,
-    createLabel,
+    createLabel: labelsDomain.createLabel,
     toggleContactLabel: contacts.toggleContactLabel,
     refreshData: contacts.refreshData,
   };

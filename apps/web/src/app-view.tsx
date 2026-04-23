@@ -2,6 +2,7 @@ import { Card } from "@widados/ui-lib";
 import { useWebAppState } from "./use-web-app-state";
 import { AuthSection } from "./auth-section";
 import { ContactsSection } from "./contacts-section";
+import { LabelsSection } from "./labels-section";
 
 export function App() {
   const s = useWebAppState();
@@ -25,16 +26,16 @@ export function App() {
       />
       {s.isAuthenticated ? (
         <>
-          <Card>
-            <h3>Labels</h3>
-            <p style={{ fontSize: 13, color: "#555", marginTop: 0 }}>Create labels, then assign them to contacts from the list below.</p>
-            <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap", marginBottom: 8 }}>
-              <input placeholder="New label name" value={s.newLabelName} onChange={(e) => s.setNewLabelName(e.target.value)} disabled={s.mutationBusy} style={{ flex: 1, minWidth: 120 }} />
-              <input type="color" value={s.newLabelColor} onChange={(e) => s.setNewLabelColor(e.target.value)} disabled={s.mutationBusy} />
-              <button onClick={s.createLabel} disabled={s.mutationBusy || s.dataBusy}>{s.mutationBusy ? "Saving..." : "Add label"}</button>
-            </div>
-            <ul style={{ paddingLeft: 18, margin: 0 }}>{s.labels.map((l) => <li key={l.id} style={{ marginBottom: 4 }}>{l.name}</li>)}</ul>
-          </Card>
+          <LabelsSection
+            labels={s.labels}
+            newLabelName={s.newLabelName}
+            setNewLabelName={s.setNewLabelName}
+            newLabelColor={s.newLabelColor}
+            setNewLabelColor={s.setNewLabelColor}
+            createLabel={s.createLabel}
+            labelBusy={s.labelBusy}
+            dataBusy={s.dataBusy}
+          />
           <ContactsSection
             showTrash={s.showTrash}
             setShowTrash={s.setShowTrash}
