@@ -27,13 +27,13 @@ This file is the single source of truth for roadmap, progress, and execution.
 
 1. Senior PM picks the next highest-priority task (**TODO** or continue **IN_PROGRESS**) and confirms dependencies/scope.
 2. Senior Fullstack engineer implements the task and confirms implementation quality against requirements.
-3. Senior QA engineer validates behavior and adds/updates automated tests when needed.
+3. Senior QA engineer validates behavior with manual web testing in Cursor browser (localhost), skipping mobile manual QA unless explicitly requested; add/update automated tests when needed.
 4. If QA fails, Senior Fullstack engineer implements feedback and hands back to QA.
 5. Repeat steps 3-4 until QA passes.
 6. If QA passes, Senior PM validates acceptance criteria and performs the end PM check.
-7. Move task to **DONE** and add evidence.
-8. Commit and push the related code/docs changes.
-9. Proceed to the next task; add newly discovered work with priority/status or mark later-phase work **OUT_OF_SCOPE** with rationale.
+7. Move task to **DONE** (or keep **IN_PROGRESS** for partial slices) and add evidence.
+8. Commit and push related code/docs changes immediately after each completed task/slice.
+9. Continue directly to the next task without waiting for additional confirmation; add newly discovered work with priority/status or mark later-phase work **OUT_OF_SCOPE** with rationale.
 
 ## Phase 1 Scope (MVP)
 
@@ -314,6 +314,7 @@ This section is the authoritative rewrite blueprint for R1.
 - 2026-04-23: L4 minimal regression harness completed: extracted web search matching into `apps/web/src/contact-search.ts`, added `apps/web/src/contact-search.test.ts` (6 passing Vitest tests), and validated `pnpm --filter @widados/web test`, `pnpm --filter @widados/web typecheck`, and `pnpm --filter @widados/mobile typecheck`.
 - 2026-04-23: R2 completed with auth/session modularization: introduced `apps/web/src/auth-section.tsx` and `apps/mobile/auth-section.tsx`, wired through kebab-case app views (`app-view.tsx`), and verified with web/mobile typecheck plus web regression tests.
 - 2026-04-23: R3 progress slice landed: extracted contacts/trash/search/assignment UI into dedicated domain components (`apps/web/src/contacts-section.tsx`, `apps/mobile/contacts-section.tsx`) and rewired app views to composition-only flow; QA passed with `pnpm --filter @widados/web typecheck`, `pnpm --filter @widados/mobile typecheck`, and `pnpm --filter @widados/web test`.
+- 2026-04-23: Agent workflow explicitly updated with mandatory Cursor-browser manual web QA (mobile manual QA skipped by default), commit+push after each completed task/slice, and automatic no-confirmation progression to next priority task.
 
 ## Notes and Constraints
 
@@ -321,3 +322,4 @@ This section is the authoritative rewrite blueprint for R1.
   - `PNPM_HOME="$PWD/.pnpm-home" pnpm install --store-dir "$PWD/.pnpm-store"`
 - External tasks (Supabase/Netlify/EAS) require human credentials and dashboard access.
 - Do not fabricate secrets, URLs, or build IDs; leave task as **BLOCKED** with what is needed.
+
