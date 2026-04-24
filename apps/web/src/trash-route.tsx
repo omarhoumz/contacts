@@ -1,8 +1,8 @@
 import { useEffect } from "react";
 import { useWebApp } from "./web-app-context";
 import { ContactsSection } from "./contacts-section";
-import { ui } from "./ui-styles";
 import { IconSearch } from "./icons";
+import { Input } from "./components/ui/input";
 
 export function TrashRoute() {
   const s = useWebApp();
@@ -14,26 +14,24 @@ export function TrashRoute() {
 
   return (
     <>
-      {/* ── Top bar ─────────────────────────────────────────────────── */}
-      <div style={ui.topBar}>
-        <h2 style={ui.topBarTitle}>Trash</h2>
+      <div className="mb-4 flex items-center gap-3">
+        <h2 className="text-xl font-semibold tracking-tight">Trash</h2>
 
-        <div style={ui.searchWrapper}>
-          <span style={ui.searchIcon}>
+        <div className="relative ml-auto w-full max-w-md">
+          <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
             <IconSearch size={14} />
           </span>
-          <input
+          <Input
             placeholder="Search trash…"
             value={s.query}
             onChange={(e) => s.setQuery(e.target.value)}
             disabled={s.dataBusy}
-            style={ui.topBarSearch}
+            className="pl-8"
           />
         </div>
       </div>
 
-      {/* ── Trash list ───────────────────────────────────────────────── */}
-      <div style={ui.mainBody}>
+      <div>
         <ContactsSection
           showTrash={true}
           displayedContacts={s.displayedContacts}

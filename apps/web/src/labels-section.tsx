@@ -1,6 +1,7 @@
 import { Card } from "@widados/ui-lib";
 import type { LabelRow } from "./contact-search";
-import { ui } from "./ui-styles";
+import { Input } from "./components/ui/input";
+import { Button } from "./components/ui/button";
 
 type LabelsSectionProps = {
   labels: LabelRow[];
@@ -17,31 +18,31 @@ export function LabelsSection(props: LabelsSectionProps) {
   return (
     <Card>
       <h3>Labels</h3>
-      <p style={ui.sectionHint}>
+      <p className="text-sm text-muted-foreground">
         Create labels, then assign them to contacts from the list below.
       </p>
-      <div style={{ ...ui.row, marginBottom: 8 }}>
-        <input
+      <div className="mb-2 flex items-center gap-2">
+        <Input
           placeholder="New label name"
           value={props.newLabelName}
           onChange={(e) => props.setNewLabelName(e.target.value)}
           disabled={props.labelBusy}
-          style={{ ...ui.compactInput, flex: 1, minWidth: 120 }}
+          className="min-w-[120px] flex-1"
         />
         <input
           type="color"
           value={props.newLabelColor}
           onChange={(e) => props.setNewLabelColor(e.target.value)}
           disabled={props.labelBusy}
-          style={{ ...ui.compactInput, width: 42, padding: 4 }}
+          className="h-9 w-[42px] rounded-md border border-input bg-background p-1"
         />
-        <button onClick={props.createLabel} disabled={props.labelBusy || props.dataBusy} style={ui.primaryButton}>
+        <Button onClick={props.createLabel} disabled={props.labelBusy || props.dataBusy}>
           {props.labelBusy ? "Saving..." : "Add label"}
-        </button>
+        </Button>
       </div>
-      <ul style={{ paddingLeft: 18, margin: 0 }}>
+      <ul className="m-0 list-disc pl-5">
         {props.labels.map((l) => (
-          <li key={l.id} style={{ marginBottom: 4 }}>
+          <li key={l.id} className="mb-1">
             {l.name}
           </li>
         ))}

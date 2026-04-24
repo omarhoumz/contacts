@@ -2,7 +2,10 @@ import { createRootRoute, Outlet } from "@tanstack/react-router";
 import { useWebAppState } from "../use-web-app-state";
 import { WebAppContext } from "../web-app-context";
 import { AppShell } from "../app-shell";
-import { ui, feedbackColor } from "../ui-styles";
+import { Card } from "../components/ui/card";
+import { Button } from "../components/ui/button";
+import { Input } from "../components/ui/input";
+import { cn } from "../lib/cn";
 
 export const Route = createRootRoute({
   component: RootComponent,
@@ -13,59 +16,67 @@ function RootComponent() {
 
   if (!s.authResolved) {
     return (
-      <div style={{ ...ui.signedOutPage }}>
-        <p style={{ color: "#94a3b8", fontFamily: "Inter, sans-serif" }}>Loading…</p>
+      <div className="flex min-h-screen items-center justify-center bg-background">
+        <p className="text-sm text-muted-foreground">Loading…</p>
       </div>
     );
   }
 
   if (!s.isAuthenticated) {
     return (
-      <div style={ui.signedOutPage}>
-        <div style={ui.signedOutInner}>
-          <h1 style={ui.signedOutTitle}>WidadOS</h1>
-          <p style={ui.signedOutSubtitle}>Your contacts, private and organised.</p>
+      <div className="flex min-h-screen items-center justify-center bg-background px-5">
+        <div className="w-full max-w-md">
+          <h1 className="mb-1 text-3xl font-bold tracking-tight text-foreground">WidadOS</h1>
+          <p className="mb-7 text-sm text-muted-foreground">Your contacts, private and organised.</p>
 
           {s.feedback ? (
-            <p style={{ color: feedbackColor(s.feedback.tone), fontSize: 14, marginBottom: 12 }}>
+            <p
+              className={cn(
+                "mb-3 text-sm",
+                s.feedback.tone === "error" && "text-destructive",
+                s.feedback.tone === "success" && "text-success",
+                s.feedback.tone === "info" && "text-info",
+              )}
+            >
               {s.feedback.text}
             </p>
           ) : null}
 
-          <div style={ui.signedOutCard}>
-            <input
+          <Card className="p-5">
+            <Input
               placeholder="Email"
               value={s.email}
               onChange={(e) => s.setEmail(e.target.value)}
               disabled={s.authBusy}
-              style={{ ...ui.input, marginBottom: 10 }}
+              className="mb-2.5"
             />
-            <input
+            <Input
               placeholder="Password"
               type="password"
               value={s.password}
               onChange={(e) => s.setPassword(e.target.value)}
               disabled={s.authBusy}
-              style={{ ...ui.input, marginBottom: 14 }}
+              className="mb-3.5"
             />
-            <div style={{ display: "flex", gap: 8 }}>
-              <button onClick={s.signIn} disabled={s.authBusy} style={{ ...ui.primaryButton, flex: 1 }}>
+            <div className="flex gap-2">
+              <Button onClick={s.signIn} disabled={s.authBusy} className="flex-1">
                 {s.authBusy ? "Working…" : "Sign in"}
-              </button>
-              <button onClick={s.signUp} disabled={s.authBusy} style={{ ...ui.secondaryButton, flex: 1 }}>
+              </Button>
+              <Button onClick={s.signUp} disabled={s.authBusy} variant="secondary" className="flex-1">
                 {s.authBusy ? "Working…" : "Sign up"}
-              </button>
+              </Button>
             </div>
             {s.canResendVerification ? (
-              <button
+              <Button
                 onClick={s.resendVerification}
                 disabled={s.authBusy}
-                style={{ ...ui.secondaryButton, width: "100%", marginTop: 10 }}
+                variant="secondary"
+                className="mt-2.5 w-full"
               >
                 {s.authBusy ? "Sending…" : "Resend verification"}
-              </button>
+              </Button>
             ) : null}
-          </div>
+          </Card>
         </div>
       </div>
     );

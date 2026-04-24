@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { useWebApp } from "./web-app-context";
 import { ContactsSection } from "./contacts-section";
-import { ui } from "./ui-styles";
 import { IconSearch } from "./icons";
 import {
   PHONE_COUNTRIES,
@@ -10,16 +9,14 @@ import {
   type PhoneCountry,
 } from "./phone-country";
 import { useBreakpoint } from "./use-breakpoint";
+import { Button } from "./components/ui/button";
+import { Input } from "./components/ui/input";
+import { Card } from "./components/ui/card";
 
 export function ContactsRoute() {
   const s = useWebApp();
   const bp = useBreakpoint();
   const isMobile = bp === "mobile";
-  const composeGridColumns = isMobile
-    ? "1fr"
-    : bp === "tablet"
-      ? "minmax(0,1fr) minmax(0,1fr)"
-      : "minmax(180px,2fr) minmax(180px,1fr) minmax(180px,1fr) minmax(220px,2fr)";
   const [showCompose, setShowCompose] = useState(false);
 
   useEffect(() => {
@@ -55,88 +52,80 @@ export function ContactsRoute() {
 
   return (
     <>
-      {/* ── Top bar ─────────────────────────────────────────────────── */}
-      <div style={ui.topBar}>
-        <h2 style={ui.topBarTitle}>Contacts</h2>
+      <div className="mb-4 flex items-center gap-3">
+        <h2 className="text-xl font-semibold tracking-tight">Contacts</h2>
 
         {!isMobile && (
           <>
-            <div style={ui.searchWrapper}>
-              <span style={ui.searchIcon}>
+            <div className="relative ml-auto w-full max-w-md">
+              <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
                 <IconSearch size={14} />
               </span>
-              <input
+              <Input
                 placeholder="Search by name, phone, email, or label…"
                 value={s.query}
                 onChange={(e) => s.setQuery(e.target.value)}
                 disabled={s.dataBusy}
-                style={ui.topBarSearch}
+                className="pl-8"
               />
             </div>
 
-            <button
+            <Button
               onClick={openCompose}
-              style={ui.primaryButton}
               disabled={s.mutationBusy}
             >
               + New contact
-            </button>
+            </Button>
           </>
         )}
       </div>
 
       {isMobile && (
-        <div style={{ ...ui.composeSection, padding: "10px 14px", borderBottom: "none" }}>
-          <div style={{ ...ui.searchWrapper, width: "100%" }}>
-            <span style={ui.searchIcon}>
+        <div className="mb-3">
+          <div className="relative w-full">
+            <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
               <IconSearch size={14} />
             </span>
-            <input
+            <Input
               placeholder="Search…"
               value={s.query}
               onChange={(e) => s.setQuery(e.target.value)}
               disabled={s.dataBusy}
-              style={{ ...ui.topBarSearch, width: "100%" }}
+              className="pl-8"
             />
           </div>
         </div>
       )}
 
-      {/* ── Compose / edit form ──────────────────────────────────────── */}
       {(showCompose || s.editingId) && (
-        <div style={ui.composeSection}>
-          <p style={ui.composeSectionTitle}>
+        <Card className="mb-4 p-4">
+          <p className="mb-2 text-sm font-semibold text-foreground">
             {s.editingId ? "Edit contact" : "New contact"}
           </p>
-          <div style={{ display: "flex", flexDirection: "column" as const, gap: 8 }}>
+          <div className="flex flex-col gap-2">
             <div
-              style={{
-                display: "grid",
-                gap: 8,
-                gridTemplateColumns: composeGridColumns,
-                alignItems: "center",
-              }}
+              className="grid grid-cols-1 items-center gap-2 md:grid-cols-2 xl:grid-cols-4"
             >
-              <input
+              <Input
                 placeholder="Display name *"
                 value={s.displayName}
                 onChange={(e) => s.setDisplayName(e.target.value)}
                 disabled={s.mutationBusy}
-                style={{ ...ui.compactInput, minWidth: 0 }}
+                className="min-w-0"
                 autoFocus
               />
-              <input
+              <Input
                 placeholder="Phone"
                 value={s.contactPhone}
                 onChange={(e) => s.setContactPhone(e.target.value)}
                 disabled={s.mutationBusy}
-                style={{ ...ui.compactInput, minWidth: 0 }}
+                className="min-w-0"
               />
               <select
                 value={s.contactPhoneCountry}
                 onChange={(e) => s.setContactPhoneCountry(e.target.value as PhoneCountry)}
                 disabled={s.mutationBusy}
-                style={{ ...ui.compactInput, minWidth: 0 }}
+                className="flex h-9 min-w-0 w-full rounded-md border border-input bg-background px-3 py-1 text-sm text-foreground shadow-sm outline-none"
               >
                 {PHONE_COUNTRIES.map((c) => (
                   <option key={c.code} value={c.code}>
@@ -144,39 +133,37 @@ export function ContactsRoute() {
                   </option>
                 ))}
               </select>
-              <input
+              <Input
                 placeholder="Email"
                 type="email"
                 value={s.contactEmail}
                 onChange={(e) => s.setContactEmail(e.target.value)}
                 disabled={s.mutationBusy}
-                style={{ ...ui.compactInput, minWidth: 0 }}
+                className="min-w-0"
               />
             </div>
-            <div style={{ display: "flex", gap: 8 }}>
+            <div className="flex gap-2">
               {s.editingId ? (
                 <>
-                  <button
+                  <Button
                     onClick={handleUpdate}
                     disabled={s.mutationBusy || s.dataBusy}
-                    style={ui.primaryButton}
                   >
                     {s.mutationBusy ? "Saving…" : "Save"}
-                  </button>
-                  <button onClick={handleCancelEdit} style={ui.secondaryButton}>
+                  </Button>
+                  <Button onClick={handleCancelEdit} variant="secondary">
                     Cancel
-                  </button>
+                  </Button>
                 </>
               ) : (
                 <>
-                  <button
+                  <Button
                     onClick={handleCreate}
                     disabled={s.mutationBusy || s.dataBusy}
-                    style={ui.primaryButton}
                   >
                     {s.mutationBusy ? "Saving…" : "Create"}
-                  </button>
-                  <button
+                  </Button>
+                  <Button
                     onClick={() => {
                       setShowCompose(false);
                       s.setDisplayName("");
@@ -184,19 +171,18 @@ export function ContactsRoute() {
                       s.setContactEmail("");
                       s.setContactPhoneCountry(getDefaultPhoneCountryFromLocale());
                     }}
-                    style={ui.secondaryButton}
+                    variant="secondary"
                   >
                     Cancel
-                  </button>
+                  </Button>
                 </>
               )}
             </div>
           </div>
-        </div>
+        </Card>
       )}
 
-      {/* ── Contact list ─────────────────────────────────────────────── */}
-      <div style={ui.mainBody}>
+      <div>
         <ContactsSection
           showTrash={false}
           displayedContacts={s.displayedContacts}
@@ -216,23 +202,13 @@ export function ContactsRoute() {
       </div>
 
       {isMobile && !showCompose && !s.editingId && (
-        <button
+        <Button
           onClick={openCompose}
           disabled={s.mutationBusy}
-          style={{
-            ...ui.primaryButton,
-            position: "fixed",
-            insetInlineEnd: 14,
-            bottom: 74,
-            borderRadius: 999,
-            paddingInline: 14,
-            paddingBlock: 10,
-            zIndex: 30,
-            boxShadow: "0 8px 18px rgba(37, 99, 235, 0.28)",
-          }}
+          className="fixed bottom-[74px] right-3 z-30 rounded-full px-4 py-2 shadow-lg"
         >
           + New
-        </button>
+        </Button>
       )}
     </>
   );

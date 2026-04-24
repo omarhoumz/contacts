@@ -1,5 +1,7 @@
 import { Card } from "@widados/ui-lib";
-import { feedbackColor, ui } from "./ui-styles";
+import { Button } from "./components/ui/button";
+import { Input } from "./components/ui/input";
+import { cn } from "./lib/cn";
 
 type Feedback = { tone: "error" | "success" | "info"; text: string } | null;
 
@@ -21,46 +23,53 @@ type AuthSectionProps = {
 export function AuthSection(props: AuthSectionProps) {
   return (
     <>
-      <p style={{ color: props.isAuthenticated ? "var(--success)" : "var(--text-muted)", marginBottom: 8 }}>
+      <p className={cn("mb-2 text-sm", props.isAuthenticated ? "text-success" : "text-muted-foreground")}>
         Auth: {props.isAuthenticated ? `signed in as ${props.sessionEmail}` : props.authResolved ? "signed out" : "checking session..."}
       </p>
       {props.feedback ? (
-        <p style={{ color: feedbackColor(props.feedback.tone), marginTop: 0, marginBottom: 10 }}>
+        <p
+          className={cn(
+            "mb-2.5 mt-0 text-sm",
+            props.feedback.tone === "error" && "text-destructive",
+            props.feedback.tone === "success" && "text-success",
+            props.feedback.tone === "info" && "text-info",
+          )}
+        >
           {props.feedback.text}
         </p>
       ) : null}
       {!props.isAuthenticated && props.authResolved ? (
         <Card>
           <h3>Sign in / Sign up</h3>
-          <input
+          <Input
             placeholder="Email"
             value={props.email}
             onChange={(e) => props.onEmailChange(e.target.value)}
             disabled={props.authBusy}
-            style={{ ...ui.input, marginBottom: 8 }}
+            className="mb-2"
           />
-          <input
+          <Input
             placeholder="Password"
             type="password"
             value={props.password}
             onChange={(e) => props.onPasswordChange(e.target.value)}
             disabled={props.authBusy}
-            style={{ ...ui.input, marginBottom: 8 }}
+            className="mb-2"
           />
-          <button onClick={props.onSignUp} disabled={props.authBusy} style={ui.primaryButton}>
+          <Button onClick={props.onSignUp} disabled={props.authBusy}>
             {props.authBusy ? "Working..." : "Sign up"}
-          </button>
-          <button onClick={props.onSignIn} style={{ ...ui.secondaryButton, marginLeft: 8 }} disabled={props.authBusy}>
+          </Button>
+          <Button onClick={props.onSignIn} variant="secondary" className="ml-2" disabled={props.authBusy}>
             {props.authBusy ? "Working..." : "Sign in"}
-          </button>
+          </Button>
         </Card>
       ) : props.isAuthenticated ? (
         <Card>
           <h3>Session</h3>
-          <p style={{ marginTop: 0, color: "var(--text-muted)" }}>You are signed in.</p>
-          <button onClick={props.onSignOut} disabled={props.authBusy} style={ui.secondaryButton}>
+          <p className="mt-0 text-muted-foreground">You are signed in.</p>
+          <Button onClick={props.onSignOut} disabled={props.authBusy} variant="secondary">
             {props.authBusy ? "Working..." : "Sign out"}
-          </button>
+          </Button>
         </Card>
       ) : null}
     </>

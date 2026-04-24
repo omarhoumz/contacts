@@ -32,7 +32,7 @@ type ContactsSectionProps = {
 export function ContactsSection(props: ContactsSectionProps) {
   return (
     <>
-      <View style={{ flexDirection: "row", gap: 16 }}>
+      <View className="flex-row gap-4">
         <Button
           title="Active"
           onPress={() => {
@@ -50,20 +50,20 @@ export function ContactsSection(props: ContactsSectionProps) {
           }}
         />
       </View>
-      <Text style={{ fontWeight: "600" }}>Labels</Text>
-      <View style={{ flexDirection: "row", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
+      <Text className="font-semibold">Labels</Text>
+      <View className="flex-row flex-wrap items-center gap-2">
         <TextInput
           placeholder="New label"
           value={props.newLabelName}
           onChangeText={props.setNewLabelName}
-          style={{ flex: 1, minWidth: 120, borderWidth: 1, borderColor: "#ccc", padding: 8, borderRadius: 6 }}
+          className="min-w-[120px] flex-1 rounded-md border border-slate-300 p-2"
         />
         <TextInput
           placeholder="#hex"
           value={props.newLabelColor}
           onChangeText={props.setNewLabelColor}
           autoCapitalize="characters"
-          style={{ width: 88, borderWidth: 1, borderColor: "#ccc", padding: 8, borderRadius: 6 }}
+          className="w-[88px] rounded-md border border-slate-300 p-2"
         />
         <Button title={props.mutationBusy ? "Saving..." : "Add label"} onPress={props.createLabel} disabled={props.mutationBusy || props.dataBusy} />
       </View>
@@ -71,7 +71,7 @@ export function ContactsSection(props: ContactsSectionProps) {
         placeholder="Search name or label"
         value={props.query}
         onChangeText={props.setQuery}
-        style={{ borderWidth: 1, borderColor: "#ccc", padding: 8, borderRadius: 6 }}
+        className="rounded-md border border-slate-300 p-2"
       />
       {props.showCompose ? (
         <>
@@ -79,7 +79,7 @@ export function ContactsSection(props: ContactsSectionProps) {
             placeholder="Display name"
             value={props.displayName}
             onChangeText={props.setDisplayName}
-            style={{ borderWidth: 1, borderColor: "#ccc", padding: 8, borderRadius: 6 }}
+            className="rounded-md border border-slate-300 p-2"
           />
           {props.editingId ? (
             <Button title={props.mutationBusy ? "Saving..." : "Update contact"} onPress={props.updateContact} disabled={props.mutationBusy || props.dataBusy} />
@@ -92,8 +92,8 @@ export function ContactsSection(props: ContactsSectionProps) {
       {props.displayedContacts.map((contact) => {
         const assignedIds = new Set((contact.contact_labels ?? []).map((cl) => cl.label_id));
         return (
-          <View key={contact.id} style={{ marginTop: 8, paddingBottom: 8, borderBottomWidth: 1, borderBottomColor: "#eee" }}>
-            <Text style={{ fontSize: 17, fontWeight: "600" }}>{contact.display_name}</Text>
+          <View key={contact.id} className="mt-2 border-b border-slate-200 pb-2">
+            <Text className="text-lg font-semibold">{contact.display_name}</Text>
             {!props.showTrash ? (
               <>
                 <Button
@@ -104,7 +104,7 @@ export function ContactsSection(props: ContactsSectionProps) {
                   }}
                 />
                 <Button title="Move to trash" onPress={() => props.softDeleteContact(contact.id)} />
-                <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 6, marginTop: 6 }}>
+                <View className="mt-1.5 flex-row flex-wrap gap-1.5">
                   {props.labels.map((l) => (
                     <Button
                       key={l.id}
@@ -115,7 +115,7 @@ export function ContactsSection(props: ContactsSectionProps) {
                 </View>
               </>
             ) : (
-              <View style={{ flexDirection: "row", gap: 8, marginTop: 6 }}>
+              <View className="mt-1.5 flex-row gap-2">
                 <Button title="Restore" onPress={() => props.restoreContact(contact.id)} />
                 <Button title="Delete forever" onPress={() => props.permanentlyDeleteContact(contact.id)} />
               </View>

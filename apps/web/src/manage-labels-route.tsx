@@ -1,11 +1,26 @@
 import { useWebApp } from "./web-app-context";
-import { ui } from "./ui-styles";
+import { Button } from "./components/ui/button";
+import { Input } from "./components/ui/input";
+import { Card } from "./components/ui/card";
 
 const PRESET_COLORS = [
   "#2563eb", "#7c3aed", "#db2777", "#dc2626",
   "#ea580c", "#ca8a04", "#16a34a", "#0891b2",
   "#64748b", "#0f172a",
 ];
+
+const COLOR_CLASSES: Record<string, string> = {
+  "#2563eb": "bg-[#2563eb]",
+  "#7c3aed": "bg-[#7c3aed]",
+  "#db2777": "bg-[#db2777]",
+  "#dc2626": "bg-[#dc2626]",
+  "#ea580c": "bg-[#ea580c]",
+  "#ca8a04": "bg-[#ca8a04]",
+  "#16a34a": "bg-[#16a34a]",
+  "#0891b2": "bg-[#0891b2]",
+  "#64748b": "bg-[#64748b]",
+  "#0f172a": "bg-[#0f172a]",
+};
 
 export function ManageLabelsRoute() {
   const s = useWebApp();
@@ -17,33 +32,29 @@ export function ManageLabelsRoute() {
 
   return (
     <>
-      {/* ── Top bar ─────────────────────────────────────────────────── */}
-      <div style={ui.topBar}>
-        <h2 style={ui.topBarTitle}>Manage Labels</h2>
+      <div className="mb-4">
+        <h2 className="text-xl font-semibold tracking-tight">Manage Labels</h2>
       </div>
 
-      {/* ── Create label form ────────────────────────────────────────── */}
-      <div style={ui.composeSection}>
-        <p style={ui.composeSectionTitle}>New label</p>
-        <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-          <input
+      <Card className="mb-4 p-4">
+        <p className="mb-2 text-sm font-semibold text-foreground">New label</p>
+        <div className="flex items-center gap-2">
+          <Input
             placeholder="Label name"
             value={s.newLabelName}
             onChange={(e) => s.setNewLabelName(e.target.value)}
             disabled={s.labelBusy}
-            style={{ ...ui.compactInput, flex: 1 }}
+            className="flex-1"
           />
-          <button
+          <Button
             onClick={s.createLabel}
             disabled={s.labelBusy || s.dataBusy || !s.newLabelName.trim()}
-            style={ui.primaryButton}
           >
             {s.labelBusy ? "Saving…" : "Add label"}
-          </button>
+          </Button>
         </div>
 
-        {/* Colour swatches */}
-        <div style={{ display: "flex", gap: 6, marginBlockStart: 10, flexWrap: "wrap" as const }}>
+        <div className="mt-2.5 flex flex-wrap gap-1.5">
           {PRESET_COLORS.map((color) => (
             <button
               key={color}
@@ -52,65 +63,41 @@ export function ManageLabelsRoute() {
               disabled={s.labelBusy}
               title={color}
               aria-label={`Pick colour ${color}`}
-              style={{
-                width: 22,
-                height: 22,
-                borderRadius: "50%",
-                background: color,
-                border: s.newLabelColor === color ? "2px solid var(--text-primary)" : "2px solid transparent",
-                cursor: "pointer",
-                padding: 0,
-                outline: s.newLabelColor === color ? "2px solid var(--bg-surface)" : "none",
-                outlineOffset: -3,
-              }}
+              className={`h-[22px] w-[22px] cursor-pointer rounded-full p-0 ${COLOR_CLASSES[color]} ${
+                s.newLabelColor === color ? "ring-2 ring-foreground ring-offset-2 ring-offset-background" : "border-2 border-transparent"
+              }`}
             />
           ))}
         </div>
-        <div style={{ display: "none" }}>
-        </div>
-      </div>
+      </Card>
 
-      {/* ── Labels list ──────────────────────────────────────────────── */}
-      <div style={ui.mainBody}>
+      <div>
         {s.labels.length === 0 && !s.dataBusy && (
-          <p style={{ color: "var(--text-subtle)", fontSize: 14, textAlign: "center", marginTop: 48 }}>
+          <p className="mt-12 text-center text-sm text-muted-foreground">
             No labels yet — create your first one above.
           </p>
         )}
         {s.dataBusy && (
-          <p style={{ color: "var(--text-subtle)", fontSize: 14, padding: "20px 0" }}>Loading…</p>
+          <p className="py-5 text-sm text-muted-foreground">Loading…</p>
         )}
-        <ul style={{ listStyle: "none", margin: 0, padding: 0 }}>
+        <ul className="m-0 list-none rounded-xl border bg-card p-0">
           {s.labels.map((l) => (
             <li
               key={l.id}
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 10,
-                padding: "12px 0",
-                borderBottom: "1px solid var(--border-soft)",
-              }}
+              className="flex items-center gap-2 border-b px-3 py-3 last:border-b-0"
             >
               <span
-                style={{
-                  width: 14,
-                  height: 14,
-                  borderRadius: "50%",
-                  background: l.color ?? "#cbd5e1",
-                  flexShrink: 0,
-                }}
+                className={`h-3.5 w-3.5 shrink-0 rounded-full ${COLOR_CLASSES[l.color ?? ""] ?? "bg-slate-300"}`}
               />
               {s.editingLabelId === l.id ? (
-                <div style={{ display: "flex", flexDirection: "column", gap: 8, flex: 1 }}>
-                  <input
+                <div className="flex flex-1 flex-col gap-2">
+                  <Input
                     value={s.editLabelName}
                     onChange={(e) => s.setEditLabelName(e.target.value)}
                     disabled={s.labelBusy}
-                    style={ui.compactInput}
                     aria-label={`Edit name for ${l.name}`}
                   />
-                  <div style={{ display: "flex", gap: 6, flexWrap: "wrap" as const }}>
+                  <div className="flex flex-wrap gap-1.5">
                     {PRESET_COLORS.map((color) => (
                       <button
                         key={`${l.id}-${color}`}
@@ -119,69 +106,60 @@ export function ManageLabelsRoute() {
                         disabled={s.labelBusy}
                         title={color}
                         aria-label={`Set ${l.name} colour to ${color}`}
-                        style={{
-                          width: 20,
-                          height: 20,
-                          borderRadius: "50%",
-                          background: color,
-                          border: s.editLabelColor === color ? "2px solid var(--text-primary)" : "2px solid transparent",
-                          cursor: "pointer",
-                          padding: 0,
-                          outline: s.editLabelColor === color ? "2px solid var(--bg-surface)" : "none",
-                          outlineOffset: -3,
-                        }}
+                        className={`h-5 w-5 cursor-pointer rounded-full p-0 ${COLOR_CLASSES[color]} ${
+                          s.editLabelColor === color ? "ring-2 ring-foreground ring-offset-2 ring-offset-background" : "border-2 border-transparent"
+                        }`}
                       />
                     ))}
                   </div>
-                  <div style={{ display: "flex", gap: 8 }}>
-                    <button
+                  <div className="flex gap-2">
+                    <Button
                       type="button"
                       onClick={s.saveLabelEdit}
                       disabled={s.labelBusy || !s.editLabelName.trim()}
-                      style={ui.smallButton}
+                      variant="secondary"
+                      size="sm"
                     >
                       Save
-                    </button>
-                    <button
+                    </Button>
+                    <Button
                       type="button"
                       onClick={s.cancelEditLabel}
                       disabled={s.labelBusy}
-                      style={ui.smallButton}
+                      variant="secondary"
+                      size="sm"
                     >
                       Cancel
-                    </button>
+                    </Button>
                   </div>
                 </div>
               ) : (
                 <>
-                  <span style={{ fontSize: 14, color: "var(--text-primary)", flex: 1 }}>{l.name}</span>
-                  <div style={{ display: "flex", gap: 8 }}>
-                    <button
+                  <span className="flex-1 text-sm text-foreground">{l.name}</span>
+                  <div className="flex gap-2">
+                    <Button
                       type="button"
                       onClick={() => s.beginEditLabel(l)}
                       disabled={s.labelBusy}
-                      style={ui.smallButton}
+                      variant="secondary"
+                      size="sm"
                       aria-label={`Edit label ${l.name}`}
                     >
                       Edit
-                    </button>
-                    <button
+                    </Button>
+                    <Button
                       type="button"
                       onClick={() => {
                         if (!confirmDeleteLabel(l.name)) return;
                         void s.deleteLabel(l);
                       }}
                       disabled={s.labelBusy}
-                      style={{
-                        ...ui.smallButton,
-                        borderColor: "var(--danger-border)",
-                        color: "var(--danger)",
-                        background: "var(--danger-bg)",
-                      }}
+                      variant="destructive"
+                      size="sm"
                       aria-label={`Delete label ${l.name}`}
                     >
                       Delete
-                    </button>
+                    </Button>
                   </div>
                 </>
               )}

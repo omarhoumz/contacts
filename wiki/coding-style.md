@@ -20,9 +20,18 @@ Update this file whenever a new convention is established or an existing one is 
 
 ---
 
+## Styling System
+
+- Web (`apps/web`) uses Tailwind utility classes and shadcn-style primitives.
+- Mobile (`apps/mobile`) uses NativeWind class-based styling.
+- Runtime inline styles (`style={{...}}`) are not allowed in app UI code.
+- Shared class composition helper is `cn()` (`clsx` + `tailwind-merge`).
+
+---
+
 ## Logical Properties — RTL by Design
 
-All layout CSS **must** use [CSS logical properties](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_logical_properties_and_values) instead of physical directional properties. This makes every layout bidirectional (LTR/RTL) at zero extra cost.
+All layout CSS and utility choices should stay RTL-safe by default.
 
 ### Property mapping
 
@@ -45,27 +54,11 @@ All layout CSS **must** use [CSS logical properties](https://developer.mozilla.o
 | `width` (for inline sizing intent) | `inlineSize` |
 | `height` (for block sizing intent) | `blockSize` |
 
-### React inline style examples
-
-```tsx
-// ❌ Physical
-<div style={{ marginLeft: "auto", paddingLeft: 16, borderLeft: "3px solid blue" }} />
-
-// ✅ Logical
-<div style={{ marginInlineStart: "auto", paddingInlineStart: 16, borderInlineStart: "3px solid blue" }} />
-```
-
-### When physical properties are acceptable
-
-- `width` / `height` when the value is literally a fixed size not related to reading direction (e.g., avatar circles, icon sizes).
-- `top` / `bottom` for vertical stacking unrelated to reading direction.
-- Vendor/third-party component APIs that don't support logical properties yet.
-
 ### Enforcement
 
-- New code must use logical properties for all inline/block directional styling.
-- Existing code is migrated opportunistically — touch it when you're already editing that file.
-- The `ui-styles.ts` token file is the reference implementation; all tokens should use logical properties.
+- New code must keep directional behavior RTL-safe (`start/end` semantics over hard left/right assumptions).
+- Runtime inline style objects are disallowed in app UI.
+- Use shared primitives and utility classes instead of per-file style maps.
 
 ---
 

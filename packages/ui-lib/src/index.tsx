@@ -2,7 +2,7 @@ import type { PropsWithChildren } from 'react'
 
 export function Card({ children }: PropsWithChildren) {
   return (
-    <div style={{ border: '1px solid #ddd', borderRadius: 8, padding: 12 }}>
+    <div className="rounded-xl border border-border bg-card p-3 text-card-foreground shadow-card">
       {children}
     </div>
   )

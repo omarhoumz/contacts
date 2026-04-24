@@ -1,9 +1,10 @@
 import { useState, useCallback, useEffect, type ReactNode } from "react";
-import { ui, feedbackColor, SIDEBAR_W, SIDEBAR_W_COLLAPSED } from "./ui-styles";
 import { SidebarNav } from "./sidebar-nav";
 import { BottomNav } from "./bottom-nav";
 import { useWebApp } from "./web-app-context";
 import { useBreakpoint } from "./use-breakpoint";
+import { cn } from "./lib/cn";
+import { AlertCircle, CheckCircle2, Info } from "lucide-react";
 
 const LS_KEY = "sidebar-collapsed";
 
@@ -42,21 +43,11 @@ export function AppShell({ children }: AppShellProps) {
   }, []);
 
   const isMobile = bp === "mobile";
-  const sidebarW = isMobile ? 0 : collapsed ? SIDEBAR_W_COLLAPSED : SIDEBAR_W;
+  const shellMarginClass = isMobile ? "ml-0" : collapsed ? "ml-12" : "ml-[220px]";
 
   return (
     <div
-      style={{
-        ...ui.shell,
-        marginInlineStart: sidebarW,
-        ...(isMobile
-          ? {
-              height: "100dvh",
-              display: "flex",
-              flexDirection: "column",
-            }
-          : {}),
-      }}
+      className={cn("min-h-screen bg-background transition-[margin] rtl:mr-0", shellMarginClass)}
     >
       {!isMobile && (
         <SidebarNav
@@ -70,32 +61,23 @@ export function AppShell({ children }: AppShellProps) {
         />
       )}
 
-      <main
-        style={{
-          ...ui.mainContent,
-          ...(isMobile
-            ? {
-                flex: 1,
-                minHeight: 0,
-                overflowY: "auto",
-                paddingBlockEnd: 64,
-              }
-            : {}),
-        }}
-      >
+      <main className={cn("mx-auto w-full max-w-5xl p-4 sm:p-5", isMobile && "min-h-0 flex-1 overflow-y-auto pb-16")}>
         {s.feedback ? (
           <div
-            style={{
-              ...ui.feedbackBanner,
-              color: feedbackColor(s.feedback.tone),
-              background:
-                s.feedback.tone === "error"
-                  ? "var(--danger-bg)"
-                  : s.feedback.tone === "success"
-                    ? "color-mix(in srgb, var(--success) 20%, var(--bg-surface))"
-                    : "color-mix(in srgb, var(--info) 20%, var(--bg-surface))",
-            }}
+            className={cn(
+              "mb-3 flex items-center gap-2 rounded-md border px-3 py-2 text-sm",
+              s.feedback.tone === "error" && "border-destructive/40 bg-destructive/10 text-destructive",
+              s.feedback.tone === "success" && "border-success/40 bg-success/10 text-success",
+              s.feedback.tone === "info" && "border-info/40 bg-info/10 text-info",
+            )}
           >
+            {s.feedback.tone === "error" ? (
+              <AlertCircle size={14} />
+            ) : s.feedback.tone === "success" ? (
+              <CheckCircle2 size={14} />
+            ) : (
+              <Info size={14} />
+            )}
             {s.feedback.text}
           </div>
         ) : null}

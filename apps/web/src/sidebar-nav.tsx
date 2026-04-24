@@ -1,5 +1,4 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { ui, SIDEBAR_W, SIDEBAR_W_COLLAPSED } from "./ui-styles";
 import {
   IconUser,
   IconMerge,
@@ -10,6 +9,8 @@ import {
   IconChevronsRight,
   IconLogOut,
 } from "./icons";
+import { Button } from "./components/ui/button";
+import { cn } from "./lib/cn";
 
 type SidebarNavProps = {
   sessionEmail: string | null;
@@ -43,49 +44,53 @@ export function SidebarNav({
   onToggleTheme,
 }: SidebarNavProps) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
-  const w = collapsed ? SIDEBAR_W_COLLAPSED : SIDEBAR_W;
 
   return (
-    <nav style={{ ...ui.sidebar, width: w }}>
-      {/* ── Header ────────────────────────────────────────────────────────── */}
+    <nav
+      className={cn(
+        "fixed inset-y-0 left-0 z-30 flex flex-col overflow-hidden border-r bg-background transition-[width]",
+        collapsed ? "w-12" : "w-[220px]",
+      )}
+    >
       <div
-        style={{
-          ...ui.sidebarHeader,
-          ...(collapsed ? ui.sidebarHeaderCollapsed : {}),
-        }}
+        className={cn(
+          "flex w-full items-center gap-2 overflow-hidden border-b px-5 pb-3 pt-5",
+          collapsed && "justify-center px-0",
+        )}
       >
         {!collapsed && (
-          <div style={ui.sidebarBranding}>
-            <p style={ui.sidebarAppName}>WidadOS</p>
-            {sessionEmail ? <p style={ui.sidebarEmail}>{sessionEmail}</p> : null}
+          <div className="min-w-0 flex-1 overflow-hidden">
+            <p className="m-0 whitespace-nowrap text-xl font-bold tracking-tight text-foreground">WidadOS</p>
+            {sessionEmail ? (
+              <p className="m-0 mt-1 truncate text-xs text-muted-foreground">{sessionEmail}</p>
+            ) : null}
           </div>
         )}
 
-        <button
+        <Button
           onClick={onToggleCollapse}
-          style={ui.sidebarToggleBtn}
+          variant="ghost"
+          size="icon"
           aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
           title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
         >
           {collapsed ? <IconChevronsRight size={16} /> : <IconChevronsLeft size={16} />}
-        </button>
+        </Button>
       </div>
 
-      {/* ── Nav list ──────────────────────────────────────────────────────── */}
-      <ul style={ui.navList}>
+      <ul className="m-0 flex flex-1 list-none flex-col overflow-hidden p-0 py-1">
         {NAV_ORDER.map((item) => {
-          const itemStyle = {
-            ...ui.navItem,
-            ...(collapsed ? ui.navItemCollapsed : {}),
-          };
-
           if (item.kind === "route") {
             const isActive = pathname === item.to || pathname.startsWith(item.to + "/");
             return (
               <li key={item.to}>
                 <Link
                   to={item.to}
-                  style={{ ...itemStyle, ...(isActive ? ui.navItemActive : {}) }}
+                  className={cn(
+                    "flex w-full items-center gap-2 overflow-hidden border-l-4 border-transparent px-4 py-3 text-sm text-muted-foreground no-underline",
+                    collapsed && "justify-center px-0",
+                    isActive && "border-l-primary bg-secondary text-primary font-semibold",
+                  )}
                   title={collapsed ? item.label : undefined}
                   aria-label={collapsed ? item.label : undefined}
                 >
@@ -99,7 +104,10 @@ export function SidebarNav({
           return (
             <li key={item.label}>
               <span
-                style={{ ...itemStyle, ...ui.navItemDisabled }}
+                className={cn(
+                  "pointer-events-none flex w-full items-center gap-2 overflow-hidden border-l-4 border-transparent px-4 py-3 text-sm text-muted-foreground opacity-70",
+                  collapsed && "justify-center px-0",
+                )}
                 title={collapsed ? item.label : undefined}
                 aria-label={collapsed ? item.label : undefined}
               >
@@ -111,32 +119,39 @@ export function SidebarNav({
         })}
       </ul>
 
-      {/* ── Footer ────────────────────────────────────────────────────────── */}
       <div
-        style={{
-          ...ui.sidebarFooter,
-          ...(collapsed ? ui.sidebarFooterCollapsed : {}),
-        }}
+        className={cn(
+          "border-t px-5 py-3",
+          collapsed && "flex justify-center px-0",
+        )}
       >
         {!collapsed && (
-          <button
+          <Button
             onClick={onToggleTheme}
-            style={{ ...ui.smallButton, marginBottom: 10, width: "100%" }}
+            variant="secondary"
+            size="sm"
+            className="mb-2 w-full"
             aria-label="Toggle theme"
           >
             {themeMode === "dark" ? "Light mode" : "Dark mode"}
-          </button>
+          </Button>
         )}
-        <button
+        <Button
           onClick={onSignOut}
           disabled={authBusy}
-          style={ui.signOutBtn}
+          variant="ghost"
+          size={collapsed ? "icon" : "sm"}
+          className={cn(
+            "hover:bg-transparent",
+            collapsed
+              ? "text-destructive"
+              : "w-full justify-start px-1 text-sm font-medium text-destructive/90 hover:text-destructive",
+          )}
           title={collapsed ? "Sign out" : undefined}
           aria-label={collapsed ? "Sign out" : undefined}
         >
-          <IconLogOut size={14} />
-          {!collapsed && (authBusy ? "Signing out…" : "Sign out")}
-        </button>
+          {collapsed ? <IconLogOut size={14} /> : (authBusy ? "Signing out…" : "Sign out")}
+        </Button>
       </div>
     </nav>
   );

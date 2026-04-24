@@ -1,5 +1,7 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import { IconUser, IconTrash, IconTag, IconLogOut } from "./icons";
+import { cn } from "./lib/cn";
+import { Button } from "./components/ui/button";
 
 type BottomNavProps = { onSignOut: () => void };
 
@@ -15,60 +17,37 @@ const NAV_ITEMS: NavItem[] = [
   { to: "/manage-labels", label: "Labels", icon: <IconTag size={22} /> },
 ];
 
-const TAB: React.CSSProperties = {
-  flex: 1,
-  display: "flex",
-  flexDirection: "column",
-  alignItems: "center",
-  justifyContent: "center",
-  gap: 3,
-  minHeight: 44,
-  fontSize: 10,
-  fontWeight: 500,
-  color: "var(--text-muted)",
-  textDecoration: "none",
-  border: "none",
-  background: "none",
-  cursor: "pointer",
-  padding: 0,
-};
-
-const TAB_ACTIVE: React.CSSProperties = {
-  ...TAB,
-  color: "var(--accent)",
-};
-
-const BAR: React.CSSProperties = {
-  position: "fixed",
-  insetInlineStart: 0,
-  insetInlineEnd: 0,
-  bottom: 0,
-  height: 64,
-  background: "var(--bg-surface)",
-  borderBlockStart: "1px solid var(--border-strong)",
-  display: "flex",
-  zIndex: 40,
-};
-
 export function BottomNav({ onSignOut }: BottomNavProps) {
   const router = useRouterState();
   const current = router.location.pathname;
 
   return (
-    <nav style={BAR}>
+    <nav className="fixed inset-x-0 bottom-0 z-40 flex h-16 border-t bg-background">
       {NAV_ITEMS.map(({ to, label, icon }) => {
         const active = current === to || current.startsWith(to + "/");
         return (
-          <Link key={to} to={to} style={active ? TAB_ACTIVE : TAB}>
+          <Link
+            key={to}
+            to={to}
+            className={cn(
+              "flex min-h-11 flex-1 flex-col items-center justify-center gap-0.5 text-[10px] font-medium no-underline",
+              active ? "text-primary" : "text-muted-foreground",
+            )}
+          >
             {icon}
             <span>{label}</span>
           </Link>
         );
       })}
-      <button style={TAB} onClick={onSignOut} aria-label="Sign out">
+      <Button
+        variant="ghost"
+        className="h-auto min-h-11 flex-1 flex-col gap-0.5 rounded-none p-0 text-[10px] text-muted-foreground"
+        onClick={onSignOut}
+        aria-label="Sign out"
+      >
         <IconLogOut size={22} />
         <span>Sign out</span>
-      </button>
+      </Button>
     </nav>
   );
 }

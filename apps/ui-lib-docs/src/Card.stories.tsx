@@ -26,41 +26,19 @@ export const ContactRow: Story = {
   name: "Contact row example",
   render: () => (
     <Card>
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "flex-start",
-          gap: 16,
-        }}
-      >
+      <div className="flex items-start justify-between gap-4">
         <div>
-          <div style={{ fontWeight: 600, fontSize: 16 }}>Widad Contact</div>
-          <div style={{ fontSize: 13, color: "#555", marginTop: 8 }}>
-            <span
-              style={{
-                marginRight: 6,
-                padding: "2px 10px",
-                borderRadius: 999,
-                background: "#e0e7ff",
-                border: "1px solid #6366f1",
-              }}
-            >
+          <div className="text-base font-semibold">Widad Contact</div>
+          <div className="mt-2 text-[13px] text-muted-foreground">
+            <span className="mr-1.5 rounded-full border border-indigo-500 bg-indigo-100 px-2.5 py-0.5">
               Friends
             </span>
-            <span
-              style={{
-                padding: "2px 10px",
-                borderRadius: 999,
-                background: "#fce7f3",
-                border: "1px solid #db2777",
-              }}
-            >
+            <span className="rounded-full border border-pink-600 bg-pink-100 px-2.5 py-0.5">
               Family
             </span>
           </div>
         </div>
-        <button type="button" style={{ fontSize: 13 }}>
+        <button type="button" className="text-[13px]">
           Edit
         </button>
       </div>

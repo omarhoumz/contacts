@@ -7,9 +7,9 @@ import { ContactsSection } from "./contacts-section";
 export function App() {
   const s = useMobileAppState();
   return (
-    <SafeAreaView style={{ flex: 1 }}>
-      <ScrollView contentContainerStyle={{ padding: 16, gap: 12, paddingBottom: 32 }}>
-        <Text style={{ fontSize: 26, fontWeight: "700" }}>WidadOS Mobile</Text>
+    <SafeAreaView className="flex-1">
+      <ScrollView contentContainerClassName="gap-3 px-4 pb-8 pt-4">
+        <Text className="text-3xl font-bold">WidadOS Mobile</Text>
         <MobileCard label="Auth, contacts, labels, and trash" />
         <AuthSection
           sessionEmail={s.sessionEmail}
@@ -54,9 +54,9 @@ export function App() {
             />
           </>
         ) : (
-          <View style={{ padding: 12, borderWidth: 1, borderColor: "#e5e7eb", borderRadius: 8 }}>
-            <Text style={{ fontWeight: "600", marginBottom: 6 }}>Sign in to manage contacts</Text>
-            <Text style={{ color: "#555" }}>Labels and contacts are hidden until you are signed in.</Text>
+          <View className="rounded-lg border border-slate-200 p-3">
+            <Text className="mb-1.5 font-semibold">Sign in to manage contacts</Text>
+            <Text className="text-slate-600">Labels and contacts are hidden until you are signed in.</Text>
           </View>
         )}
       </ScrollView>

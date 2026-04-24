@@ -1,8 +1,23 @@
 import { useState } from "react";
 import { normalizeLabels, getPrimaryPhone, getPrimaryEmail, type ContactRow, type LabelRow } from "./contact-search";
 import { detectCountryFromE164, type PhoneCountry } from "./phone-country";
-import { ui } from "./ui-styles";
 import { IconMoreHorizontal } from "./icons";
+import { Button } from "./components/ui/button";
+import { Card } from "./components/ui/card";
+import { cn } from "./lib/cn";
+
+const LABEL_COLOR_CLASSES: Record<string, string> = {
+  "#2563eb": "bg-[#2563eb]/20 text-[#2563eb]",
+  "#7c3aed": "bg-[#7c3aed]/20 text-[#7c3aed]",
+  "#db2777": "bg-[#db2777]/20 text-[#db2777]",
+  "#dc2626": "bg-[#dc2626]/20 text-[#dc2626]",
+  "#ea580c": "bg-[#ea580c]/20 text-[#ea580c]",
+  "#ca8a04": "bg-[#ca8a04]/20 text-[#ca8a04]",
+  "#16a34a": "bg-[#16a34a]/20 text-[#16a34a]",
+  "#0891b2": "bg-[#0891b2]/20 text-[#0891b2]",
+  "#64748b": "bg-[#64748b]/20 text-[#64748b]",
+  "#0f172a": "bg-[#0f172a]/20 text-[#0f172a]",
+};
 
 type ContactsSectionProps = {
   showTrash: boolean;
@@ -26,29 +41,29 @@ export function ContactsSection(props: ContactsSectionProps) {
 
   if (props.dataBusy) {
     return (
-      <div style={{ ...ui.listCard, padding: "20px 16px" }}>
-        <p style={{ margin: 0, color: "var(--text-subtle)", fontSize: 14 }}>Loading…</p>
-      </div>
+      <Card className="p-4">
+        <p className="m-0 text-sm text-muted-foreground">Loading…</p>
+      </Card>
     );
   }
 
   if (props.displayedContacts.length === 0) {
     return (
-      <div style={{ ...ui.listCard, padding: "48px 24px", textAlign: "center" }}>
-        <p style={{ margin: 0, color: "var(--text-subtle)", fontSize: 14 }}>
+      <Card className="p-12 text-center">
+        <p className="m-0 text-sm text-muted-foreground">
           {props.showTrash
             ? "Trash is empty."
             : "No contacts yet — add your first one above."}
         </p>
-      </div>
+      </Card>
     );
   }
 
   const count = props.displayedContacts.length;
 
   return (
-    <div style={ui.listCard}>
-      <ul style={{ listStyle: "none", margin: 0, padding: 0 }}>
+    <Card>
+      <ul className="m-0 list-none p-0">
         {props.displayedContacts.map((contact, idx) => {
           const isLast = idx === props.displayedContacts.length - 1;
           const isExpanded = expandedId === contact.id;
@@ -61,53 +76,23 @@ export function ContactsSection(props: ContactsSectionProps) {
 
           return (
             <li key={contact.id}>
-              {/* ── Main row (always 48px) ───────────────────────────── */}
               <div
-                style={{
-                  ...ui.contactRow,
-                  borderBottom: isExpanded || !isLast ? "1px solid var(--border-soft)" : "none",
-                }}
+                className={cn(
+                  "flex items-center gap-3 px-4 py-3",
+                  (isExpanded || !isLast) && "border-b",
+                )}
               >
-                {/* Avatar */}
-                <div style={ui.avatar}>
+                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/15 text-xs font-semibold text-primary">
                   {contact.display_name.slice(0, 2).toUpperCase()}
                 </div>
 
-                {/* Name + secondary line + label pills */}
-                <div
-                  style={{
-                    flex: 1,
-                    minWidth: 0,
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 8,
-                    overflow: "hidden",
-                  }}
-                >
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div
-                      style={{
-                        fontSize: 14,
-                        fontWeight: 600,
-                        color: "var(--text-primary)",
-                        whiteSpace: "nowrap",
-                        overflow: "hidden",
-                        textOverflow: "ellipsis",
-                      }}
-                    >
+                <div className="flex min-w-0 flex-1 items-center gap-2 overflow-hidden">
+                  <div className="min-w-0 flex-1">
+                    <div className="truncate text-sm font-semibold text-foreground">
                       {contact.display_name}
                     </div>
                     {(getPrimaryPhone(contact) ?? getPrimaryEmail(contact)) && (
-                      <div
-                        style={{
-                          fontSize: 12,
-                          color: "var(--text-muted)",
-                          whiteSpace: "nowrap",
-                          overflow: "hidden",
-                          textOverflow: "ellipsis",
-                          marginBlockStart: 1,
-                        }}
-                      >
+                      <div className="mt-0.5 truncate text-xs text-muted-foreground">
                         {[getPrimaryPhone(contact), getPrimaryEmail(contact)]
                           .filter(Boolean)
                           .join(" · ")}
@@ -115,23 +100,15 @@ export function ContactsSection(props: ContactsSectionProps) {
                     )}
                   </div>
 
-                  {/* Pills pushed to inline-end */}
                   {assignedLabels.length > 0 && (
-                    <div
-                      style={{
-                        display: "flex",
-                        gap: 4,
-                        flexShrink: 0,
-                      }}
-                    >
+                    <div className="flex shrink-0 gap-1">
                       {assignedLabels.map((l) => (
                         <span
                           key={l.id}
-                          style={{
-                            ...ui.labelPill,
-                            background: l.color ? `${l.color}33` : "var(--bg-subtle)",
-                            color: l.color ?? "var(--text-muted)",
-                          }}
+                          className={cn(
+                            "rounded-full px-2 py-0.5 text-[11px] font-medium",
+                            l.color ? LABEL_COLOR_CLASSES[l.color] : "bg-muted text-muted-foreground",
+                          )}
                         >
                           {l.name}
                         </span>
@@ -140,64 +117,53 @@ export function ContactsSection(props: ContactsSectionProps) {
                   )}
                 </div>
 
-                {/* Overflow menu toggle */}
-                <button
-                  style={{
-                    ...ui.iconButton,
-                    color: isExpanded ? "var(--accent)" : "var(--text-subtle)",
-                  }}
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className={cn(isExpanded ? "text-primary" : "text-muted-foreground")}
                   onClick={() =>
                     setExpandedId(isExpanded ? null : contact.id)
                   }
                   aria-label="More actions"
                 >
                   <IconMoreHorizontal size={16} />
-                </button>
+                </Button>
               </div>
 
-              {/* ── Expanded actions panel ───────────────────────────── */}
               {isExpanded && (
                 <div
-                  style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 6,
-                  paddingBlock: "8px 10px",
-                  paddingInlineStart: 60,
-                  paddingInlineEnd: 16,
-                  flexWrap: "wrap" as const,
-                  borderBottom: isLast ? "none" : "1px solid var(--border-soft)",
-                  background: "var(--bg-subtle)",
-                  }}
+                  className={cn(
+                    "flex flex-wrap items-center gap-1.5 bg-muted px-4 pb-2 pt-2",
+                    !isLast && "border-b",
+                    "pl-[60px]",
+                  )}
                 >
                   {props.showTrash ? (
                     <>
-                      <button
+                      <Button
                         onClick={() => {
                           props.restoreContact(contact.id);
                           setExpandedId(null);
                         }}
-                        style={ui.smallButton}
+                        variant="secondary"
+                        size="sm"
                       >
                         Restore
-                      </button>
-                      <button
+                      </Button>
+                      <Button
                         onClick={() => {
                           props.permanentlyDeleteContact(contact.id);
                           setExpandedId(null);
                         }}
-                        style={{
-                          ...ui.smallButton,
-                          color: "var(--danger)",
-                          borderColor: "var(--danger-border)",
-                        }}
+                        variant="destructive"
+                        size="sm"
                       >
                         Delete forever
-                      </button>
+                      </Button>
                     </>
                   ) : (
                     <>
-                      <button
+                      <Button
                         onClick={() => {
                           props.setEditingId(contact.id);
                           props.setDisplayName(contact.display_name);
@@ -208,37 +174,26 @@ export function ContactsSection(props: ContactsSectionProps) {
                           );
                           setExpandedId(null);
                         }}
-                        style={ui.smallButton}
+                        variant="secondary"
+                        size="sm"
                       >
                         Edit
-                      </button>
-                      <button
+                      </Button>
+                      <Button
                         onClick={() => {
                           props.softDeleteContact(contact.id);
                           setExpandedId(null);
                         }}
-                        style={{
-                          ...ui.smallButton,
-                          color: "var(--danger)",
-                          borderColor: "var(--danger-border)",
-                        }}
+                        variant="destructive"
+                        size="sm"
                       >
                         Move to trash
-                      </button>
+                      </Button>
 
-                      {/* Label toggles — only shown in expanded panel */}
                       {props.labels.length > 0 && (
-                        <span
-                          style={{
-                            width: "100%",
-                            display: "flex",
-                            gap: 4,
-                            flexWrap: "wrap" as const,
-                            marginTop: 4,
-                          }}
-                        >
+                        <span className="mt-1 flex w-full flex-wrap gap-1">
                           {props.labels.map((l) => (
-                            <button
+                            <Button
                               key={l.id}
                               type="button"
                               onClick={() =>
@@ -249,19 +204,13 @@ export function ContactsSection(props: ContactsSectionProps) {
                                 )
                               }
                               disabled={props.mutationBusy}
-                              style={{
-                                ...ui.smallButton,
-                                borderColor: assignedIds.has(l.id)
-                                  ? "var(--accent)"
-                                  : "var(--border-strong)",
-                                color: assignedIds.has(l.id)
-                                  ? "var(--accent)"
-                                  : "var(--text-muted)",
-                              }}
+                              variant="secondary"
+                              size="sm"
+                              className={cn(assignedIds.has(l.id) && "border-primary text-primary")}
                             >
                               {assignedIds.has(l.id) ? "✓ " : "+ "}
                               {l.name}
-                            </button>
+                            </Button>
                           ))}
                         </span>
                       )}
@@ -274,11 +223,10 @@ export function ContactsSection(props: ContactsSectionProps) {
         })}
       </ul>
 
-      {/* Contact count footer */}
-      <div style={ui.listCardFooter}>
+      <div className="border-t px-4 py-2 text-xs text-muted-foreground">
         {count} {count === 1 ? "contact" : "contacts"}
         {props.showTrash ? " in trash" : ""}
       </div>
-    </div>
+    </Card>
   );
 }

@@ -53,9 +53,10 @@ The web app (`apps/web`) was fully rewritten across R2–R7. Key decisions:
 - Shell uses `marginInlineStart` (logical property) to offset the fixed sidebar — RTL-safe.
 
 ### Styling
-- All styles are in `ui-styles.ts` as a single exported `ui` object. No Tailwind or CSS files (except `index.css` CSS reset).
-- **Logical CSS properties** everywhere (`paddingInlineStart`, `marginInlineStart`, `borderInlineStart`, etc.) — see `wiki/coding-style.md`.
-- Constants: `SIDEBAR_W = 220`, `SIDEBAR_W_COLLAPSED = 48` exported from `ui-styles.ts`.
+- Web uses Tailwind utility classes and shadcn-style primitives.
+- Mobile uses NativeWind class-based styling.
+- Runtime inline style objects are deprecated and removed from app UI surfaces.
+- Theme mode uses `dark` class on `document.documentElement` with CSS token variables in `apps/web/src/index.css`.
 
 ### File naming
 - All source files are **kebab-case** — see `wiki/coding-style.md`.

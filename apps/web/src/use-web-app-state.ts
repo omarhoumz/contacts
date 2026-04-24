@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { createClient } from "@supabase/supabase-js";
 import { useWebContactsDomain } from "./use-web-contacts-domain";
 import { useWebLabelsDomain } from "./use-web-labels-domain";
-import { applyTheme, type ThemeMode } from "./ui-styles";
+type ThemeMode = "light" | "dark";
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL ?? "";
 const supabasePublishableKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY ?? "";
@@ -57,7 +57,9 @@ export function useWebAppState() {
   }, []);
 
   useEffect(() => {
-    applyTheme(themeMode);
+    if (typeof document !== "undefined") {
+      document.documentElement.classList.toggle("dark", themeMode === "dark");
+    }
     try {
       localStorage.setItem("theme-mode", themeMode);
     } catch {
