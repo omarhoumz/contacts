@@ -465,3 +465,4 @@ This section is the authoritative rewrite blueprint for R1.
   - `PNPM_HOME="$PWD/.pnpm-home" pnpm install --store-dir "$PWD/.pnpm-store"`
 - External tasks (Supabase/Netlify/EAS) require human credentials and dashboard access.
 - Do not fabricate secrets, URLs, or build IDs; leave task as **BLOCKED** with what is needed.
+
