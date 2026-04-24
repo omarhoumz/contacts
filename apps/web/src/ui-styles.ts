@@ -29,22 +29,25 @@ export const ui = {
 
   // ── Authenticated shell ───────────────────────────────────────────────────
   shell: {
-    display: "flex",
-    height: "100vh",
-    overflow: "hidden",
     fontFamily: "Inter, sans-serif",
     background: "#f8fafc",
+    marginLeft: 220,
+    minHeight: "100vh",
   },
 
   // ── Sidebar ───────────────────────────────────────────────────────────────
   sidebar: {
+    position: "fixed" as const,
+    top: 0,
+    left: 0,
     width: 220,
-    minWidth: 220,
+    height: "100vh",
     background: "#ffffff",
     borderRight: "1px solid #e2e8f0",
     display: "flex",
     flexDirection: "column" as const,
-    height: "100vh",
+    zIndex: 20,
+    overflow: "hidden",
   },
   sidebarHeader: {
     padding: "20px 20px 14px",
@@ -70,7 +73,8 @@ export const ui = {
     padding: "8px 0",
     listStyle: "none",
     margin: 0,
-    overflowY: "auto" as const,
+    minHeight: 0,
+    overflow: "hidden",
   },
   navItem: {
     display: "flex",
@@ -123,11 +127,9 @@ export const ui = {
 
   // ── Main content ──────────────────────────────────────────────────────────
   mainContent: {
-    flex: 1,
     display: "flex",
     flexDirection: "column" as const,
-    minWidth: 0,
-    overflowY: "auto" as const,
+    minHeight: "100vh",
   },
   topBar: {
     display: "flex",
@@ -159,9 +161,15 @@ export const ui = {
     width: 240,
     fontFamily: "inherit",
   },
+  composeSection: {
+    padding: "14px 24px",
+    background: "#f8fafc",
+    borderBottom: "1px solid #e2e8f0",
+  },
   mainBody: {
     padding: 24,
     flex: 1,
+    overflowY: "auto" as const,
   },
 
   // ── Right aside (post-MVP) ────────────────────────────────────────────────

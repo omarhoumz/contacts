@@ -10,9 +10,10 @@ type SidebarNavProps = {
 const ACTIVE_ROUTES = [
   { to: "/contacts", label: "Contacts" },
   { to: "/trash", label: "Trash" },
+  { to: "/manage-labels", label: "Manage Labels" },
 ] as const;
 
-const STUB_ITEMS = ["Fix & Merge", "Import", "Manage Labels"] as const;
+const STUB_ITEMS = ["Fix & Merge", "Import"] as const;
 
 export function SidebarNav({ sessionEmail, authBusy, onSignOut }: SidebarNavProps) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });

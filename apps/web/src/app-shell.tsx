@@ -35,14 +35,6 @@ export function AppShell({ children }: AppShellProps) {
         ) : null}
         {children}
       </main>
-
-      <aside style={ui.rightAside}>
-        <div style={ui.asidePlaceholder}>
-          <p style={ui.asidePlaceholderTitle}>Contact details</p>
-          <p style={ui.asidePlaceholderText}>Select a contact to view details.</p>
-          <span style={ui.postMvpBadge}>Post-MVP</span>
-        </div>
-      </aside>
     </div>
   );
 }
