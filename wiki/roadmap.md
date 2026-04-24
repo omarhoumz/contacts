@@ -12,7 +12,7 @@ This file is the single source of truth for roadmap, progress, and execution.
 ### Now / Next / Later
 
 - **Now:** `R7` — end-to-end web acceptance pass.
-- **Next:** `R8` docs closeout, then `R9` dark mode.
+- **Next:** `R8` docs closeout, `R10` phone + email fields, then `R9` dark mode.
 - **Later:** `R9` dark mode; then re-enter deferred cloud/mobile tasks (`D4`-`D8`, `E3`).
 
 ### R5 Design Decisions (approved 2026-04-23)
@@ -59,7 +59,7 @@ Routes:
 
 1. Senior PM picks the next highest-priority task (**TODO** or continue **IN_PROGRESS**) and confirms dependencies/scope.
 2. Senior Fullstack engineer implements the task and confirms implementation quality against requirements.
-3. Senior QA engineer validates behavior with manual web testing in Cursor browser (localhost), skipping mobile manual QA unless explicitly requested; add/update automated tests when needed.
+3. Senior QA engineer validates behavior with manual web testing in Cursor browser (localhost), skipping mobile manual QA unless explicitly requested; add/update automated tests when needed. Always set viewport to at least 1280×800 before interacting — small viewports cause layout clipping and false failures.
 4. If QA fails, Senior Fullstack engineer implements feedback and hands back to QA.
 5. Repeat steps 3-4 until QA passes.
 6. If QA passes, Senior PM validates acceptance criteria and performs the end PM check.
@@ -108,7 +108,8 @@ Routes:
 | R6  | P1       | DONE         | code+test   | R5         | Expand rewrite regression coverage for auth gating, contacts search/filter, trash restore/delete, and labels assignment.                 | Added `filterContacts`, `isTrashContact`, `isActiveContact`, `isLabelAssigned`, `getAssignedLabelIds`, `getAssignedLabels`, `isAuthenticated` pure helpers to `contact-search.ts`; 35 Vitest unit tests covering all four critical flows (auth gating, search/filter, trash classification, label assignment); `pnpm --filter @widados/web test` and `typecheck` both exit 0.                                |
 | R7  | P1       | TODO         | manual      | R5,R6      | Run end-to-end local UX acceptance pass for rewrite (web mandatory, mobile deferred).                                                    | Signed-out/onboarding, signed-in CRUD, labels, search, trash, feedback states validated with evidence in Verification Log; web accepted as stable baseline.                                                                                                                                                                                                                                                  |
 | R8  | P1       | TODO         | docs        | R7         | Fold rewrite outcomes into roadmap/operations docs; define post-rewrite backlog and cloud/mobile re-entry criteria.                      | Updated roadmap + operations/docs include rewrite decisions, deferred items, and explicit gates to resume D4–D8 and E3.                                                                                                                                                                                                                                                                                      |
-| R9  | P2       | TODO         | code+design | R8         | Dark mode: system preference (`prefers-color-scheme`) on load + manual toggle in sidebar footer, persisted to `localStorage`. Web-first. | All routes (auth page, contacts, trash, manage labels) render correctly in both modes; toggle persists across reloads; no hard-coded light-only colours remain in `ui-styles.ts`.                                                                                                                                                                                                                            |
+| R10 | P1       | TODO         | code+test   | R7         | Phone + email fields on contacts: DB migration (`phone text`, `email text` nullable columns), shared Zod schema update, create/edit form fields (web), contact row secondary line display, search expanded to match phone/email. Web-first; mobile parity in a follow-up slice. | Migration applied locally; contacts can be created and edited with phone and email; values shown in contact row (secondary line below name or in expanded panel); phone/email values are matched by the search filter; `pnpm test` passes with updated search coverage; `pnpm typecheck` clean. |
+| R9  | P2       | TODO         | code+design | R10        | Dark mode: system preference (`prefers-color-scheme`) on load + manual toggle in sidebar footer, persisted to `localStorage`. Web-first. | All routes (auth page, contacts, trash, manage labels) render correctly in both modes; toggle persists across reloads; no hard-coded light-only colours remain in `ui-styles.ts`.                                                                                                                                                                                                                            |
 
 
 ## RLS verification (cross-user)
@@ -308,7 +309,8 @@ This section is the authoritative rewrite blueprint for R1.
 7. `R6` regression expansion for rewritten flows
 8. `R7` web acceptance pass
 9. `R8` docs + cloud/mobile re-entry criteria
-10. `R9` dark mode (last before post-MVP)
+10. `R10` phone + email fields on contacts (P1, last feature before dark mode)
+11. `R9` dark mode (last before post-MVP)
 
 ## Verification Log
 
