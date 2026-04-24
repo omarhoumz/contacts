@@ -12,8 +12,8 @@ This file is the single source of truth for roadmap, progress, and execution.
 ### Now / Next / Later
 
 - **Now:** `R6` — regression coverage expansion.
-- **Next:** `R6` rewrite regression expansion, then `R7` web acceptance.
-- **Later:** `R7`-`R8` acceptance and docs closeout; then re-enter deferred cloud/mobile tasks (`D4`-`D8`, `E3`).
+- **Next:** `R7` web acceptance pass, then `R8` docs closeout.
+- **Later:** `R9` dark mode; then re-enter deferred cloud/mobile tasks (`D4`-`D8`, `E3`).
 
 ### R5 Design Decisions (approved 2026-04-23)
 
@@ -108,6 +108,7 @@ Routes:
 | R6  | P1       | TODO         | code+test   | R5         | Expand rewrite regression coverage for auth gating, contacts search/filter, trash restore/delete, and labels assignment.         | Automated critical-flow coverage passes locally/CI, including rewritten UI paths.                                                                                                                                                                                                                                                                                                                            |
 | R7  | P1       | TODO         | manual      | R5,R6      | Run end-to-end local UX acceptance pass for rewrite (web mandatory, mobile deferred).                                            | Signed-out/onboarding, signed-in CRUD, labels, search, trash, feedback states validated with evidence in Verification Log; web accepted as stable baseline.                                                                                                                                                                                                                                                  |
 | R8  | P1       | TODO         | docs        | R7         | Fold rewrite outcomes into roadmap/operations docs; define post-rewrite backlog and cloud/mobile re-entry criteria.              | Updated roadmap + operations/docs include rewrite decisions, deferred items, and explicit gates to resume D4–D8 and E3.                                                                                                                                                                                                                                                                                      |
+| R9  | P2       | TODO         | code+design | R8         | Dark mode: system preference (`prefers-color-scheme`) on load + manual toggle in sidebar footer, persisted to `localStorage`. Web-first. | All routes (auth page, contacts, trash, manage labels) render correctly in both modes; toggle persists across reloads; no hard-coded light-only colours remain in `ui-styles.ts`. |
 
 
 ## RLS verification (cross-user)
@@ -307,6 +308,7 @@ This section is the authoritative rewrite blueprint for R1.
 7. `R6` regression expansion for rewritten flows
 8. `R7` web acceptance pass
 9. `R8` docs + cloud/mobile re-entry criteria
+10. `R9` dark mode (last before post-MVP)
 
 ## Verification Log
 
@@ -361,4 +363,3 @@ This section is the authoritative rewrite blueprint for R1.
   - `PNPM_HOME="$PWD/.pnpm-home" pnpm install --store-dir "$PWD/.pnpm-store"`
 - External tasks (Supabase/Netlify/EAS) require human credentials and dashboard access.
 - Do not fabricate secrets, URLs, or build IDs; leave task as **BLOCKED** with what is needed.
-
