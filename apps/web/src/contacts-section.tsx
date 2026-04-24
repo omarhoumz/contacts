@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { normalizeLabels, getPrimaryPhone, getPrimaryEmail, type ContactRow, type LabelRow } from "./contact-search";
+import { detectCountryFromE164, type PhoneCountry } from "./phone-country";
 import { ui } from "./ui-styles";
 import { IconMoreHorizontal } from "./icons";
 
@@ -13,6 +14,7 @@ type ContactsSectionProps = {
   setDisplayName: (value: string) => void;
   setContactPhone: (value: string) => void;
   setContactEmail: (value: string) => void;
+  setContactPhoneCountry: (value: PhoneCountry) => void;
   softDeleteContact: (id: string) => void;
   restoreContact: (id: string) => void;
   permanentlyDeleteContact: (id: string) => void;
@@ -201,6 +203,9 @@ export function ContactsSection(props: ContactsSectionProps) {
                           props.setDisplayName(contact.display_name);
                           props.setContactPhone(getPrimaryPhone(contact) ?? "");
                           props.setContactEmail(getPrimaryEmail(contact) ?? "");
+                          props.setContactPhoneCountry(
+                            detectCountryFromE164(getPrimaryPhone(contact) ?? ""),
+                          );
                           setExpandedId(null);
                         }}
                         style={ui.smallButton}

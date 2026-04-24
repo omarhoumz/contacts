@@ -3,7 +3,7 @@ import { useWebApp } from "./web-app-context";
 import { ContactsSection } from "./contacts-section";
 import { ui } from "./ui-styles";
 import { IconSearch } from "./icons";
-import { getPrimaryEmail, getPrimaryPhone } from "./contact-search";
+import { PHONE_COUNTRIES, formatDialPrefix } from "./phone-country";
 
 export function ContactsRoute() {
   const s = useWebApp();
@@ -28,6 +28,7 @@ export function ContactsRoute() {
     s.setDisplayName("");
     s.setContactPhone("");
     s.setContactEmail("");
+    s.setContactPhoneCountry("US");
   };
 
   return (
@@ -56,6 +57,7 @@ export function ContactsRoute() {
             s.setDisplayName("");
             s.setContactPhone("");
             s.setContactEmail("");
+            s.setContactPhoneCountry("US");
           }}
           style={ui.primaryButton}
           disabled={s.mutationBusy}
@@ -87,6 +89,18 @@ export function ContactsRoute() {
                 disabled={s.mutationBusy}
                 style={{ ...ui.compactInput, flex: 1 }}
               />
+              <select
+                value={s.contactPhoneCountry}
+                onChange={(e) => s.setContactPhoneCountry(e.target.value as (typeof PHONE_COUNTRIES)[number]["code"])}
+                disabled={s.mutationBusy}
+                style={{ ...ui.compactInput, flex: 1 }}
+              >
+                {PHONE_COUNTRIES.map((c) => (
+                  <option key={c.code} value={c.code}>
+                    {c.code} ({formatDialPrefix(c.code)})
+                  </option>
+                ))}
+              </select>
               <input
                 placeholder="Email"
                 type="email"
@@ -125,6 +139,7 @@ export function ContactsRoute() {
                       s.setDisplayName("");
                       s.setContactPhone("");
                       s.setContactEmail("");
+                      s.setContactPhoneCountry("US");
                     }}
                     style={ui.secondaryButton}
                   >
@@ -149,6 +164,7 @@ export function ContactsRoute() {
           setDisplayName={s.setDisplayName}
           setContactPhone={s.setContactPhone}
           setContactEmail={s.setContactEmail}
+          setContactPhoneCountry={s.setContactPhoneCountry}
           softDeleteContact={s.softDeleteContact}
           restoreContact={s.restoreContact}
           permanentlyDeleteContact={s.permanentlyDeleteContact}

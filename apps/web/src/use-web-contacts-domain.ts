@@ -2,6 +2,12 @@ import { useEffect, useMemo, useState } from "react";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { contactSchema } from "@widados/shared";
 import { contactMatchesQuery, type ContactRow } from "./contact-search";
+import {
+  detectCountryFromE164,
+  isLikelyValidE164,
+  normalizePhoneE164,
+  type PhoneCountry,
+} from "./phone-country";
 
 type Feedback = { tone: "error" | "success" | "info"; text: string };
 
@@ -31,6 +37,7 @@ export function useWebContactsDomain(params: UseWebContactsDomainParams) {
   const [displayName, setDisplayName] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
+  const [phoneCountry, setPhoneCountry] = useState<PhoneCountry>("US");
   const [showTrash, setShowTrash] = useState(false);
   const [dataBusy, setDataBusy] = useState(false);
   const [mutationBusy, setMutationBusy] = useState(false);
@@ -81,7 +88,7 @@ export function useWebContactsDomain(params: UseWebContactsDomainParams) {
   // Replace primary email/phone for a contact (delete-then-insert, MVP simplicity).
   const upsertContactFields = async (contactId: string, userId: string) => {
     const trimmedEmail = email.trim();
-    const trimmedPhone = phone.trim();
+    const normalizedPhone = normalizePhoneE164(phone, phoneCountry);
 
     await params.client.from("contact_emails").delete().eq("contact_id", contactId);
     if (trimmedEmail) {
@@ -95,11 +102,11 @@ export function useWebContactsDomain(params: UseWebContactsDomainParams) {
     }
 
     await params.client.from("contact_phones").delete().eq("contact_id", contactId);
-    if (trimmedPhone) {
+    if (normalizedPhone) {
       await params.client.from("contact_phones").insert({
         contact_id: contactId,
         user_id: userId,
-        e164_phone: trimmedPhone,
+        e164_phone: normalizedPhone,
         is_primary: true,
         label: "other",
       });
@@ -109,9 +116,22 @@ export function useWebContactsDomain(params: UseWebContactsDomainParams) {
   const createContact = async () => {
     setMutationBusy(true);
     params.setFeedback(null);
-    const parsed = contactSchema.safeParse({ display_name: displayName });
+    const normalizedPhone = normalizePhoneE164(phone, phoneCountry);
+    const parsed = contactSchema.safeParse({
+      display_name: displayName,
+      email: email.trim(),
+      phone,
+    });
     if (!parsed.success) {
-      params.setFeedback({ tone: "error", text: "Display name is required." });
+      params.setFeedback({ tone: "error", text: "Enter valid display name and email." });
+      setMutationBusy(false);
+      return;
+    }
+    if (phone.trim() && !isLikelyValidE164(normalizedPhone)) {
+      params.setFeedback({
+        tone: "error",
+        text: "Enter a valid phone number including area code.",
+      });
       setMutationBusy(false);
       return;
     }
@@ -145,6 +165,7 @@ export function useWebContactsDomain(params: UseWebContactsDomainParams) {
     setDisplayName("");
     setPhone("");
     setEmail("");
+    setPhoneCountry("US");
     await refreshData();
     setMutationBusy(false);
   };
@@ -153,9 +174,22 @@ export function useWebContactsDomain(params: UseWebContactsDomainParams) {
     if (!editingId) return;
     setMutationBusy(true);
     params.setFeedback(null);
-    const parsed = contactSchema.safeParse({ display_name: displayName });
+    const normalizedPhone = normalizePhoneE164(phone, phoneCountry);
+    const parsed = contactSchema.safeParse({
+      display_name: displayName,
+      email: email.trim(),
+      phone,
+    });
     if (!parsed.success) {
-      params.setFeedback({ tone: "error", text: "Display name is required." });
+      params.setFeedback({ tone: "error", text: "Enter valid display name and email." });
+      setMutationBusy(false);
+      return;
+    }
+    if (phone.trim() && !isLikelyValidE164(normalizedPhone)) {
+      params.setFeedback({
+        tone: "error",
+        text: "Enter a valid phone number including area code.",
+      });
       setMutationBusy(false);
       return;
     }
@@ -180,6 +214,7 @@ export function useWebContactsDomain(params: UseWebContactsDomainParams) {
     setDisplayName("");
     setPhone("");
     setEmail("");
+    setPhoneCountry("US");
     await refreshData();
     setMutationBusy(false);
   };
@@ -275,6 +310,7 @@ export function useWebContactsDomain(params: UseWebContactsDomainParams) {
     displayName,
     phone,
     email,
+    phoneCountry,
     showTrash,
     dataBusy,
     mutationBusy,
@@ -284,6 +320,7 @@ export function useWebContactsDomain(params: UseWebContactsDomainParams) {
     setDisplayName,
     setPhone,
     setEmail,
+    setPhoneCountry,
     setShowTrash,
     refreshData,
     createContact,
@@ -292,5 +329,6 @@ export function useWebContactsDomain(params: UseWebContactsDomainParams) {
     restoreContact,
     permanentlyDeleteContact,
     toggleContactLabel,
+    detectCountryFromE164,
   };
 }

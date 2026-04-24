@@ -44,6 +44,7 @@ export function TrashRoute() {
           setDisplayName={s.setDisplayName}
           setContactPhone={s.setContactPhone}
           setContactEmail={s.setContactEmail}
+          setContactPhoneCountry={s.setContactPhoneCountry}
           softDeleteContact={s.softDeleteContact}
           restoreContact={s.restoreContact}
           permanentlyDeleteContact={s.permanentlyDeleteContact}

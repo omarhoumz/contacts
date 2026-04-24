@@ -3,6 +3,8 @@ import { z } from "zod";
 export const contactSchema = z.object({
   id: z.string().uuid().optional(),
   display_name: z.string().min(1),
+  email: z.string().trim().email().optional().or(z.literal("")),
+  phone: z.string().trim().optional().default(""),
   first_name: z.string().optional().default(""),
   last_name: z.string().optional().default(""),
   company: z.string().optional().default(""),
