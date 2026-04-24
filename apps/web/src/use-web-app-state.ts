@@ -21,23 +21,27 @@ export function useWebAppState() {
   );
   const isAuthenticated = authResolved && Boolean(sessionEmail);
 
-  const syncSession = async () => {
+  // Initial session check on mount — calls getUser() once to avoid relying
+  // on potentially stale localStorage token without server verification.
+  const syncInitialSession = async () => {
     const { data, error } = await client.auth.getUser();
     if (error || !data.user) {
       setSessionEmail(null);
-      setAuthResolved(true);
-      return;
+    } else {
+      setSessionEmail(data.user.email ?? null);
     }
-    setSessionEmail(data.user.email ?? null);
     setAuthResolved(true);
   };
 
   useEffect(() => {
-    void syncSession();
+    void syncInitialSession();
+    // onAuthStateChange carries the session object — read it directly
+    // instead of calling getUser() again, which would create a request loop.
     const {
       data: { subscription },
-    } = client.auth.onAuthStateChange(() => {
-      void syncSession();
+    } = client.auth.onAuthStateChange((_event, session) => {
+      setSessionEmail(session?.user?.email ?? null);
+      setAuthResolved(true);
     });
     return () => {
       subscription.unsubscribe();
@@ -63,13 +67,13 @@ export function useWebAppState() {
   const signUp = async () => {
     setAuthBusy(true);
     setFeedback(null);
-    const { error: signError } = await client.auth.signUp({ email, password });
+    const { data, error: signError } = await client.auth.signUp({ email, password });
     if (signError) {
       setFeedback({ tone: "error", text: signError.message });
       setAuthBusy(false);
       return;
     }
-    await syncSession();
+    setSessionEmail(data.user?.email ?? null);
     setFeedback({ tone: "info", text: "Check your email to confirm the address if required, then sign in." });
     setAuthBusy(false);
   };
@@ -77,13 +81,13 @@ export function useWebAppState() {
   const signIn = async () => {
     setAuthBusy(true);
     setFeedback(null);
-    const { error: signError } = await client.auth.signInWithPassword({ email, password });
+    const { data, error: signError } = await client.auth.signInWithPassword({ email, password });
     if (signError) {
       setFeedback({ tone: "error", text: signError.message });
       setAuthBusy(false);
       return;
     }
-    await syncSession();
+    setSessionEmail(data.user?.email ?? null);
     setFeedback({ tone: "success", text: "Signed in." });
     await contacts.refreshData();
     setAuthBusy(false);
@@ -98,7 +102,7 @@ export function useWebAppState() {
       setAuthBusy(false);
       return;
     }
-    await syncSession();
+    setSessionEmail(null);
     setFeedback({ tone: "info", text: "Signed out." });
     labelsDomain.clearLabels();
     setAuthBusy(false);
