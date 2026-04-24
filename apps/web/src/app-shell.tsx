@@ -1,7 +1,9 @@
-import { useState, useCallback, type ReactNode } from "react";
+import { useState, useCallback, useEffect, type ReactNode } from "react";
 import { ui, feedbackColor, SIDEBAR_W, SIDEBAR_W_COLLAPSED } from "./ui-styles";
 import { SidebarNav } from "./sidebar-nav";
+import { BottomNav } from "./bottom-nav";
 import { useWebApp } from "./web-app-context";
+import { useBreakpoint } from "./use-breakpoint";
 
 const LS_KEY = "sidebar-collapsed";
 
@@ -17,7 +19,15 @@ type AppShellProps = { children: ReactNode };
 
 export function AppShell({ children }: AppShellProps) {
   const s = useWebApp();
+  const bp = useBreakpoint();
   const [collapsed, setCollapsed] = useState<boolean>(readCollapsed);
+
+  // Tablet → auto-collapse; desktop → restore user's explicit preference
+  useEffect(() => {
+    if (bp === "tablet") setCollapsed(true);
+    if (bp === "desktop") setCollapsed(readCollapsed());
+    // mobile: sidebar hidden entirely, state irrelevant
+  }, [bp]);
 
   const toggleCollapsed = useCallback(() => {
     setCollapsed((prev) => {
@@ -31,17 +41,26 @@ export function AppShell({ children }: AppShellProps) {
     });
   }, []);
 
-  const sidebarW = collapsed ? SIDEBAR_W_COLLAPSED : SIDEBAR_W;
+  const isMobile = bp === "mobile";
+  const sidebarW = isMobile ? 0 : collapsed ? SIDEBAR_W_COLLAPSED : SIDEBAR_W;
 
   return (
-    <div style={{ ...ui.shell, marginInlineStart: sidebarW }}>
-      <SidebarNav
-        sessionEmail={s.sessionEmail}
-        authBusy={s.authBusy}
-        collapsed={collapsed}
-        onToggleCollapse={toggleCollapsed}
-        onSignOut={s.signOut}
-      />
+    <div
+      style={{
+        ...ui.shell,
+        marginInlineStart: sidebarW,
+        paddingBlockEnd: isMobile ? 64 : 0,
+      }}
+    >
+      {!isMobile && (
+        <SidebarNav
+          sessionEmail={s.sessionEmail}
+          authBusy={s.authBusy}
+          collapsed={collapsed}
+          onToggleCollapse={toggleCollapsed}
+          onSignOut={s.signOut}
+        />
+      )}
 
       <main style={ui.mainContent}>
         {s.feedback ? (
@@ -62,6 +81,8 @@ export function AppShell({ children }: AppShellProps) {
         ) : null}
         {children}
       </main>
+
+      {isMobile && <BottomNav onSignOut={s.signOut} />}
     </div>
   );
 }
