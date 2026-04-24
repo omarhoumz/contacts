@@ -12,7 +12,9 @@ const CONTACT_SELECT = `
   contact_labels (
     label_id,
     labels ( id, name, color )
-  )
+  ),
+  contact_emails ( email, is_primary ),
+  contact_phones ( e164_phone, is_primary )
 `;
 
 type UseWebContactsDomainParams = {
@@ -27,6 +29,8 @@ export function useWebContactsDomain(params: UseWebContactsDomainParams) {
   const [query, setQuery] = useState("");
   const [editingId, setEditingId] = useState<string | null>(null);
   const [displayName, setDisplayName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [email, setEmail] = useState("");
   const [showTrash, setShowTrash] = useState(false);
   const [dataBusy, setDataBusy] = useState(false);
   const [mutationBusy, setMutationBusy] = useState(false);
@@ -74,6 +78,34 @@ export function useWebContactsDomain(params: UseWebContactsDomainParams) {
     }
   }, [params.isAuthenticated]);
 
+  // Replace primary email/phone for a contact (delete-then-insert, MVP simplicity).
+  const upsertContactFields = async (contactId: string, userId: string) => {
+    const trimmedEmail = email.trim();
+    const trimmedPhone = phone.trim();
+
+    await params.client.from("contact_emails").delete().eq("contact_id", contactId);
+    if (trimmedEmail) {
+      await params.client.from("contact_emails").insert({
+        contact_id: contactId,
+        user_id: userId,
+        email: trimmedEmail,
+        is_primary: true,
+        label: "other",
+      });
+    }
+
+    await params.client.from("contact_phones").delete().eq("contact_id", contactId);
+    if (trimmedPhone) {
+      await params.client.from("contact_phones").insert({
+        contact_id: contactId,
+        user_id: userId,
+        e164_phone: trimmedPhone,
+        is_primary: true,
+        label: "other",
+      });
+    }
+  };
+
   const createContact = async () => {
     setMutationBusy(true);
     params.setFeedback(null);
@@ -89,23 +121,30 @@ export function useWebContactsDomain(params: UseWebContactsDomainParams) {
       setMutationBusy(false);
       return;
     }
-    const { error: insertError } = await params.client.from("contacts").insert({
-      display_name: parsed.data.display_name,
-      first_name: parsed.data.first_name,
-      last_name: parsed.data.last_name,
-      company: parsed.data.company,
-      job_title: parsed.data.job_title,
-      notes: parsed.data.notes,
-      birthday: parsed.data.birthday ?? null,
-      user_id: userData.user.id,
-    });
-    if (insertError) {
-      params.setFeedback({ tone: "error", text: insertError.message });
+    const { data: inserted, error: insertError } = await params.client
+      .from("contacts")
+      .insert({
+        display_name: parsed.data.display_name,
+        first_name: parsed.data.first_name,
+        last_name: parsed.data.last_name,
+        company: parsed.data.company,
+        job_title: parsed.data.job_title,
+        notes: parsed.data.notes,
+        birthday: parsed.data.birthday ?? null,
+        user_id: userData.user.id,
+      })
+      .select("id")
+      .single();
+    if (insertError || !inserted) {
+      params.setFeedback({ tone: "error", text: insertError?.message ?? "Insert failed." });
       setMutationBusy(false);
       return;
     }
+    await upsertContactFields(inserted.id, userData.user.id);
     params.setFeedback({ tone: "success", text: "Contact created." });
     setDisplayName("");
+    setPhone("");
+    setEmail("");
     await refreshData();
     setMutationBusy(false);
   };
@@ -120,6 +159,12 @@ export function useWebContactsDomain(params: UseWebContactsDomainParams) {
       setMutationBusy(false);
       return;
     }
+    const { data: userData2, error: userError2 } = await params.client.auth.getUser();
+    if (userError2 || !userData2.user) {
+      params.setFeedback({ tone: "error", text: userError2?.message ?? "Sign in required." });
+      setMutationBusy(false);
+      return;
+    }
     const { error: updateError } = await params.client
       .from("contacts")
       .update({ display_name: parsed.data.display_name })
@@ -129,9 +174,12 @@ export function useWebContactsDomain(params: UseWebContactsDomainParams) {
       setMutationBusy(false);
       return;
     }
+    await upsertContactFields(editingId, userData2.user.id);
     params.setFeedback({ tone: "success", text: "Contact updated." });
     setEditingId(null);
     setDisplayName("");
+    setPhone("");
+    setEmail("");
     await refreshData();
     setMutationBusy(false);
   };
@@ -225,6 +273,8 @@ export function useWebContactsDomain(params: UseWebContactsDomainParams) {
     query,
     editingId,
     displayName,
+    phone,
+    email,
     showTrash,
     dataBusy,
     mutationBusy,
@@ -232,6 +282,8 @@ export function useWebContactsDomain(params: UseWebContactsDomainParams) {
     setQuery,
     setEditingId,
     setDisplayName,
+    setPhone,
+    setEmail,
     setShowTrash,
     refreshData,
     createContact,

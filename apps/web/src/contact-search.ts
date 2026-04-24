@@ -1,10 +1,14 @@
 export type LabelRow = { id: string; name: string; color: string };
 export type ContactLabelJoin = { label_id: string; labels: LabelRow | LabelRow[] | null };
+export type ContactEmailRow = { email: string; is_primary: boolean };
+export type ContactPhoneRow = { e164_phone: string; is_primary: boolean };
 export type ContactRow = {
   id: string;
   display_name: string;
   deleted_at: string | null;
   contact_labels: ContactLabelJoin[] | null;
+  contact_emails: ContactEmailRow[] | null;
+  contact_phones: ContactPhoneRow[] | null;
 };
 
 // ── Normalisation ──────────────────────────────────────────────────────────────
@@ -25,7 +29,27 @@ export function contactMatchesQuery(c: ContactRow, q: string): boolean {
       if (label.name.toLowerCase().includes(needle)) return true;
     }
   }
+  for (const e of c.contact_emails ?? []) {
+    if (e.email.toLowerCase().includes(needle)) return true;
+  }
+  for (const p of c.contact_phones ?? []) {
+    if (p.e164_phone.toLowerCase().includes(needle)) return true;
+  }
   return false;
+}
+
+// ── Phone / email accessors ────────────────────────────────────────────────────
+
+/** Returns the primary email address, falling back to the first one. */
+export function getPrimaryEmail(c: ContactRow): string | null {
+  const rows = c.contact_emails ?? [];
+  return (rows.find((e) => e.is_primary) ?? rows[0])?.email ?? null;
+}
+
+/** Returns the primary phone number, falling back to the first one. */
+export function getPrimaryPhone(c: ContactRow): string | null {
+  const rows = c.contact_phones ?? [];
+  return (rows.find((p) => p.is_primary) ?? rows[0])?.e164_phone ?? null;
 }
 
 /** Client-side filter against a query string (empty query = show all). */

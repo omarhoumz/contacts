@@ -9,6 +9,8 @@ import {
   getAssignedLabelIds,
   getAssignedLabels,
   isAuthenticated,
+  getPrimaryEmail,
+  getPrimaryPhone,
   type ContactRow,
   type LabelRow,
 } from "./contact-search";
@@ -28,6 +30,8 @@ function makeContact(
     display_name: "Jane Doe",
     deleted_at: null,
     contact_labels: labels ? labels.map((l) => ({ label_id: l.id, labels: l })) : null,
+    contact_emails: null,
+    contact_phones: null,
     ...rest,
   };
 }
@@ -77,6 +81,8 @@ describe("contactMatchesQuery", () => {
       display_name: "Bob",
       deleted_at: null,
       contact_labels: [{ label_id: "l2", labels: LABEL_WORK }],
+      contact_emails: null,
+      contact_phones: null,
     };
     expect(contactMatchesQuery(c, "work")).toBe(true);
   });
@@ -95,6 +101,92 @@ describe("contactMatchesQuery", () => {
     const c = makeContact({ contact_labels: null });
     expect(contactMatchesQuery(c, "family")).toBe(false);
     expect(contactMatchesQuery(c, "jane")).toBe(true);
+  });
+
+  it("matches on email address (case-insensitive)", () => {
+    const c = makeContact({
+      contact_emails: [{ email: "jane@example.com", is_primary: true }],
+    });
+    expect(contactMatchesQuery(c, "jane@example")).toBe(true);
+    expect(contactMatchesQuery(c, "EXAMPLE.COM")).toBe(true);
+    expect(contactMatchesQuery(c, "other@")).toBe(false);
+  });
+
+  it("matches on phone number", () => {
+    const c = makeContact({
+      contact_phones: [{ e164_phone: "+14155550001", is_primary: true }],
+    });
+    expect(contactMatchesQuery(c, "+14155")).toBe(true);
+    expect(contactMatchesQuery(c, "555")).toBe(true);
+    expect(contactMatchesQuery(c, "999")).toBe(false);
+  });
+
+  it("handles null contact_emails and contact_phones gracefully", () => {
+    const c = makeContact({ contact_emails: null, contact_phones: null });
+    expect(contactMatchesQuery(c, "jane")).toBe(true);
+    expect(contactMatchesQuery(c, "phone")).toBe(false);
+  });
+});
+
+// ── getPrimaryEmail / getPrimaryPhone ───────────────────────────────────────────
+
+describe("getPrimaryEmail", () => {
+  it("returns the primary email", () => {
+    const c = makeContact({
+      contact_emails: [
+        { email: "other@example.com", is_primary: false },
+        { email: "primary@example.com", is_primary: true },
+      ],
+    });
+    expect(getPrimaryEmail(c)).toBe("primary@example.com");
+  });
+
+  it("falls back to first email when none is marked primary", () => {
+    const c = makeContact({
+      contact_emails: [
+        { email: "first@example.com", is_primary: false },
+        { email: "second@example.com", is_primary: false },
+      ],
+    });
+    expect(getPrimaryEmail(c)).toBe("first@example.com");
+  });
+
+  it("returns null when contact_emails is null", () => {
+    expect(getPrimaryEmail(makeContact())).toBeNull();
+  });
+
+  it("returns null when contact_emails is empty array", () => {
+    expect(getPrimaryEmail(makeContact({ contact_emails: [] }))).toBeNull();
+  });
+});
+
+describe("getPrimaryPhone", () => {
+  it("returns the primary phone", () => {
+    const c = makeContact({
+      contact_phones: [
+        { e164_phone: "+10000000001", is_primary: false },
+        { e164_phone: "+14155550001", is_primary: true },
+      ],
+    });
+    expect(getPrimaryPhone(c)).toBe("+14155550001");
+  });
+
+  it("falls back to first phone when none is marked primary", () => {
+    const c = makeContact({
+      contact_phones: [
+        { e164_phone: "+10000000001", is_primary: false },
+        { e164_phone: "+10000000002", is_primary: false },
+      ],
+    });
+    expect(getPrimaryPhone(c)).toBe("+10000000001");
+  });
+
+  it("returns null when contact_phones is null", () => {
+    expect(getPrimaryPhone(makeContact())).toBeNull();
+  });
+
+  it("returns null when contact_phones is empty array", () => {
+    expect(getPrimaryPhone(makeContact({ contact_phones: [] }))).toBeNull();
   });
 });
 
@@ -216,6 +308,8 @@ describe("getAssignedLabels", () => {
       display_name: "Stale",
       deleted_at: null,
       contact_labels: [{ label_id: "l-deleted", labels: null }],
+      contact_emails: null,
+      contact_phones: null,
     };
     expect(getAssignedLabels(c, allLabels)).toEqual([]);
   });

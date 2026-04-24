@@ -11,8 +11,8 @@ This file is the single source of truth for roadmap, progress, and execution.
 
 ### Now / Next / Later
 
-- **Now:** `R10` — phone + email fields on contacts.
-- **Next:** `R11` responsive layout → `R12` BE search → `R9` dark mode → cloud re-entry (D4).
+- **Now:** `R11` — responsive layout (mobile + tablet breakpoints).
+- **Next:** `R12` BE search → `R9` dark mode → cloud re-entry (D4).
 - **Later:** `R9` dark mode; then re-enter deferred cloud/mobile tasks (`D4`-`D8`, `E3`).
 
 ### R11 Responsive Layout — Design Exploration (2026-04-23)
@@ -135,7 +135,7 @@ Routes:
 | R6  | P1       | DONE         | code+test   | R5         | Expand rewrite regression coverage for auth gating, contacts search/filter, trash restore/delete, and labels assignment.                                                                                                                                                                                                                                                                   | Added `filterContacts`, `isTrashContact`, `isActiveContact`, `isLabelAssigned`, `getAssignedLabelIds`, `getAssignedLabels`, `isAuthenticated` pure helpers to `contact-search.ts`; 35 Vitest unit tests covering all four critical flows (auth gating, search/filter, trash classification, label assignment); `pnpm --filter @widados/web test` and `typecheck` both exit 0.                                |
 | R7  | P1       | DONE         | manual      | R5,R6      | Run end-to-end local UX acceptance pass for rewrite (web mandatory, mobile deferred).                                                                                                                                                                                                                                                                                                      | Signed-out/onboarding, signed-in CRUD, labels, search, trash, feedback states validated with evidence in Verification Log; web accepted as stable baseline.                                                                                                                                                                                                                                                  |
 | R8  | P1       | DONE         | docs        | R7         | Fold rewrite outcomes into roadmap/operations docs; define post-rewrite backlog and cloud/mobile re-entry criteria.                                                                                                                                                                                                                                                                        | Updated roadmap + operations/docs include rewrite decisions, deferred items, and explicit gates to resume D4–D8 and E3.                                                                                                                                                                                                                                                                                      |
-| R10 | P1       | TODO         | code+test   | R7         | Phone + email fields on contacts: DB migration (`phone text`, `email text` nullable columns), shared Zod schema update, create/edit form fields (web), contact row secondary line display, search expanded to match phone/email. Web-first; mobile parity in a follow-up slice.                                                                                                            | Migration applied locally; contacts can be created and edited with phone and email; values shown in contact row (secondary line below name or in expanded panel); phone/email values are matched by the search filter; `pnpm test` passes with updated search coverage; `pnpm typecheck` clean.                                                                                                              |
+| R10 | P1       | DONE         | code+test   | R7         | Phone + email fields on contacts: leveraged existing normalized `contact_emails`/`contact_phones` tables (no new migration). Extended SELECT query, `ContactRow` type, `getPrimaryEmail`/`getPrimaryPhone` helpers, create/edit form fields, contact row secondary line, search on phone/email. Web-first; mobile deferred.                                                               | No migration needed. `CONTACT_SELECT` extended with `contact_emails(email,is_primary)` + `contact_phones(e164_phone,is_primary)`. Form: Phone + Email inputs; edit pre-fills from primary row. Secondary line `phone · email` in contact row. Search matches all email/phone entries. 46 Vitest tests pass (up from 35); `pnpm typecheck` clean; 11-step browser QA all PASS (2026-04-23). |
 | R11 | P1       | TODO         | code+design | R10        | Responsive layout — mobile + tablet breakpoints. Mobile (≤640px): bottom nav bar (Contacts / Trash / Labels / More), sidebar hidden behind hamburger drawer overlay. Tablet (641–1023px): sidebar auto-collapses to icon-only (48px) on mount. Desktop (≥1024px): current 2-column layout unchanged. Touch targets ≥44px on mobile. Web only; React Native mobile app is a separate track. | Resizing to 375px shows bottom nav + no sidebar; resizing to 768px shows collapsed sidebar; desktop unchanged; no horizontal overflow at any breakpoint; `pnpm typecheck` clean.                                                                                                                                                                                                                             |
 | R12 | P2       | TODO         | code+test   | R10        | Backend-enabled search: replace client-side `contactMatchesQuery` filter with a debounced Supabase `ilike` query across `display_name`, `phone`, `email`, and label names (via join). Keeps zero-query state (empty input = load all). Add GIN-indexed `tsvector` column as a follow-up optimisation only if `ilike` proves slow at scale. Web-first; mobile parity in same slice.         | Empty search loads all contacts; typing debounces 300ms then fires server query; results match on name, phone, email, and label name; network tab shows one request per settled input (not one per keystroke); `pnpm typecheck` clean; existing 35 unit tests still pass (pure helpers remain for offline/fallback use).                                                                                     |
 | R9  | P2       | TODO         | code+design | R12        | Dark mode: system preference (`prefers-color-scheme`) on load + manual toggle in sidebar footer, persisted to `localStorage`. Web-first.                                                                                                                                                                                                                                                   | All routes (auth page, contacts, trash, manage labels) render correctly in both modes; toggle persists across reloads; no hard-coded light-only colours remain in `ui-styles.ts`.                                                                                                                                                                                                                            |
@@ -159,24 +159,28 @@ Automated suite: `apps/backend/supabase/tests/database/contacts_rls.test.sql`. R
 
 All conditions below must be true before resuming cloud/Netlify rollout tasks:
 
-| Gate | Condition | Status |
-|---|---|---|
-| C1 | R7 web acceptance pass complete — rewritten app is stable baseline | ✅ Done |
-| C2 | R8 docs closeout merged — architecture decisions captured | ✅ Done |
-| C3 | R10 phone + email fields shipped — schema is stable before cloud deploy | ⬜ Pending |
-| C4 | No P1 bugs open on `main` | ⬜ Check at time of re-entry |
-| C5 | `.env.cloud` values verified current (Supabase publishable key, project URL) | ⬜ Check at time of re-entry |
+
+| Gate | Condition                                                                    | Status                      |
+| ---- | ---------------------------------------------------------------------------- | --------------------------- |
+| C1   | R7 web acceptance pass complete — rewritten app is stable baseline           | ✅ Done                      |
+| C2   | R8 docs closeout merged — architecture decisions captured                    | ✅ Done                      |
+| C3   | R10 phone + email fields shipped — schema is stable before cloud deploy      | ⬜ Pending                   |
+| C4   | No P1 bugs open on `main`                                                    | ⬜ Check at time of re-entry |
+| C5   | `.env.cloud` values verified current (Supabase publishable key, project URL) | ⬜ Check at time of re-entry |
+
 
 Once all gates pass: run `pnpm netlify:env:push` then `pnpm netlify:deploy:prod`, then execute D4 smoke (auth + one contact mutation on production URL).
 
 ## Mobile Re-entry Criteria (gate to resume E3 and mobile track)
 
-| Gate | Condition | Status |
-|---|---|---|
-| M1 | R7 web acceptance pass complete | ✅ Done |
-| M2 | R10 phone + email fields shipped (shared schema must be stable) | ⬜ Pending |
-| M3 | R11 responsive web layout done (defines boundary between web-responsive and native mobile) | ⬜ Pending |
-| M4 | Decision made: continue with React Native `apps/mobile` or rewrite for web-only PWA | ⬜ Pending — product decision |
+
+| Gate | Condition                                                                                  | Status                       |
+| ---- | ------------------------------------------------------------------------------------------ | ---------------------------- |
+| M1   | R7 web acceptance pass complete                                                            | ✅ Done                       |
+| M2   | R10 phone + email fields shipped (shared schema must be stable)                            | ⬜ Pending                    |
+| M3   | R11 responsive web layout done (defines boundary between web-responsive and native mobile) | ⬜ Pending                    |
+| M4   | Decision made: continue with React Native `apps/mobile` or rewrite for web-only PWA        | ⬜ Pending — product decision |
+
 
 Once M1–M4 pass: verify `apps/mobile` typecheck, then run E3 (cold-restart session persistence) and resume D5–D7 (EAS build).
 
@@ -427,8 +431,8 @@ This section is the authoritative rewrite blueprint for R1.
 - 2026-04-23: R4 progress slice landed: extracted mobile labels state/actions into `apps/mobile/use-mobile-labels-domain.ts` and rewired `apps/mobile/use-mobile-app-state.ts` to compose labels + contacts domains; validated via `pnpm --filter @widados/mobile typecheck`, `pnpm --filter @widados/web typecheck`, `pnpm --filter @widados/web test`, and required manual Cursor-browser localhost QA (signed-out gating, signed-in labels/contacts visibility, label create, contact label toggle, no blocking runtime errors).
 - 2026-04-23: PM end-check closed `R4` as **DONE** and advanced active execution to `R5` (**IN_PROGRESS**) after web/mobile labels modularization completed with automated checks and required manual web QA gate evidence.
 - 2026-04-23: R5 **DONE**: 3-column authenticated shell implemented with TanStack Router file-based routing (`@tanstack/react-router` + `@tanstack/router-plugin` Vite plugin). Routes: `/contacts` (active contacts + labels), `/trash` (trash management). Sidebar shows all 5 nav items; Fix&Merge, Import, Manage Labels are greyed-out design stubs with "soon" badge. Right aside is post-MVP contact-details placeholder. Signed-out state is centered full-page auth card. `ui-styles.ts` extended with full shell token set. Typecheck clean, 6 unit tests passing, Cursor-browser QA confirmed all layout, routing, and auth-gating behaviors.
-
 - 2026-04-23: **R8** DONE — `wiki/operations.md` updated with web app architecture (routing, state, styling, auth loop fix, sidebar, tests); `wiki/roadmap.md` updated with Cloud Re-entry Criteria (C1–C5), Mobile Re-entry Criteria (M1–M4), and Post-Rewrite Architecture Decisions section. Post-rewrite backlog (R10–R12, R9) defined with dependencies and AC.
+- 2026-04-23: **R10** DONE — Phone + email fields leveraged existing normalized `contact_emails`/`contact_phones` tables (no new migration). `CONTACT_SELECT` extended; `ContactRow` type updated with `ContactEmailRow`/`ContactPhoneRow`; `getPrimaryEmail`/`getPrimaryPhone` helpers added to `contact-search.ts`; `contactMatchesQuery` extended to search all email + phone entries; create/edit form gains Phone + Email inputs; edit pre-fills from primary row; contact list shows `phone · email` secondary line. 46 Vitest tests pass (up from 35); typecheck clean; 11-step browser QA all PASS.
 - 2026-04-23: **R7** DONE — full 12-step manual acceptance pass completed in Cursor browser. All steps PASS: signed-out gating, sign-in, contact create/edit (··· menu), search/filter, Manage Labels route (label create with colour swatches), label assignment, soft delete, trash view, restore, permanent delete, sign-out. Two bugs found and fixed during pass: (1) auth `getUser` loop in `onAuthStateChange` → reads session directly from event now; (2) `<input type="color">` on Manage Labels crashed headless browser → replaced with preset colour swatch buttons. Web accepted as stable baseline.
 
 ## Notes and Constraints

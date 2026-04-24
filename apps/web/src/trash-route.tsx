@@ -42,6 +42,8 @@ export function TrashRoute() {
           mutationBusy={s.mutationBusy}
           setEditingId={s.setEditingId}
           setDisplayName={s.setDisplayName}
+          setContactPhone={s.setContactPhone}
+          setContactEmail={s.setContactEmail}
           softDeleteContact={s.softDeleteContact}
           restoreContact={s.restoreContact}
           permanentlyDeleteContact={s.permanentlyDeleteContact}

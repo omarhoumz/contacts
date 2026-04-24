@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { normalizeLabels, type ContactRow, type LabelRow } from "./contact-search";
+import { normalizeLabels, getPrimaryPhone, getPrimaryEmail, type ContactRow, type LabelRow } from "./contact-search";
 import { ui } from "./ui-styles";
 import { IconMoreHorizontal } from "./icons";
 
@@ -11,6 +11,8 @@ type ContactsSectionProps = {
   mutationBusy: boolean;
   setEditingId: (value: string | null) => void;
   setDisplayName: (value: string) => void;
+  setContactPhone: (value: string) => void;
+  setContactEmail: (value: string) => void;
   softDeleteContact: (id: string) => void;
   restoreContact: (id: string) => void;
   permanentlyDeleteContact: (id: string) => void;
@@ -69,7 +71,7 @@ export function ContactsSection(props: ContactsSectionProps) {
                   {contact.display_name.slice(0, 2).toUpperCase()}
                 </div>
 
-                {/* Name + assigned label pills */}
+                {/* Name + secondary line + label pills */}
                 <div
                   style={{
                     flex: 1,
@@ -80,24 +82,41 @@ export function ContactsSection(props: ContactsSectionProps) {
                     overflow: "hidden",
                   }}
                 >
-                  <span
-                    style={{
-                      fontSize: 14,
-                      fontWeight: 600,
-                      color: "#0f172a",
-                      whiteSpace: "nowrap",
-                      overflow: "hidden",
-                      textOverflow: "ellipsis",
-                    }}
-                  >
-                    {contact.display_name}
-                  </span>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div
+                      style={{
+                        fontSize: 14,
+                        fontWeight: 600,
+                        color: "#0f172a",
+                        whiteSpace: "nowrap",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                      }}
+                    >
+                      {contact.display_name}
+                    </div>
+                    {(getPrimaryPhone(contact) ?? getPrimaryEmail(contact)) && (
+                      <div
+                        style={{
+                          fontSize: 12,
+                          color: "#64748b",
+                          whiteSpace: "nowrap",
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                          marginBlockStart: 1,
+                        }}
+                      >
+                        {[getPrimaryPhone(contact), getPrimaryEmail(contact)]
+                          .filter(Boolean)
+                          .join(" · ")}
+                      </div>
+                    )}
+                  </div>
 
                   {/* Pills pushed to inline-end */}
                   {assignedLabels.length > 0 && (
                     <div
                       style={{
-                        marginInlineStart: "auto",
                         display: "flex",
                         gap: 4,
                         flexShrink: 0,
@@ -180,6 +199,8 @@ export function ContactsSection(props: ContactsSectionProps) {
                         onClick={() => {
                           props.setEditingId(contact.id);
                           props.setDisplayName(contact.display_name);
+                          props.setContactPhone(getPrimaryPhone(contact) ?? "");
+                          props.setContactEmail(getPrimaryEmail(contact) ?? "");
                           setExpandedId(null);
                         }}
                         style={ui.smallButton}
