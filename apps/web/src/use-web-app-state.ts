@@ -22,6 +22,7 @@ export function useWebAppState() {
   const [sessionEmail, setSessionEmail] = useState<string | null>(null);
   const [authResolved, setAuthResolved] = useState(false);
   const [authBusy, setAuthBusy] = useState(false);
+  const [canResendVerification, setCanResendVerification] = useState(false);
   const client = useMemo(
     () => createClient(supabaseUrl, supabasePublishableKey, { auth: { persistSession: true } }),
     [],
@@ -96,6 +97,7 @@ export function useWebAppState() {
   const signUp = async () => {
     setAuthBusy(true);
     setFeedback(null);
+    setCanResendVerification(false);
     const emailRedirectTo = `${window.location.origin}/contacts`;
     const { data, error: signError } = await client.auth.signUp({
       email,
@@ -115,8 +117,12 @@ export function useWebAppState() {
   const signIn = async () => {
     setAuthBusy(true);
     setFeedback(null);
+    setCanResendVerification(false);
     const { data, error: signError } = await client.auth.signInWithPassword({ email, password });
     if (signError) {
+      if (signError.message.toLowerCase().includes("email not confirmed")) {
+        setCanResendVerification(true);
+      }
       setFeedback({ tone: "error", text: signError.message });
       setAuthBusy(false);
       return;
@@ -124,6 +130,29 @@ export function useWebAppState() {
     setSessionEmail(data.user?.email ?? null);
     setFeedback({ tone: "success", text: "Signed in." });
     await contacts.refreshData();
+    setAuthBusy(false);
+  };
+
+  const resendVerification = async () => {
+    const trimmedEmail = email.trim();
+    if (!trimmedEmail) {
+      setFeedback({ tone: "error", text: "Enter your email first." });
+      return;
+    }
+    setAuthBusy(true);
+    const emailRedirectTo = `${window.location.origin}/contacts`;
+    const { error } = await client.auth.resend({
+      type: "signup",
+      email: trimmedEmail,
+      options: { emailRedirectTo },
+    });
+    if (error) {
+      setFeedback({ tone: "error", text: error.message });
+      setAuthBusy(false);
+      return;
+    }
+    setFeedback({ tone: "success", text: "Verification email sent. Check your inbox." });
+    setCanResendVerification(false);
     setAuthBusy(false);
   };
 
@@ -162,6 +191,7 @@ export function useWebAppState() {
     sessionEmail,
     authResolved,
     authBusy,
+    canResendVerification,
     dataBusy: contacts.dataBusy,
     mutationBusy: contacts.mutationBusy,
     labelBusy: labelsDomain.labelBusy,
@@ -185,6 +215,7 @@ export function useWebAppState() {
     signUp,
     signIn,
     signOut,
+    resendVerification,
     createContact: contacts.createContact,
     updateContact: contacts.updateContact,
     softDeleteContact: contacts.softDeleteContact,

@@ -56,6 +56,15 @@ function RootComponent() {
                 {s.authBusy ? "Working…" : "Sign up"}
               </button>
             </div>
+            {s.canResendVerification ? (
+              <button
+                onClick={s.resendVerification}
+                disabled={s.authBusy}
+                style={{ ...ui.secondaryButton, width: "100%", marginTop: 10 }}
+              >
+                {s.authBusy ? "Sending…" : "Resend verification"}
+              </button>
+            ) : null}
           </div>
         </div>
       </div>
