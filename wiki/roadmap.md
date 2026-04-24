@@ -8,6 +8,7 @@ This file is the single source of truth for roadmap, progress, and execution.
 - **Last updated:** 2026-04-24
 - **Current focus:** Web-first rewrite execution with stability and regression gates (mobile deferred until web is stable)
 - **Primary owner:** agents and maintainers using this board
+- **Execution mode:** Caveman + Karpathy discipline (concise communication, surgical changes, explicit verification)
 
 ### Now / Next / Later
 
@@ -54,13 +55,13 @@ Approved mockups (absolute paths on this machine):
 **Sidebar nav items and MVP status:**
 
 
-| Item          | Status   | Notes                                                                        |
-| ------------- | -------- | ---------------------------------------------------------------------------- |
-| Contacts      | MVP      | Active contacts list, search, create, label assign                           |
-| Trash         | MVP      | Trashed contacts, restore, delete forever                                    |
-| Fix & Merge   | Post-MVP | Sidebar item shown greyed out; no route code                                 |
-| Import        | Post-MVP | Sidebar item shown greyed out; no route code                                 |
-| Manage Labels | MVP      | Full labels lifecycle in progress (`R14`: edit + delete)                     |
+| Item          | Status   | Notes                                                    |
+| ------------- | -------- | -------------------------------------------------------- |
+| Contacts      | MVP      | Active contacts list, search, create, label assign       |
+| Trash         | MVP      | Trashed contacts, restore, delete forever                |
+| Fix & Merge   | Post-MVP | Sidebar item shown greyed out; no route code             |
+| Import        | Post-MVP | Sidebar item shown greyed out; no route code             |
+| Manage Labels | MVP      | Full labels lifecycle in progress (`R14`: edit + delete) |
 
 
 **Right aside (contact details):** Always visible as a post-MVP placeholder in the authenticated shell. No implementation until explicitly scoped.
@@ -77,6 +78,8 @@ Routes:
 
 ## Status Definitions (for agents)
 
+Global rule: all roles and all workflow steps follow the **Execution discipline (Caveman + Karpathy)** defined in this document.
+
 - **TODO**: not started
 - **IN_PROGRESS**: currently being worked; only one task should be in progress at a time unless explicitly parallelized
 - **BLOCKED**: cannot proceed without external input or dependency
@@ -85,17 +88,28 @@ Routes:
 
 ## Agent Workflow
 
+Applies to all roles and all steps: follow the **Execution discipline (Caveman + Karpathy)** in this section.
+
 1. Senior PM picks the next highest-priority task (**TODO** or continue **IN_PROGRESS**) and confirms dependencies/scope.
 2. Senior Fullstack engineer implements the task and confirms implementation quality against requirements.
 3. Senior QA engineer validates behavior with manual web testing in Cursor browser (localhost), skipping mobile manual QA unless explicitly requested; add/update automated tests when needed.
-   - Desktop-first checks: use viewport at least 1280×800.
-   - Mobile/responsive tasks: validate at 375×812, 768×1024, and 1280×800.
+  - Desktop-first checks: use viewport at least 1280×800.
+  - Mobile/responsive tasks: validate at 375×812, 768×1024, and 1280×800.
 4. If QA fails, Senior Fullstack engineer implements feedback and hands back to QA.
 5. Repeat steps 3-4 until QA passes.
 6. If QA passes, Senior PM validates acceptance criteria and performs the end PM check.
 7. Move task to **DONE** (or keep **IN_PROGRESS** for partial slices) and add evidence.
 8. Commit and push related code/docs changes immediately after each completed task/slice.
 9. Continue directly to the next task without waiting for additional confirmation; add newly discovered work with priority/status or mark later-phase work **OUT_OF_SCOPE** with rationale.
+
+### Execution discipline (Caveman + Karpathy)
+
+- Communicate in caveman-full style: concise, no filler, technically exact.
+- Before coding, state assumptions and ambiguities; ask when scope is unclear.
+- Keep changes surgical: only lines/files required for the requested outcome.
+- Prefer simplest implementation that satisfies acceptance criteria; avoid speculative abstractions.
+- Define explicit verification for each task (tests/lint/typecheck/manual QA) and run it before marking done.
+- Report result with: goal, change, verification evidence, and remaining risk/open questions.
 
 ## Phase 1 Scope (MVP)
 
