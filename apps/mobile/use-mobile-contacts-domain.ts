@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { contactSchema } from "@widados/shared";
-import { contactMatchesQuery, type ContactRow } from "./mobile-contact-search";
+import type { ContactRow } from "./mobile-contact-search";
 
 type Feedback = { tone: "error" | "success" | "info"; text: string };
 
@@ -12,7 +12,9 @@ const CONTACT_SELECT = `
   contact_labels (
     label_id,
     labels ( id, name, color )
-  )
+  ),
+  contact_emails ( email, is_primary ),
+  contact_phones ( e164_phone, is_primary )
 `;
 
 type UseMobileContactsDomainParams = {
@@ -31,26 +33,52 @@ export function useMobileContactsDomain(params: UseMobileContactsDomainParams) {
   const [mutationBusy, setMutationBusy] = useState(false);
   const [contactRows, setContactRows] = useState<ContactRow[]>([]);
 
-  const displayedContacts = useMemo(
-    () => contactRows.filter((c) => contactMatchesQuery(c, query)),
-    [contactRows, query],
-  );
+  const displayedContacts = useMemo(() => contactRows, [contactRows]);
 
-  const loadContacts = async (trashMode: boolean) => {
-    let qb = params.client
-      .from("contacts")
-      .select(CONTACT_SELECT)
-      .order("updated_at", { ascending: false });
+  const escapeLike = (value: string) => value.replaceAll("%", "\\%").replaceAll("_", "\\_");
+
+  const loadContacts = async (trashMode: boolean, searchTerm: string) => {
+    const trimmed = searchTerm.trim();
+    let qb = params.client.from("contacts").select(CONTACT_SELECT).order("updated_at", { ascending: false });
     qb = trashMode ? qb.not("deleted_at", "is", null) : qb.is("deleted_at", null);
+    if (!trimmed) {
+      const { data, error } = await qb;
+      if (error) throw new Error(error.message);
+      setContactRows((data ?? []) as ContactRow[]);
+      return;
+    }
+
+    const like = `%${escapeLike(trimmed)}%`;
+    const [nameMatch, emailMatch, phoneMatch, labelMatch] = await Promise.all([
+      params.client.from("contacts").select("id").ilike("display_name", like),
+      params.client.from("contact_emails").select("contact_id").ilike("email", like),
+      params.client.from("contact_phones").select("contact_id").ilike("e164_phone", like),
+      params.client.from("contact_labels").select("contact_id,labels!inner(name)").ilike("labels.name", like),
+    ]);
+    if (nameMatch.error) throw new Error(nameMatch.error.message);
+    if (emailMatch.error) throw new Error(emailMatch.error.message);
+    if (phoneMatch.error) throw new Error(phoneMatch.error.message);
+    if (labelMatch.error) throw new Error(labelMatch.error.message);
+
+    const idSet = new Set<string>();
+    for (const row of nameMatch.data ?? []) idSet.add(row.id);
+    for (const row of emailMatch.data ?? []) idSet.add(row.contact_id);
+    for (const row of phoneMatch.data ?? []) idSet.add(row.contact_id);
+    for (const row of labelMatch.data ?? []) idSet.add(row.contact_id);
+    if (idSet.size === 0) {
+      setContactRows([]);
+      return;
+    }
+    qb = qb.in("id", [...idSet]);
     const { data, error } = await qb;
     if (error) throw new Error(error.message);
     setContactRows((data ?? []) as ContactRow[]);
   };
 
-  const refreshData = async (trashMode = showTrash) => {
+  const refreshData = async (trashMode = showTrash, searchTerm = query) => {
     setDataBusy(true);
     try {
-      await Promise.all([loadContacts(trashMode), params.loadLabels()]);
+      await Promise.all([loadContacts(trashMode, searchTerm), params.loadLabels()]);
     } catch (e) {
       params.setFeedback({
         tone: "error",
@@ -63,11 +91,16 @@ export function useMobileContactsDomain(params: UseMobileContactsDomainParams) {
 
   useEffect(() => {
     if (params.sessionEmail) {
-      void refreshData(showTrash);
+      const timer = setTimeout(() => {
+        void refreshData(showTrash, query);
+      }, 300);
+      return () => clearTimeout(timer);
+    }
+    if (!params.sessionEmail) {
+      setContactRows([]);
       return;
     }
-    setContactRows([]);
-  }, [params.sessionEmail]);
+  }, [params.sessionEmail, showTrash, query]);
 
   const createContact = async () => {
     setMutationBusy(true);
