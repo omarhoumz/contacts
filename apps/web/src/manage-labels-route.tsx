@@ -1,6 +1,12 @@
 import { useWebApp } from "./web-app-context";
 import { ui } from "./ui-styles";
 
+const PRESET_COLORS = [
+  "#2563eb", "#7c3aed", "#db2777", "#dc2626",
+  "#ea580c", "#ca8a04", "#16a34a", "#0891b2",
+  "#64748b", "#0f172a",
+];
+
 export function ManageLabelsRoute() {
   const s = useWebApp();
 
@@ -22,21 +28,40 @@ export function ManageLabelsRoute() {
             disabled={s.labelBusy}
             style={{ ...ui.compactInput, flex: 1 }}
           />
-          <input
-            type="color"
-            value={s.newLabelColor}
-            onChange={(e) => s.setNewLabelColor(e.target.value)}
-            disabled={s.labelBusy}
-            style={{ ...ui.compactInput, width: 42, padding: 4 }}
-            title="Label colour"
-          />
           <button
             onClick={s.createLabel}
-            disabled={s.labelBusy || s.dataBusy}
+            disabled={s.labelBusy || s.dataBusy || !s.newLabelName.trim()}
             style={ui.primaryButton}
           >
             {s.labelBusy ? "Saving…" : "Add label"}
           </button>
+        </div>
+
+        {/* Colour swatches */}
+        <div style={{ display: "flex", gap: 6, marginBlockStart: 10, flexWrap: "wrap" as const }}>
+          {PRESET_COLORS.map((color) => (
+            <button
+              key={color}
+              type="button"
+              onClick={() => s.setNewLabelColor(color)}
+              disabled={s.labelBusy}
+              title={color}
+              aria-label={`Pick colour ${color}`}
+              style={{
+                width: 22,
+                height: 22,
+                borderRadius: "50%",
+                background: color,
+                border: s.newLabelColor === color ? "2px solid #0f172a" : "2px solid transparent",
+                cursor: "pointer",
+                padding: 0,
+                outline: s.newLabelColor === color ? "2px solid #fff" : "none",
+                outlineOffset: -3,
+              }}
+            />
+          ))}
+        </div>
+        <div style={{ display: "none" }}>
         </div>
       </div>
 
