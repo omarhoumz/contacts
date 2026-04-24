@@ -25,7 +25,7 @@ const TAB: React.CSSProperties = {
   minHeight: 44,
   fontSize: 10,
   fontWeight: 500,
-  color: "#64748b",
+  color: "var(--text-muted)",
   textDecoration: "none",
   border: "none",
   background: "none",
@@ -35,7 +35,7 @@ const TAB: React.CSSProperties = {
 
 const TAB_ACTIVE: React.CSSProperties = {
   ...TAB,
-  color: "#4f46e5",
+  color: "var(--accent)",
 };
 
 const BAR: React.CSSProperties = {
@@ -44,8 +44,8 @@ const BAR: React.CSSProperties = {
   insetInlineEnd: 0,
   bottom: 0,
   height: 64,
-  background: "#ffffff",
-  borderBlockStart: "1px solid #e2e8f0",
+  background: "var(--bg-surface)",
+  borderBlockStart: "1px solid var(--border-strong)",
   display: "flex",
   zIndex: 40,
 };

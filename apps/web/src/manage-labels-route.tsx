@@ -57,10 +57,10 @@ export function ManageLabelsRoute() {
                 height: 22,
                 borderRadius: "50%",
                 background: color,
-                border: s.newLabelColor === color ? "2px solid #0f172a" : "2px solid transparent",
+                border: s.newLabelColor === color ? "2px solid var(--text-primary)" : "2px solid transparent",
                 cursor: "pointer",
                 padding: 0,
-                outline: s.newLabelColor === color ? "2px solid #fff" : "none",
+                outline: s.newLabelColor === color ? "2px solid var(--bg-surface)" : "none",
                 outlineOffset: -3,
               }}
             />
@@ -73,12 +73,12 @@ export function ManageLabelsRoute() {
       {/* ── Labels list ──────────────────────────────────────────────── */}
       <div style={ui.mainBody}>
         {s.labels.length === 0 && !s.dataBusy && (
-          <p style={{ color: "#94a3b8", fontSize: 14, textAlign: "center", marginTop: 48 }}>
+          <p style={{ color: "var(--text-subtle)", fontSize: 14, textAlign: "center", marginTop: 48 }}>
             No labels yet — create your first one above.
           </p>
         )}
         {s.dataBusy && (
-          <p style={{ color: "#94a3b8", fontSize: 14, padding: "20px 0" }}>Loading…</p>
+          <p style={{ color: "var(--text-subtle)", fontSize: 14, padding: "20px 0" }}>Loading…</p>
         )}
         <ul style={{ listStyle: "none", margin: 0, padding: 0 }}>
           {s.labels.map((l) => (
@@ -89,7 +89,7 @@ export function ManageLabelsRoute() {
                 alignItems: "center",
                 gap: 10,
                 padding: "12px 0",
-                borderBottom: "1px solid #f1f5f9",
+                borderBottom: "1px solid var(--border-soft)",
               }}
             >
               <span
@@ -124,10 +124,10 @@ export function ManageLabelsRoute() {
                           height: 20,
                           borderRadius: "50%",
                           background: color,
-                          border: s.editLabelColor === color ? "2px solid #0f172a" : "2px solid transparent",
+                          border: s.editLabelColor === color ? "2px solid var(--text-primary)" : "2px solid transparent",
                           cursor: "pointer",
                           padding: 0,
-                          outline: s.editLabelColor === color ? "2px solid #fff" : "none",
+                          outline: s.editLabelColor === color ? "2px solid var(--bg-surface)" : "none",
                           outlineOffset: -3,
                         }}
                       />
@@ -154,7 +154,7 @@ export function ManageLabelsRoute() {
                 </div>
               ) : (
                 <>
-                  <span style={{ fontSize: 14, color: "#0f172a", flex: 1 }}>{l.name}</span>
+                  <span style={{ fontSize: 14, color: "var(--text-primary)", flex: 1 }}>{l.name}</span>
                   <div style={{ display: "flex", gap: 8 }}>
                     <button
                       type="button"
@@ -174,9 +174,9 @@ export function ManageLabelsRoute() {
                       disabled={s.labelBusy}
                       style={{
                         ...ui.smallButton,
-                        borderColor: "#fecaca",
-                        color: "#b91c1c",
-                        background: "#fef2f2",
+                        borderColor: "var(--danger-border)",
+                        color: "var(--danger)",
+                        background: "var(--danger-bg)",
                       }}
                       aria-label={`Delete label ${l.name}`}
                     >

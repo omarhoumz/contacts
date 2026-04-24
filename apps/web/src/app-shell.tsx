@@ -90,10 +90,10 @@ export function AppShell({ children }: AppShellProps) {
               color: feedbackColor(s.feedback.tone),
               background:
                 s.feedback.tone === "error"
-                  ? "#fef2f2"
+                  ? "var(--danger-bg)"
                   : s.feedback.tone === "success"
-                    ? "#f0fdf4"
-                    : "#f0fdfa",
+                    ? "color-mix(in srgb, var(--success) 20%, var(--bg-surface))"
+                    : "color-mix(in srgb, var(--info) 20%, var(--bg-surface))",
             }}
           >
             {s.feedback.text}

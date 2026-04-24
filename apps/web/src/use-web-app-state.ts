@@ -64,6 +64,15 @@ export function useWebAppState() {
     }
   }, [themeMode]);
 
+  useEffect(() => {
+    if (!feedback) return;
+    const timeoutMs = feedback.tone === "error" ? 3500 : 1500;
+    const timer = window.setTimeout(() => {
+      setFeedback((current) => (current === feedback ? null : current));
+    }, timeoutMs);
+    return () => window.clearTimeout(timer);
+  }, [feedback]);
+
   const toggleTheme = () => {
     setThemeMode((prev) => (prev === "dark" ? "light" : "dark"));
   };

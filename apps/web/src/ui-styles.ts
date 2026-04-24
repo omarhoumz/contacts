@@ -13,6 +13,15 @@ const LIGHT_THEME = {
   "--text-secondary": "#374151",
   "--text-muted": "#64748b",
   "--text-subtle": "#94a3b8",
+  "--accent": "#2563eb",
+  "--accent-weak": "#eff6ff",
+  "--danger": "#b91c1c",
+  "--danger-bg": "#fef2f2",
+  "--danger-border": "#fecaca",
+  "--success": "#166534",
+  "--info": "#0f766e",
+  "--avatar-bg": "#dbeafe",
+  "--avatar-fg": "#1d4ed8",
 };
 
 const DARK_THEME = {
@@ -26,6 +35,15 @@ const DARK_THEME = {
   "--text-secondary": "#cbd5e1",
   "--text-muted": "#94a3b8",
   "--text-subtle": "#64748b",
+  "--accent": "#60a5fa",
+  "--accent-weak": "#1e293b",
+  "--danger": "#fca5a5",
+  "--danger-bg": "#3f1d1d",
+  "--danger-border": "#7f1d1d",
+  "--success": "#86efac",
+  "--info": "#5eead4",
+  "--avatar-bg": "#1e3a8a",
+  "--avatar-fg": "#bfdbfe",
 };
 
 export function applyTheme(mode: ThemeMode) {
@@ -174,9 +192,9 @@ export const ui = {
     gap: 0,
   },
   navItemActive: {
-    color: "#2563eb",
-    background: "#eff6ff",
-    borderInlineStart: "3px solid #2563eb",
+    color: "var(--accent)",
+    background: "var(--accent-weak)",
+    borderInlineStart: "3px solid var(--accent)",
     fontWeight: 600,
   },
   navItemDisabled: {
@@ -197,7 +215,7 @@ export const ui = {
   signOutBtn: {
     background: "none",
     border: "none",
-    color: "#ef4444",
+    color: "var(--danger)",
     fontSize: 13,
     cursor: "pointer",
     padding: 0,
@@ -310,8 +328,8 @@ export const ui = {
     width: 32,
     height: 32,
     borderRadius: "50%",
-    background: "#dbeafe",
-    color: "#1d4ed8",
+    background: "var(--avatar-bg)",
+    color: "var(--avatar-fg)",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
@@ -325,7 +343,7 @@ export const ui = {
     border: "none",
     cursor: "pointer",
     padding: "6px 8px",
-    color: "#94a3b8",
+    color: "var(--text-subtle)",
     display: "flex",
     alignItems: "center",
     borderRadius: 6,
@@ -366,9 +384,9 @@ export const ui = {
     outline: "none",
   },
   primaryButton: {
-    border: "1px solid #2563eb",
-    background: "#2563eb",
-    color: "#ffffff",
+    border: "1px solid var(--accent)",
+    background: "var(--accent)",
+    color: "var(--bg-surface)",
     borderRadius: 8,
     padding: "8px 14px",
     cursor: "pointer",
@@ -427,7 +445,7 @@ export const ui = {
 };
 
 export function feedbackColor(tone: "error" | "success" | "info") {
-  if (tone === "error") return "#b91c1c";
-  if (tone === "success") return "#166534";
-  return "#0f766e";
+  if (tone === "error") return "var(--danger)";
+  if (tone === "success") return "var(--success)";
+  return "var(--info)";
 }

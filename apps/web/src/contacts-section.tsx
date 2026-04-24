@@ -27,7 +27,7 @@ export function ContactsSection(props: ContactsSectionProps) {
   if (props.dataBusy) {
     return (
       <div style={{ ...ui.listCard, padding: "20px 16px" }}>
-        <p style={{ margin: 0, color: "#94a3b8", fontSize: 14 }}>Loading…</p>
+        <p style={{ margin: 0, color: "var(--text-subtle)", fontSize: 14 }}>Loading…</p>
       </div>
     );
   }
@@ -35,7 +35,7 @@ export function ContactsSection(props: ContactsSectionProps) {
   if (props.displayedContacts.length === 0) {
     return (
       <div style={{ ...ui.listCard, padding: "48px 24px", textAlign: "center" }}>
-        <p style={{ margin: 0, color: "#94a3b8", fontSize: 14 }}>
+        <p style={{ margin: 0, color: "var(--text-subtle)", fontSize: 14 }}>
           {props.showTrash
             ? "Trash is empty."
             : "No contacts yet — add your first one above."}
@@ -65,7 +65,7 @@ export function ContactsSection(props: ContactsSectionProps) {
               <div
                 style={{
                   ...ui.contactRow,
-                  borderBottom: isExpanded || !isLast ? "1px solid #f1f5f9" : "none",
+                  borderBottom: isExpanded || !isLast ? "1px solid var(--border-soft)" : "none",
                 }}
               >
                 {/* Avatar */}
@@ -89,7 +89,7 @@ export function ContactsSection(props: ContactsSectionProps) {
                       style={{
                         fontSize: 14,
                         fontWeight: 600,
-                        color: "#0f172a",
+                        color: "var(--text-primary)",
                         whiteSpace: "nowrap",
                         overflow: "hidden",
                         textOverflow: "ellipsis",
@@ -101,7 +101,7 @@ export function ContactsSection(props: ContactsSectionProps) {
                       <div
                         style={{
                           fontSize: 12,
-                          color: "#64748b",
+                          color: "var(--text-muted)",
                           whiteSpace: "nowrap",
                           overflow: "hidden",
                           textOverflow: "ellipsis",
@@ -129,8 +129,8 @@ export function ContactsSection(props: ContactsSectionProps) {
                           key={l.id}
                           style={{
                             ...ui.labelPill,
-                            background: l.color ? `${l.color}33` : "#f1f5f9",
-                            color: l.color ?? "#64748b",
+                            background: l.color ? `${l.color}33` : "var(--bg-subtle)",
+                            color: l.color ?? "var(--text-muted)",
                           }}
                         >
                           {l.name}
@@ -144,7 +144,7 @@ export function ContactsSection(props: ContactsSectionProps) {
                 <button
                   style={{
                     ...ui.iconButton,
-                    color: isExpanded ? "#2563eb" : "#94a3b8",
+                    color: isExpanded ? "var(--accent)" : "var(--text-subtle)",
                   }}
                   onClick={() =>
                     setExpandedId(isExpanded ? null : contact.id)
@@ -166,8 +166,8 @@ export function ContactsSection(props: ContactsSectionProps) {
                   paddingInlineStart: 60,
                   paddingInlineEnd: 16,
                   flexWrap: "wrap" as const,
-                  borderBottom: isLast ? "none" : "1px solid #f1f5f9",
-                  background: "#fafbfc",
+                  borderBottom: isLast ? "none" : "1px solid var(--border-soft)",
+                  background: "var(--bg-subtle)",
                   }}
                 >
                   {props.showTrash ? (
@@ -188,8 +188,8 @@ export function ContactsSection(props: ContactsSectionProps) {
                         }}
                         style={{
                           ...ui.smallButton,
-                          color: "#ef4444",
-                          borderColor: "#fecaca",
+                          color: "var(--danger)",
+                          borderColor: "var(--danger-border)",
                         }}
                       >
                         Delete forever
@@ -219,8 +219,8 @@ export function ContactsSection(props: ContactsSectionProps) {
                         }}
                         style={{
                           ...ui.smallButton,
-                          color: "#ef4444",
-                          borderColor: "#fecaca",
+                          color: "var(--danger)",
+                          borderColor: "var(--danger-border)",
                         }}
                       >
                         Move to trash
@@ -252,11 +252,11 @@ export function ContactsSection(props: ContactsSectionProps) {
                               style={{
                                 ...ui.smallButton,
                                 borderColor: assignedIds.has(l.id)
-                                  ? "#2563eb"
-                                  : "#e2e8f0",
+                                  ? "var(--accent)"
+                                  : "var(--border-strong)",
                                 color: assignedIds.has(l.id)
-                                  ? "#2563eb"
-                                  : "#64748b",
+                                  ? "var(--accent)"
+                                  : "var(--text-muted)",
                               }}
                             >
                               {assignedIds.has(l.id) ? "✓ " : "+ "}

@@ -21,7 +21,7 @@ type AuthSectionProps = {
 export function AuthSection(props: AuthSectionProps) {
   return (
     <>
-      <p style={{ color: props.isAuthenticated ? "#166534" : "#6b7280", marginBottom: 8 }}>
+      <p style={{ color: props.isAuthenticated ? "var(--success)" : "var(--text-muted)", marginBottom: 8 }}>
         Auth: {props.isAuthenticated ? `signed in as ${props.sessionEmail}` : props.authResolved ? "signed out" : "checking session..."}
       </p>
       {props.feedback ? (
@@ -57,7 +57,7 @@ export function AuthSection(props: AuthSectionProps) {
       ) : props.isAuthenticated ? (
         <Card>
           <h3>Session</h3>
-          <p style={{ marginTop: 0, color: "#555" }}>You are signed in.</p>
+          <p style={{ marginTop: 0, color: "var(--text-muted)" }}>You are signed in.</p>
           <button onClick={props.onSignOut} disabled={props.authBusy} style={ui.secondaryButton}>
             {props.authBusy ? "Working..." : "Sign out"}
           </button>
