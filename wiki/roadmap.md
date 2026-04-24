@@ -6,7 +6,7 @@ This file is the single source of truth for roadmap, progress, and execution.
 
 - **Branch:** `main`
 - **Last updated:** 2026-04-24
-- **Current focus:** Web-first rewrite execution with stability and regression gates (mobile deferred until web is stable)
+- **Current focus:** Cloud re-entry smoke validation (`D4`) after web rewrite stabilization
 - **Primary owner:** agents and maintainers using this board
 - **Execution mode:** Caveman + Karpathy discipline (concise communication, surgical changes, explicit verification)
 
@@ -14,7 +14,7 @@ This file is the single source of truth for roadmap, progress, and execution.
 
 - **Now:** cloud re-entry (D4).
 - **Next:** resume `R9` mobile visual QA after viewport-tooling fix.
-- **Later:** re-enter deferred cloud/mobile tasks (`D4`-`D8`, `E3`).
+- **Later:** continue deferred cloud/mobile tasks (`D5`-`D8`, `E3`) once `D4` is complete.
 
 ### R11 Responsive Layout — Design Exploration (2026-04-23)
 
@@ -190,6 +190,15 @@ All conditions below must be true before resuming cloud/Netlify rollout tasks:
 
 
 Once all gates pass: run `pnpm netlify:env:push` then `pnpm netlify:deploy:prod`, then execute D4 smoke (auth + one contact mutation on production URL).
+
+### D4 exit evidence checklist
+
+Record all items below in Verification Log before moving `D4` to **DONE**:
+
+- Production URL tested (`https://widados-contacts.netlify.app/`).
+- Auth flow on prod validated (sign-in success with non-test account path used for smoke).
+- One contact mutation validated on prod (create or edit or delete), including observed UI/API success result.
+- Timestamp (UTC) and verifier initials/agent noted.
 
 ## Mobile Re-entry Criteria (gate to resume E3 and mobile track)
 
@@ -403,9 +412,9 @@ This section is the authoritative rewrite blueprint for R1.
 10. `R10` phone + email fields on contacts (P1)
 11. `R11` responsive layout — mobile bottom nav + tablet auto-collapse (P1)
 12. `R13` field-level validation + country-aware phone input (P1) ✅
-13. `R14` labels edit + delete (P1) ⏳
-14. `R12` backend-enabled search — debounced `ilike` across all contact fields (P2)
-15. `R9` dark mode (last before post-MVP)
+13. `R14` labels edit + delete (P1) ✅
+14. `R12` backend-enabled search — debounced `ilike` across all contact fields (P2) ✅
+15. `R9` dark mode (last before post-MVP, currently blocked on mobile viewport QA) ⛔
 
 ## Verification Log
 
@@ -435,9 +444,9 @@ This section is the authoritative rewrite blueprint for R1.
 - 2026-04-24: **D1** done: Netlify site `widados-contacts` — `https://widados-contacts.netlify.app` (`netlify sites:create -n widados-contacts --json`, monorepo target **@widados/web**); root `.netlify/state.json` aligned for repo-root `netlify.toml`.
 - 2026-04-24: **E1** done: Expo + Supabase session storage research in `wiki/security.md` (depends relaxed to B7).
 - 2026-04-24: **E2** done: SecureStore-backed `auth.storage` for `@widados/mobile` (`supabaseStorage.ts`, `App.tsx`); mobile typecheck green.
-- 2026-04-25: **D3** tooling: `pnpm netlify:env:push` / `pnpm netlify:env:list` (avoid root monorepo picker); `wiki/operations.md` + `wiki/deployment.md` updated.
-- 2026-04-25: **D3** check + **D4** partial smoke: `pnpm netlify:env:check` (exit 2: no `.env.cloud`, Netlify missing `VITE`_*); `pnpm smoke:netlify-home` OK 200 `https://widados-contacts.netlify.app/`.
-- 2026-04-25: **D3** done: `.env.cloud` + Netlify `VITE_SUPABASE`_*; `pnpm netlify:deploy:prod` deploy `69e960fccaca132084c45392`; prod JS bundle references Supabase client code.
+- 2026-04-24: **D3** tooling: `pnpm netlify:env:push` / `pnpm netlify:env:list` (avoid root monorepo picker); `wiki/operations.md` + `wiki/deployment.md` updated.
+- 2026-04-24: **D3** check + **D4** partial smoke: `pnpm netlify:env:check` (exit 2: no `.env.cloud`, Netlify missing `VITE`_*); `pnpm smoke:netlify-home` OK 200 `https://widados-contacts.netlify.app/`.
+- 2026-04-24: **D3** done: `.env.cloud` + Netlify `VITE_SUPABASE`_*; `pnpm netlify:deploy:prod` deploy `69e960fccaca132084c45392`; prod JS bundle references Supabase client code.
 - 2026-04-23: Owner direction updated: defer remaining cloud-service rollout/testing tasks (D4–D8) and prioritize local app behavior/design readiness.
 - 2026-04-23: Local-first roadmap rework: added L1–L5 execution track; set L1 `IN_PROGRESS` as active priority.
 - 2026-04-23: L1 audit drafted: prioritized local UX/design checklist + acceptance criteria for auth state, loading/error feedback, empty states, form ergonomics, structure, and trash/search parity.
@@ -465,7 +474,7 @@ This section is the authoritative rewrite blueprint for R1.
 - 2026-04-24: `R12` progress slice QA PASS on localhost (`http://localhost:5174`): backend-debounced search validates across display name, phone, email, and label name; empty query restores full list; rapid typing confirms settled-input request behavior (not one request per keystroke). Automated checks: `pnpm --filter @widados/web lint`, `pnpm --filter @widados/web typecheck`.
 - 2026-04-24: `R12` mobile-parity slice implemented: mobile contacts domain now uses debounced backend `ilike` matching across name/phone/email/label with empty-query full-list behavior; automated checks PASS (`pnpm --filter @widados/mobile typecheck`, `pnpm --filter @widados/mobile lint`, plus web regression typecheck/lint).
 - 2026-04-24: PM end-check closed `R12` as **DONE** and advanced active execution to `R9` (**IN_PROGRESS**) after strict QA order completion: manual web QA reconfirmed empty-query baseline restore, name/phone/email/label matching, and debounced settled-input request behavior via network traces; web/mobile lint+typecheck gates remain PASS.
-- 2026-04-24: `R9` progress slice implemented: added web theme mode (`light`/`dark`) with system-preference default, persisted manual toggle in sidebar footer, and theme variable application through `ui-styles.ts`. Automated checks PASS (`pnpm --filter @widados/web lint`, `pnpm --filter @widados/web typecheck`). Manual visual QA remains in progress.
+- 2026-04-24: `R9` progress slice implemented: added web theme mode (`light`/`dark`) with system-preference default, persisted manual toggle in sidebar footer, and theme variable application through CSS tokens with `dark` class toggling on the root element. Automated checks PASS (`pnpm --filter @widados/web lint`, `pnpm --filter @widados/web typecheck`). Manual visual QA remains in progress.
 - 2026-04-24: `R9` QA pass (post-fix): desktop dark-mode readability PASS on Contacts/Trash/Manage Labels after tokenizing remaining hardcoded colors and faster feedback-dismiss timing. Mobile visual QA remains BLOCKED in browser automation: viewport resize requests to `375x812` render at ~`634x801`, preventing reliable bottom-nav verification in true mobile breakpoint.
 - 2026-04-24: PM hygiene pass completed — promoted Manage Labels to MVP scope, refreshed snapshot date, aligned cloud/mobile gate statuses with completed tasks (`R10`, `R11`), and split QA viewport policy into desktop baseline plus required responsive checkpoints.
 - 2026-04-23: **R10** DONE — Phone + email fields leveraged existing normalized `contact_emails`/`contact_phones` tables (no new migration). `CONTACT_SELECT` extended; `ContactRow` type updated with `ContactEmailRow`/`ContactPhoneRow`; `getPrimaryEmail`/`getPrimaryPhone` helpers added to `contact-search.ts`; `contactMatchesQuery` extended to search all email + phone entries; create/edit form gains Phone + Email inputs; edit pre-fills from primary row; contact list shows `phone · email` secondary line. 46 Vitest tests pass (up from 35); typecheck clean; 11-step browser QA all PASS.
