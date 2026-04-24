@@ -49,7 +49,12 @@ export function AppShell({ children }: AppShellProps) {
       style={{
         ...ui.shell,
         marginInlineStart: sidebarW,
-        paddingBlockEnd: isMobile ? 64 : 0,
+        ...(isMobile
+          ? {
+              height: "100dvh",
+              overflow: "hidden",
+            }
+          : {}),
       }}
     >
       {!isMobile && (
@@ -62,7 +67,17 @@ export function AppShell({ children }: AppShellProps) {
         />
       )}
 
-      <main style={ui.mainContent}>
+      <main
+        style={{
+          ...ui.mainContent,
+          ...(isMobile
+            ? {
+                overflowY: "auto",
+                paddingBlockEnd: 64,
+              }
+            : {}),
+        }}
+      >
         {s.feedback ? (
           <div
             style={{
