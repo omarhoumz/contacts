@@ -18,8 +18,6 @@ export const PHONE_COUNTRIES: Array<{ code: PhoneCountry; label: string; dialCod
   { code: "AU", label: "Australia", dialCode: "61" },
 ];
 
-const byCode = new Map(PHONE_COUNTRIES.map((c) => [c.code, c]));
-
 export function formatDialPrefix(country: PhoneCountry): string {
   return `+${getCountryCallingCode(country as CountryCode)}`;
 }
