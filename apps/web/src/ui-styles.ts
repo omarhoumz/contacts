@@ -1,3 +1,6 @@
+export const SIDEBAR_W = 220;
+export const SIDEBAR_W_COLLAPSED = 48;
+
 export const ui = {
   // ── Signed-out page ──────────────────────────────────────────────────────
   signedOutPage: {
@@ -35,29 +38,43 @@ export const ui = {
 
   // ── Authenticated shell ───────────────────────────────────────────────────
   shell: {
-    marginLeft: 220,
     minHeight: "100vh",
     background: "#f8fafc",
+    transition: "margin-inline-start 0.2s ease",
   },
 
   // ── Sidebar ───────────────────────────────────────────────────────────────
   sidebar: {
     position: "fixed" as const,
     top: 0,
-    left: 0,
-    width: 220,
+    insetInlineStart: 0,
     height: "100vh",
+    zIndex: 30,
     background: "#ffffff",
-    borderRight: "1px solid #e2e8f0",
+    borderInlineEnd: "1px solid #e2e8f0",
     display: "flex",
     flexDirection: "column" as const,
-    zIndex: 20,
     overflow: "hidden",
+    transition: "width 0.2s ease",
   },
   sidebarHeader: {
-    padding: "20px 20px 14px",
+    display: "flex",
+    alignItems: "center",
+    gap: 8,
+    paddingBlock: "20px 14px",
+    paddingInline: 20,
     borderBottom: "1px solid #f1f5f9",
     flexShrink: 0,
+    overflow: "hidden",
+  },
+  sidebarHeaderCollapsed: {
+    justifyContent: "center",
+    paddingInline: 0,
+  },
+  sidebarBranding: {
+    flex: 1,
+    minWidth: 0,
+    overflow: "hidden",
   },
   sidebarAppName: {
     fontSize: 20,
@@ -65,6 +82,7 @@ export const ui = {
     color: "#0f172a",
     margin: 0,
     letterSpacing: "-0.03em",
+    whiteSpace: "nowrap" as const,
   },
   sidebarEmail: {
     fontSize: 12,
@@ -73,6 +91,19 @@ export const ui = {
     overflow: "hidden" as const,
     textOverflow: "ellipsis",
     whiteSpace: "nowrap" as const,
+  },
+  sidebarToggleBtn: {
+    background: "none",
+    border: "none",
+    cursor: "pointer",
+    color: "#94a3b8",
+    padding: 4,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: 4,
+    flexShrink: 0,
+    lineHeight: 0,
   },
   navList: {
     flex: 1,
@@ -86,23 +117,32 @@ export const ui = {
     display: "flex",
     alignItems: "center",
     gap: 10,
-    padding: "12px 20px",
+    paddingBlock: 12,
+    paddingInlineStart: 20,
+    paddingInlineEnd: 16,
     fontSize: 14,
     color: "#374151",
     cursor: "pointer",
     border: "none",
     background: "none",
     width: "100%",
-    textAlign: "left" as const,
-    borderLeft: "3px solid transparent",
+    textAlign: "start" as const,
+    borderInlineStart: "3px solid transparent",
     fontFamily: "inherit",
     textDecoration: "none",
     lineHeight: 1.4,
+    whiteSpace: "nowrap" as const,
+    overflow: "hidden",
+  },
+  navItemCollapsed: {
+    justifyContent: "center",
+    paddingInline: 0,
+    gap: 0,
   },
   navItemActive: {
     color: "#2563eb",
     background: "#eff6ff",
-    borderLeft: "3px solid #2563eb",
+    borderInlineStart: "3px solid #2563eb",
     fontWeight: 600,
   },
   navItemDisabled: {
@@ -110,9 +150,15 @@ export const ui = {
     pointerEvents: "none" as const,
   },
   sidebarFooter: {
-    padding: "12px 20px",
+    paddingBlock: 12,
+    paddingInline: 20,
     borderTop: "1px solid #f1f5f9",
     flexShrink: 0,
+  },
+  sidebarFooterCollapsed: {
+    paddingInline: 0,
+    display: "flex",
+    justifyContent: "center",
   },
   signOutBtn: {
     background: "none",
@@ -122,6 +168,9 @@ export const ui = {
     cursor: "pointer",
     padding: 0,
     fontFamily: "inherit",
+    display: "flex",
+    alignItems: "center",
+    gap: 6,
   },
 
   // ── Main content ──────────────────────────────────────────────────────────
@@ -158,7 +207,7 @@ export const ui = {
   },
   searchIcon: {
     position: "absolute" as const,
-    right: 10,
+    insetInlineEnd: 10,
     top: "50%",
     transform: "translateY(-50%)",
     color: "#94a3b8",
