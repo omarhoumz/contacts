@@ -1,5 +1,7 @@
+import { useState } from "react";
 import { normalizeLabels, type ContactRow, type LabelRow } from "./contact-search";
 import { ui } from "./ui-styles";
+import { IconMoreHorizontal } from "./icons";
 
 type ContactsSectionProps = {
   showTrash: boolean;
@@ -16,136 +18,227 @@ type ContactsSectionProps = {
 };
 
 export function ContactsSection(props: ContactsSectionProps) {
+  const [expandedId, setExpandedId] = useState<string | null>(null);
+
   if (props.dataBusy) {
-    return <p style={{ color: "#94a3b8", fontSize: 14, padding: "20px 0" }}>Loading…</p>;
+    return (
+      <div style={{ ...ui.listCard, padding: "20px 16px" }}>
+        <p style={{ margin: 0, color: "#94a3b8", fontSize: 14 }}>Loading…</p>
+      </div>
+    );
   }
 
   if (props.displayedContacts.length === 0) {
     return (
-      <p style={{ color: "#94a3b8", fontSize: 14, textAlign: "center", marginTop: 48 }}>
-        {props.showTrash ? "Trash is empty." : "No contacts yet — add your first one above."}
-      </p>
+      <div style={{ ...ui.listCard, padding: "48px 24px", textAlign: "center" }}>
+        <p style={{ margin: 0, color: "#94a3b8", fontSize: 14 }}>
+          {props.showTrash
+            ? "Trash is empty."
+            : "No contacts yet — add your first one above."}
+        </p>
+      </div>
     );
   }
 
+  const count = props.displayedContacts.length;
+
   return (
-    <ul style={{ listStyle: "none", margin: 0, padding: 0 }}>
-      {props.displayedContacts.map((contact) => {
-        const assignedIds = new Set((contact.contact_labels ?? []).map((cl) => cl.label_id));
-        const assignedLabels = (contact.contact_labels ?? []).flatMap((cl) => normalizeLabels(cl.labels));
+    <div style={ui.listCard}>
+      <ul style={{ listStyle: "none", margin: 0, padding: 0 }}>
+        {props.displayedContacts.map((contact, idx) => {
+          const isLast = idx === props.displayedContacts.length - 1;
+          const isExpanded = expandedId === contact.id;
+          const assignedIds = new Set(
+            (contact.contact_labels ?? []).map((cl) => cl.label_id),
+          );
+          const assignedLabels = (contact.contact_labels ?? []).flatMap((cl) =>
+            normalizeLabels(cl.labels),
+          );
 
-        return (
-          <li
-            key={contact.id}
-            style={{
-              display: "flex",
-              alignItems: "flex-start",
-              gap: 12,
-              padding: "12px 0",
-              borderBottom: "1px solid #f1f5f9",
-            }}
-          >
-            {/* Avatar */}
-            <div
-              style={{
-                width: 36,
-                height: 36,
-                borderRadius: "50%",
-                background: "#dbeafe",
-                color: "#1d4ed8",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                fontSize: 13,
-                fontWeight: 600,
-                flexShrink: 0,
-              }}
-            >
-              {contact.display_name.slice(0, 2).toUpperCase()}
-            </div>
+          return (
+            <li key={contact.id}>
+              {/* ── Main row (always 48px) ───────────────────────────── */}
+              <div
+                style={{
+                  ...ui.contactRow,
+                  borderBottom: isExpanded || !isLast ? "1px solid #f1f5f9" : "none",
+                }}
+              >
+                {/* Avatar */}
+                <div style={ui.avatar}>
+                  {contact.display_name.slice(0, 2).toUpperCase()}
+                </div>
 
-            {/* Name + labels */}
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" as const }}>
-                <strong style={{ fontSize: 14 }}>{contact.display_name}</strong>
-                {assignedLabels.map((l) => (
+                {/* Name + assigned label pills */}
+                <div
+                  style={{
+                    flex: 1,
+                    minWidth: 0,
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 6,
+                    overflow: "hidden",
+                  }}
+                >
                   <span
-                    key={l.id}
                     style={{
-                      fontSize: 11,
-                      background: l.color ? `${l.color}22` : "#f1f5f9",
-                      color: l.color ?? "#64748b",
-                      borderRadius: 4,
-                      padding: "1px 7px",
-                      fontWeight: 500,
+                      fontSize: 14,
+                      fontWeight: 600,
+                      color: "#0f172a",
+                      whiteSpace: "nowrap",
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
                     }}
                   >
-                    {l.name}
+                    {contact.display_name}
                   </span>
-                ))}
-              </div>
-
-              {/* Label toggles (active view only) */}
-              {!props.showTrash && props.labels.length > 0 && (
-                <div style={{ marginTop: 5, display: "flex", gap: 4, flexWrap: "wrap" as const }}>
-                  {props.labels.map((l) => (
-                    <button
+                  {assignedLabels.map((l) => (
+                    <span
                       key={l.id}
-                      type="button"
-                      onClick={() => props.toggleContactLabel(contact.id, l.id, assignedIds.has(l.id))}
-                      disabled={props.mutationBusy}
                       style={{
-                        ...ui.secondaryButton,
-                        padding: "2px 8px",
-                        fontSize: 11,
-                        borderColor: assignedIds.has(l.id) ? "#2563eb" : "#e2e8f0",
-                        color: assignedIds.has(l.id) ? "#2563eb" : "#64748b",
+                        ...ui.labelPill,
+                        background: l.color ? `${l.color}22` : "#f1f5f9",
+                        color: l.color ?? "#64748b",
+                        flexShrink: 0,
                       }}
                     >
-                      {assignedIds.has(l.id) ? "✓ " : "+ "}{l.name}
-                    </button>
+                      {l.name}
+                    </span>
                   ))}
                 </div>
-              )}
-            </div>
 
-            {/* Actions */}
-            <div style={{ display: "flex", gap: 6, flexShrink: 0 }}>
-              {props.showTrash ? (
-                <>
-                  <button onClick={() => props.restoreContact(contact.id)} style={ui.secondaryButton}>
-                    Restore
-                  </button>
-                  <button
-                    onClick={() => props.permanentlyDeleteContact(contact.id)}
-                    style={{ ...ui.secondaryButton, color: "#ef4444", borderColor: "#fecaca" }}
-                  >
-                    Delete forever
-                  </button>
-                </>
-              ) : (
-                <>
-                  <button
-                    onClick={() => {
-                      props.setEditingId(contact.id);
-                      props.setDisplayName(contact.display_name);
-                    }}
-                    style={ui.secondaryButton}
-                  >
-                    Edit
-                  </button>
-                  <button
-                    onClick={() => props.softDeleteContact(contact.id)}
-                    style={{ ...ui.secondaryButton, color: "#ef4444", borderColor: "#fecaca" }}
-                  >
-                    Trash
-                  </button>
-                </>
+                {/* Overflow menu toggle */}
+                <button
+                  style={{
+                    ...ui.iconButton,
+                    color: isExpanded ? "#2563eb" : "#94a3b8",
+                  }}
+                  onClick={() =>
+                    setExpandedId(isExpanded ? null : contact.id)
+                  }
+                  aria-label="More actions"
+                >
+                  <IconMoreHorizontal size={16} />
+                </button>
+              </div>
+
+              {/* ── Expanded actions panel ───────────────────────────── */}
+              {isExpanded && (
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 6,
+                    padding: "8px 16px 10px 60px",
+                    flexWrap: "wrap" as const,
+                    borderBottom: isLast ? "none" : "1px solid #f1f5f9",
+                    background: "#fafbfc",
+                  }}
+                >
+                  {props.showTrash ? (
+                    <>
+                      <button
+                        onClick={() => {
+                          props.restoreContact(contact.id);
+                          setExpandedId(null);
+                        }}
+                        style={ui.smallButton}
+                      >
+                        Restore
+                      </button>
+                      <button
+                        onClick={() => {
+                          props.permanentlyDeleteContact(contact.id);
+                          setExpandedId(null);
+                        }}
+                        style={{
+                          ...ui.smallButton,
+                          color: "#ef4444",
+                          borderColor: "#fecaca",
+                        }}
+                      >
+                        Delete forever
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      <button
+                        onClick={() => {
+                          props.setEditingId(contact.id);
+                          props.setDisplayName(contact.display_name);
+                          setExpandedId(null);
+                        }}
+                        style={ui.smallButton}
+                      >
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => {
+                          props.softDeleteContact(contact.id);
+                          setExpandedId(null);
+                        }}
+                        style={{
+                          ...ui.smallButton,
+                          color: "#ef4444",
+                          borderColor: "#fecaca",
+                        }}
+                      >
+                        Move to trash
+                      </button>
+
+                      {/* Label toggles — only shown in expanded panel */}
+                      {props.labels.length > 0 && (
+                        <span
+                          style={{
+                            width: "100%",
+                            display: "flex",
+                            gap: 4,
+                            flexWrap: "wrap" as const,
+                            marginTop: 4,
+                          }}
+                        >
+                          {props.labels.map((l) => (
+                            <button
+                              key={l.id}
+                              type="button"
+                              onClick={() =>
+                                props.toggleContactLabel(
+                                  contact.id,
+                                  l.id,
+                                  assignedIds.has(l.id),
+                                )
+                              }
+                              disabled={props.mutationBusy}
+                              style={{
+                                ...ui.smallButton,
+                                borderColor: assignedIds.has(l.id)
+                                  ? "#2563eb"
+                                  : "#e2e8f0",
+                                color: assignedIds.has(l.id)
+                                  ? "#2563eb"
+                                  : "#64748b",
+                              }}
+                            >
+                              {assignedIds.has(l.id) ? "✓ " : "+ "}
+                              {l.name}
+                            </button>
+                          ))}
+                        </span>
+                      )}
+                    </>
+                  )}
+                </div>
               )}
-            </div>
-          </li>
-        );
-      })}
-    </ul>
+            </li>
+          );
+        })}
+      </ul>
+
+      {/* Contact count footer */}
+      <div style={ui.listCardFooter}>
+        {count} {count === 1 ? "contact" : "contacts"}
+        {props.showTrash ? " in trash" : ""}
+      </div>
+    </div>
   );
 }

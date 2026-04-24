@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useWebApp } from "./web-app-context";
 import { ContactsSection } from "./contacts-section";
 import { ui } from "./ui-styles";
+import { IconSearch } from "./icons";
 
 export function ContactsRoute() {
   const s = useWebApp();
@@ -17,13 +18,13 @@ export function ContactsRoute() {
     setShowCompose(false);
   };
 
+  const handleUpdate = async () => {
+    await s.updateContact();
+  };
+
   const handleCancelEdit = () => {
     s.setEditingId(null);
     s.setDisplayName("");
-  };
-
-  const handleUpdate = async () => {
-    await s.updateContact();
   };
 
   return (
@@ -31,15 +32,26 @@ export function ContactsRoute() {
       {/* ── Top bar ─────────────────────────────────────────────────── */}
       <div style={ui.topBar}>
         <h2 style={ui.topBarTitle}>Contacts</h2>
-        <input
-          placeholder="Search by name or label…"
-          value={s.query}
-          onChange={(e) => s.setQuery(e.target.value)}
-          disabled={s.dataBusy}
-          style={ui.topBarSearch}
-        />
+
+        <div style={ui.searchWrapper}>
+          <span style={ui.searchIcon}>
+            <IconSearch size={14} />
+          </span>
+          <input
+            placeholder="Search by name or label…"
+            value={s.query}
+            onChange={(e) => s.setQuery(e.target.value)}
+            disabled={s.dataBusy}
+            style={ui.topBarSearch}
+          />
+        </div>
+
         <button
-          onClick={() => { setShowCompose(true); s.setEditingId(null); s.setDisplayName(""); }}
+          onClick={() => {
+            setShowCompose(true);
+            s.setEditingId(null);
+            s.setDisplayName("");
+          }}
           style={ui.primaryButton}
           disabled={s.mutationBusy}
         >
@@ -50,7 +62,7 @@ export function ContactsRoute() {
       {/* ── Compose / edit form ──────────────────────────────────────── */}
       {(showCompose || s.editingId) && (
         <div style={ui.composeSection}>
-          <p style={{ margin: "0 0 10px", fontSize: 13, fontWeight: 600, color: "#374151" }}>
+          <p style={ui.composeSectionTitle}>
             {s.editingId ? "Edit contact" : "New contact"}
           </p>
           <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
@@ -64,7 +76,11 @@ export function ContactsRoute() {
             />
             {s.editingId ? (
               <>
-                <button onClick={handleUpdate} disabled={s.mutationBusy || s.dataBusy} style={ui.primaryButton}>
+                <button
+                  onClick={handleUpdate}
+                  disabled={s.mutationBusy || s.dataBusy}
+                  style={ui.primaryButton}
+                >
                   {s.mutationBusy ? "Saving…" : "Save"}
                 </button>
                 <button onClick={handleCancelEdit} style={ui.secondaryButton}>
@@ -73,10 +89,20 @@ export function ContactsRoute() {
               </>
             ) : (
               <>
-                <button onClick={handleCreate} disabled={s.mutationBusy || s.dataBusy} style={ui.primaryButton}>
+                <button
+                  onClick={handleCreate}
+                  disabled={s.mutationBusy || s.dataBusy}
+                  style={ui.primaryButton}
+                >
                   {s.mutationBusy ? "Saving…" : "Create"}
                 </button>
-                <button onClick={() => { setShowCompose(false); s.setDisplayName(""); }} style={ui.secondaryButton}>
+                <button
+                  onClick={() => {
+                    setShowCompose(false);
+                    s.setDisplayName("");
+                  }}
+                  style={ui.secondaryButton}
+                >
                   Cancel
                 </button>
               </>
@@ -93,7 +119,7 @@ export function ContactsRoute() {
           labels={s.labels}
           dataBusy={s.dataBusy}
           mutationBusy={s.mutationBusy}
-          setEditingId={(id) => { s.setEditingId(id); if (id) setShowCompose(false); }}
+          setEditingId={s.setEditingId}
           setDisplayName={s.setDisplayName}
           softDeleteContact={s.softDeleteContact}
           restoreContact={s.restoreContact}

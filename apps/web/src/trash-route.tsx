@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { useWebApp } from "./web-app-context";
 import { ContactsSection } from "./contacts-section";
 import { ui } from "./ui-styles";
+import { IconSearch } from "./icons";
 
 export function TrashRoute() {
   const s = useWebApp();
@@ -16,13 +17,19 @@ export function TrashRoute() {
       {/* ── Top bar ─────────────────────────────────────────────────── */}
       <div style={ui.topBar}>
         <h2 style={ui.topBarTitle}>Trash</h2>
-        <input
-          placeholder="Search trash…"
-          value={s.query}
-          onChange={(e) => s.setQuery(e.target.value)}
-          disabled={s.dataBusy}
-          style={ui.topBarSearch}
-        />
+
+        <div style={ui.searchWrapper}>
+          <span style={ui.searchIcon}>
+            <IconSearch size={14} />
+          </span>
+          <input
+            placeholder="Search trash…"
+            value={s.query}
+            onChange={(e) => s.setQuery(e.target.value)}
+            disabled={s.dataBusy}
+            style={ui.topBarSearch}
+          />
+        </div>
       </div>
 
       {/* ── Trash list ───────────────────────────────────────────────── */}

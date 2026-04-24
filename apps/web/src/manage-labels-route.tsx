@@ -13,9 +13,7 @@ export function ManageLabelsRoute() {
 
       {/* ── Create label form ────────────────────────────────────────── */}
       <div style={ui.composeSection}>
-        <p style={{ margin: "0 0 10px", fontSize: 13, fontWeight: 600, color: "#374151" }}>
-          New label
-        </p>
+        <p style={ui.composeSectionTitle}>New label</p>
         <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
           <input
             placeholder="Label name"

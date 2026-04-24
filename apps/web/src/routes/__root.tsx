@@ -32,7 +32,7 @@ function RootComponent() {
             </p>
           ) : null}
 
-          <div style={{ background: "#fff", border: "1px solid #e2e8f0", borderRadius: 14, padding: "24px 20px" }}>
+          <div style={ui.signedOutCard}>
             <input
               placeholder="Email"
               value={s.email}
