@@ -3,13 +3,23 @@ import { useWebApp } from "./web-app-context";
 import { ContactsSection } from "./contacts-section";
 import { ui } from "./ui-styles";
 import { IconSearch } from "./icons";
-import { PHONE_COUNTRIES, formatDialPrefix } from "./phone-country";
+import {
+  PHONE_COUNTRIES,
+  formatDialPrefix,
+  getDefaultPhoneCountryFromLocale,
+  type PhoneCountry,
+} from "./phone-country";
 import { useBreakpoint } from "./use-breakpoint";
 
 export function ContactsRoute() {
   const s = useWebApp();
   const bp = useBreakpoint();
   const isMobile = bp === "mobile";
+  const composeGridColumns = isMobile
+    ? "1fr"
+    : bp === "tablet"
+      ? "minmax(0,1fr) minmax(0,1fr)"
+      : "minmax(180px,2fr) minmax(180px,1fr) minmax(180px,1fr) minmax(220px,2fr)";
   const [showCompose, setShowCompose] = useState(false);
 
   useEffect(() => {
@@ -31,7 +41,7 @@ export function ContactsRoute() {
     s.setDisplayName("");
     s.setContactPhone("");
     s.setContactEmail("");
-    s.setContactPhoneCountry("US");
+    s.setContactPhoneCountry(getDefaultPhoneCountryFromLocale());
   };
 
   const openCompose = () => {
@@ -40,7 +50,7 @@ export function ContactsRoute() {
     s.setDisplayName("");
     s.setContactPhone("");
     s.setContactEmail("");
-    s.setContactPhoneCountry("US");
+    s.setContactPhoneCountry(getDefaultPhoneCountryFromLocale());
   };
 
   return (
@@ -99,13 +109,20 @@ export function ContactsRoute() {
             {s.editingId ? "Edit contact" : "New contact"}
           </p>
           <div style={{ display: "flex", flexDirection: "column" as const, gap: 8 }}>
-            <div style={{ display: "flex", gap: 8, flexDirection: isMobile ? ("column" as const) : ("row" as const) }}>
+            <div
+              style={{
+                display: "grid",
+                gap: 8,
+                gridTemplateColumns: composeGridColumns,
+                alignItems: "center",
+              }}
+            >
               <input
                 placeholder="Display name *"
                 value={s.displayName}
                 onChange={(e) => s.setDisplayName(e.target.value)}
                 disabled={s.mutationBusy}
-                style={{ ...ui.compactInput, flex: isMobile ? undefined : 2 }}
+                style={{ ...ui.compactInput, minWidth: 0 }}
                 autoFocus
               />
               <input
@@ -113,17 +130,17 @@ export function ContactsRoute() {
                 value={s.contactPhone}
                 onChange={(e) => s.setContactPhone(e.target.value)}
                 disabled={s.mutationBusy}
-                style={{ ...ui.compactInput, flex: isMobile ? undefined : 1 }}
+                style={{ ...ui.compactInput, minWidth: 0 }}
               />
               <select
                 value={s.contactPhoneCountry}
-                onChange={(e) => s.setContactPhoneCountry(e.target.value as (typeof PHONE_COUNTRIES)[number]["code"])}
+                onChange={(e) => s.setContactPhoneCountry(e.target.value as PhoneCountry)}
                 disabled={s.mutationBusy}
-                style={{ ...ui.compactInput, flex: isMobile ? undefined : 1 }}
+                style={{ ...ui.compactInput, minWidth: 0 }}
               >
                 {PHONE_COUNTRIES.map((c) => (
                   <option key={c.code} value={c.code}>
-                    {c.code} ({formatDialPrefix(c.code)})
+                    {c.label} ({c.code}) {formatDialPrefix(c.code)}
                   </option>
                 ))}
               </select>
@@ -133,7 +150,7 @@ export function ContactsRoute() {
                 value={s.contactEmail}
                 onChange={(e) => s.setContactEmail(e.target.value)}
                 disabled={s.mutationBusy}
-                style={{ ...ui.compactInput, flex: isMobile ? undefined : 2 }}
+                style={{ ...ui.compactInput, minWidth: 0 }}
               />
             </div>
             <div style={{ display: "flex", gap: 8 }}>
@@ -165,7 +182,7 @@ export function ContactsRoute() {
                       s.setDisplayName("");
                       s.setContactPhone("");
                       s.setContactEmail("");
-                      s.setContactPhoneCountry("US");
+                      s.setContactPhoneCountry(getDefaultPhoneCountryFromLocale());
                     }}
                     style={ui.secondaryButton}
                   >

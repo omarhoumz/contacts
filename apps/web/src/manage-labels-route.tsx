@@ -9,6 +9,11 @@ const PRESET_COLORS = [
 
 export function ManageLabelsRoute() {
   const s = useWebApp();
+  const confirmDeleteLabel = (name: string) => {
+    return window.confirm(
+      `Delete "${name}"? This also removes it from any contacts that currently use it.`,
+    );
+  };
 
   return (
     <>
@@ -96,7 +101,90 @@ export function ManageLabelsRoute() {
                   flexShrink: 0,
                 }}
               />
-              <span style={{ fontSize: 14, color: "#0f172a" }}>{l.name}</span>
+              {s.editingLabelId === l.id ? (
+                <div style={{ display: "flex", flexDirection: "column", gap: 8, flex: 1 }}>
+                  <input
+                    value={s.editLabelName}
+                    onChange={(e) => s.setEditLabelName(e.target.value)}
+                    disabled={s.labelBusy}
+                    style={ui.compactInput}
+                    aria-label={`Edit name for ${l.name}`}
+                  />
+                  <div style={{ display: "flex", gap: 6, flexWrap: "wrap" as const }}>
+                    {PRESET_COLORS.map((color) => (
+                      <button
+                        key={`${l.id}-${color}`}
+                        type="button"
+                        onClick={() => s.setEditLabelColor(color)}
+                        disabled={s.labelBusy}
+                        title={color}
+                        aria-label={`Set ${l.name} colour to ${color}`}
+                        style={{
+                          width: 20,
+                          height: 20,
+                          borderRadius: "50%",
+                          background: color,
+                          border: s.editLabelColor === color ? "2px solid #0f172a" : "2px solid transparent",
+                          cursor: "pointer",
+                          padding: 0,
+                          outline: s.editLabelColor === color ? "2px solid #fff" : "none",
+                          outlineOffset: -3,
+                        }}
+                      />
+                    ))}
+                  </div>
+                  <div style={{ display: "flex", gap: 8 }}>
+                    <button
+                      type="button"
+                      onClick={s.saveLabelEdit}
+                      disabled={s.labelBusy || !s.editLabelName.trim()}
+                      style={ui.smallButton}
+                    >
+                      Save
+                    </button>
+                    <button
+                      type="button"
+                      onClick={s.cancelEditLabel}
+                      disabled={s.labelBusy}
+                      style={ui.smallButton}
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <>
+                  <span style={{ fontSize: 14, color: "#0f172a", flex: 1 }}>{l.name}</span>
+                  <div style={{ display: "flex", gap: 8 }}>
+                    <button
+                      type="button"
+                      onClick={() => s.beginEditLabel(l)}
+                      disabled={s.labelBusy}
+                      style={ui.smallButton}
+                      aria-label={`Edit label ${l.name}`}
+                    >
+                      Edit
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (!confirmDeleteLabel(l.name)) return;
+                        void s.deleteLabel(l);
+                      }}
+                      disabled={s.labelBusy}
+                      style={{
+                        ...ui.smallButton,
+                        borderColor: "#fecaca",
+                        color: "#b91c1c",
+                        background: "#fef2f2",
+                      }}
+                      aria-label={`Delete label ${l.name}`}
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </>
+              )}
             </li>
           ))}
         </ul>

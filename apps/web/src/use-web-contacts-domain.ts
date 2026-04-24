@@ -4,6 +4,7 @@ import { contactSchema } from "@widados/shared";
 import { contactMatchesQuery, type ContactRow } from "./contact-search";
 import {
   detectCountryFromE164,
+  getDefaultPhoneCountryFromLocale,
   isLikelyValidE164,
   normalizePhoneE164,
   type PhoneCountry,
@@ -37,7 +38,7 @@ export function useWebContactsDomain(params: UseWebContactsDomainParams) {
   const [displayName, setDisplayName] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
-  const [phoneCountry, setPhoneCountry] = useState<PhoneCountry>("US");
+  const [phoneCountry, setPhoneCountry] = useState<PhoneCountry>(() => getDefaultPhoneCountryFromLocale());
   const [showTrash, setShowTrash] = useState(false);
   const [dataBusy, setDataBusy] = useState(false);
   const [mutationBusy, setMutationBusy] = useState(false);
@@ -165,7 +166,7 @@ export function useWebContactsDomain(params: UseWebContactsDomainParams) {
     setDisplayName("");
     setPhone("");
     setEmail("");
-    setPhoneCountry("US");
+    setPhoneCountry(getDefaultPhoneCountryFromLocale());
     await refreshData();
     setMutationBusy(false);
   };
@@ -214,7 +215,7 @@ export function useWebContactsDomain(params: UseWebContactsDomainParams) {
     setDisplayName("");
     setPhone("");
     setEmail("");
-    setPhoneCountry("US");
+    setPhoneCountry(getDefaultPhoneCountryFromLocale());
     await refreshData();
     setMutationBusy(false);
   };

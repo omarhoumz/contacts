@@ -1,33 +1,61 @@
 import {
   AsYouType,
+  getCountries,
   parsePhoneNumberFromString,
   getCountryCallingCode,
   type CountryCode,
 } from "libphonenumber-js";
 
-export type PhoneCountry = "US" | "CA" | "GB" | "DE" | "FR" | "AE" | "IN" | "AU";
+export type PhoneCountry = CountryCode;
+export type PhoneCountryOption = { code: PhoneCountry; label: string; dialCode: string };
 
-export const PHONE_COUNTRIES: Array<{ code: PhoneCountry; label: string; dialCode: string }> = [
-  { code: "US", label: "United States", dialCode: "1" },
-  { code: "CA", label: "Canada", dialCode: "1" },
-  { code: "GB", label: "United Kingdom", dialCode: "44" },
-  { code: "DE", label: "Germany", dialCode: "49" },
-  { code: "FR", label: "France", dialCode: "33" },
-  { code: "AE", label: "United Arab Emirates", dialCode: "971" },
-  { code: "IN", label: "India", dialCode: "91" },
-  { code: "AU", label: "Australia", dialCode: "61" },
-];
+const fallbackCountry = "US" as PhoneCountry;
+const countries = getCountries() as PhoneCountry[];
+
+function getCountryLabeler() {
+  try {
+    return new Intl.DisplayNames(["en"], { type: "region" });
+  } catch {
+    return null;
+  }
+}
+
+const labeler = getCountryLabeler();
+
+export const PHONE_COUNTRIES: PhoneCountryOption[] = countries
+  .map((code) => ({
+    code,
+    label: labeler?.of(code) ?? code,
+    dialCode: getCountryCallingCode(code),
+  }))
+  .sort((a, b) => a.label.localeCompare(b.label));
+
+const countrySet = new Set(PHONE_COUNTRIES.map((c) => c.code));
+
+export function getDefaultPhoneCountryFromLocale(): PhoneCountry {
+  const candidates: string[] = [];
+  if (typeof navigator !== "undefined") {
+    if (Array.isArray(navigator.languages)) candidates.push(...navigator.languages);
+    if (navigator.language) candidates.push(navigator.language);
+  }
+  for (const locale of candidates) {
+    const region = locale.split("-").at(-1)?.toUpperCase();
+    if (!region) continue;
+    if (countrySet.has(region as PhoneCountry)) return region as PhoneCountry;
+  }
+  return fallbackCountry;
+}
 
 export function formatDialPrefix(country: PhoneCountry): string {
-  return `+${getCountryCallingCode(country as CountryCode)}`;
+  return `+${getCountryCallingCode(country)}`;
 }
 
 export function normalizePhoneE164(raw: string, country: PhoneCountry): string {
   const trimmed = raw.trim();
   if (!trimmed) return "";
-  const parsed = parsePhoneNumberFromString(trimmed, country as CountryCode);
+  const parsed = parsePhoneNumberFromString(trimmed, country);
   if (parsed) return parsed.number;
-  const formatter = new AsYouType(country as CountryCode);
+  const formatter = new AsYouType(country);
   formatter.input(trimmed);
   const maybe = formatter.getNumber();
   return maybe?.number ?? "";
@@ -40,9 +68,9 @@ export function isLikelyValidE164(value: string): boolean {
 
 export function detectCountryFromE164(value: string): PhoneCountry {
   const normalized = value.trim();
-  if (!normalized.startsWith("+")) return "US";
+  if (!normalized.startsWith("+")) return fallbackCountry;
   const digits = normalized.slice(1);
   const sorted = [...PHONE_COUNTRIES].sort((a, b) => b.dialCode.length - a.dialCode.length);
   const match = sorted.find((c) => digits.startsWith(c.dialCode));
-  return match?.code ?? "US";
+  return match?.code ?? fallbackCountry;
 }
