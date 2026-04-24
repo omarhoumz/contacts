@@ -185,8 +185,8 @@ All conditions below must be true before resuming cloud/Netlify rollout tasks:
 | C1   | R7 web acceptance pass complete — rewritten app is stable baseline           | ✅ Done                      |
 | C2   | R8 docs closeout merged — architecture decisions captured                    | ✅ Done                      |
 | C3   | R10 phone + email fields shipped — schema is stable before cloud deploy      | ✅ Done                      |
-| C4   | No P1 bugs open on `main`                                                    | ⬜ Check at time of re-entry |
-| C5   | `.env.cloud` values verified current (Supabase publishable key, project URL) | ⬜ Check at time of re-entry |
+| C4   | No P1 bugs open on `main`                                                    | ✅ Done (2026-04-24 audit)  |
+| C5   | `.env.cloud` values verified current (Supabase publishable key, project URL) | ✅ Done (2026-04-24 check)  |
 
 
 Once all gates pass: run `pnpm netlify:env:push` then `pnpm netlify:deploy:prod`, then execute D4 smoke (auth + one contact mutation on production URL).
@@ -418,9 +418,10 @@ This section is the authoritative rewrite blueprint for R1.
 
 ## Verification Log
 
+- 2026-04-24: Re-ran cloud re-entry gates: `pnpm netlify:env:check` PASS (`.env.cloud` present, publishable key format valid, Netlify production env contains `VITE_SUPABASE_URL` + `VITE_SUPABASE_PUBLISHABLE_KEY`), and `pnpm smoke:netlify-home` PASS (`OK 200 https://widados-contacts.netlify.app/`). `D4` remains **IN_PROGRESS** pending authenticated sign-in + one production contact mutation evidence.
 - 2026-04-24: Auth UX hardening shipped on web: sign-in failure for unconfirmed email now exposes `Resend verification`, wired to Supabase `auth.resend({ type: "signup", email, options: { emailRedirectTo } })`; web lint + typecheck PASS before merge.
 - 2026-04-24: CI runtime hardening: `.github/workflows/ci.yml` upgraded to `actions/checkout@v6`, `actions/setup-node@v6`, `pnpm/action-setup@v5`; GitHub Actions run `24894750158` PASS with Node24-native actions and no Node20 deprecation annotation.
-- 2026-04-24: PM status update: set `R9` to **BLOCKED** (mobile viewport automation mismatch: requested `375x812` renders ~`634x801`), moved active execution to cloud re-entry` D4`, and queued` R9` resumption after tooling fix or manual real-device mobile QA.
+- 2026-04-24: PM status update: set `R9` to **BLOCKED** (mobile viewport automation mismatch: requested `375x812` renders ~`634x801`), moved active execution to cloud re-entry `D4`, and queued `R9` resumption after tooling fix or manual real-device mobile QA.
 - 2026-04-24: `D4` re-entry started: production homepage smoke PASS via `pnpm smoke:netlify-home` (`OK 200 https://widados-contacts.netlify.app/`); next check is authenticated sign-in + one contact mutation on prod URL.
 - 2026-04-24: `R15` completed in full slices: web runtime styling migrated from inline style maps to Tailwind/shadcn-style primitives, `ui-styles.ts` removed, mobile screens migrated to NativeWind className styling, and migration process/docs published (`wiki/tailwind-shadcn-nativewind-migration.md`, coding-style + operations updates). Verification PASS: `pnpm --filter @widados/web lint`, `pnpm --filter @widados/web typecheck`, `pnpm --filter @widados/web test`, `pnpm --filter @widados/mobile lint`, `pnpm --filter @widados/mobile typecheck`.
 - 2026-04-21: A3 complete, `pnpm typecheck` green after TS config/dependency fixes (`dfd1f18`).
