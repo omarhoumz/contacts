@@ -76,7 +76,7 @@ export function ContactsSection(props: ContactsSectionProps) {
                     minWidth: 0,
                     display: "flex",
                     alignItems: "center",
-                    gap: 6,
+                    gap: 8,
                     overflow: "hidden",
                   }}
                 >
@@ -92,19 +92,31 @@ export function ContactsSection(props: ContactsSectionProps) {
                   >
                     {contact.display_name}
                   </span>
-                  {assignedLabels.map((l) => (
-                    <span
-                      key={l.id}
+
+                  {/* Pills pushed to inline-end */}
+                  {assignedLabels.length > 0 && (
+                    <div
                       style={{
-                        ...ui.labelPill,
-                        background: l.color ? `${l.color}33` : "#f1f5f9",
-                        color: l.color ?? "#64748b",
+                        marginInlineStart: "auto",
+                        display: "flex",
+                        gap: 4,
                         flexShrink: 0,
                       }}
                     >
-                      {l.name}
-                    </span>
-                  ))}
+                      {assignedLabels.map((l) => (
+                        <span
+                          key={l.id}
+                          style={{
+                            ...ui.labelPill,
+                            background: l.color ? `${l.color}33` : "#f1f5f9",
+                            color: l.color ?? "#64748b",
+                          }}
+                        >
+                          {l.name}
+                        </span>
+                      ))}
+                    </div>
+                  )}
                 </div>
 
                 {/* Overflow menu toggle */}
@@ -126,13 +138,15 @@ export function ContactsSection(props: ContactsSectionProps) {
               {isExpanded && (
                 <div
                   style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 6,
-                    padding: "8px 16px 10px 60px",
-                    flexWrap: "wrap" as const,
-                    borderBottom: isLast ? "none" : "1px solid #f1f5f9",
-                    background: "#fafbfc",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 6,
+                  paddingBlock: "8px 10px",
+                  paddingInlineStart: 60,
+                  paddingInlineEnd: 16,
+                  flexWrap: "wrap" as const,
+                  borderBottom: isLast ? "none" : "1px solid #f1f5f9",
+                  background: "#fafbfc",
                   }}
                 >
                   {props.showTrash ? (

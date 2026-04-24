@@ -322,8 +322,9 @@ export const ui = {
   // ── Labels ────────────────────────────────────────────────────────────────
   labelPill: {
     fontSize: 11,
-    borderRadius: 4,
-    padding: "2px 7px",
+    borderRadius: 999,
+    paddingBlock: "2px",
+    paddingInline: "8px",
     fontWeight: 500,
     whiteSpace: "nowrap" as const,
   },
