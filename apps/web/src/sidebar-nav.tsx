@@ -65,7 +65,6 @@ export function SidebarNav({ sessionEmail, authBusy, onSignOut }: SidebarNavProp
               <span style={{ ...ui.navItem, ...ui.navItemDisabled }}>
                 <item.Icon size={16} />
                 {item.label}
-                <span style={ui.navBadge}>soon</span>
               </span>
             </li>
           );

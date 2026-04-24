@@ -97,7 +97,7 @@ export function ContactsSection(props: ContactsSectionProps) {
                       key={l.id}
                       style={{
                         ...ui.labelPill,
-                        background: l.color ? `${l.color}22` : "#f1f5f9",
+                        background: l.color ? `${l.color}33` : "#f1f5f9",
                         color: l.color ?? "#64748b",
                         flexShrink: 0,
                       }}

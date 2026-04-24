@@ -86,7 +86,7 @@ export const ui = {
     display: "flex",
     alignItems: "center",
     gap: 10,
-    padding: "9px 16px",
+    padding: "12px 20px",
     fontSize: 14,
     color: "#374151",
     cursor: "pointer",
@@ -106,19 +106,8 @@ export const ui = {
     fontWeight: 600,
   },
   navItemDisabled: {
-    color: "#c8d5e3",
     cursor: "default" as const,
     pointerEvents: "none" as const,
-  },
-  navBadge: {
-    fontSize: 10,
-    background: "#f1f5f9",
-    color: "#b0bec5",
-    borderRadius: 4,
-    padding: "1px 5px",
-    marginLeft: "auto",
-    fontWeight: 500,
-    letterSpacing: "0.01em",
   },
   sidebarFooter: {
     padding: "12px 20px",
@@ -169,7 +158,7 @@ export const ui = {
   },
   searchIcon: {
     position: "absolute" as const,
-    left: 10,
+    right: 10,
     top: "50%",
     transform: "translateY(-50%)",
     color: "#94a3b8",
@@ -179,10 +168,10 @@ export const ui = {
   topBarSearch: {
     border: "1px solid #e2e8f0",
     borderRadius: 8,
-    padding: "7px 10px 7px 34px",
+    padding: "7px 34px 7px 12px",
     fontSize: 13,
     background: "#f8fafc",
-    width: 240,
+    width: 280,
     fontFamily: "inherit",
     color: "#0f172a",
     outline: "none",
@@ -207,9 +196,8 @@ export const ui = {
   // ── List card ─────────────────────────────────────────────────────────────
   listCard: {
     background: "#ffffff",
-    borderRadius: 12,
-    border: "1px solid #e2e8f0",
-    boxShadow: "0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04)",
+    borderRadius: 8,
+    boxShadow: "0 1px 4px rgba(0,0,0,0.07), 0 1px 2px rgba(0,0,0,0.05)",
     overflow: "hidden",
   },
   listCardFooter: {
@@ -253,7 +241,7 @@ export const ui = {
     background: "none",
     border: "none",
     cursor: "pointer",
-    padding: "4px 6px",
+    padding: "6px 8px",
     color: "#94a3b8",
     display: "flex",
     alignItems: "center",
