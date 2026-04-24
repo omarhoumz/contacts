@@ -6,15 +6,15 @@ This file is the single source of truth for roadmap, progress, and execution.
 
 - **Branch:** `main`
 - **Last updated:** 2026-04-24
-- **Current focus:** Cloud re-entry smoke validation (`D4`) after web rewrite stabilization
+- **Current focus:** Post-`D4` cloud follow-through and blocked-item resolution (`R9` mobile QA)
 - **Primary owner:** agents and maintainers using this board
 - **Execution mode:** Caveman + Karpathy discipline (concise communication, surgical changes, explicit verification)
 
 ### Now / Next / Later
 
-- **Now:** cloud re-entry (D4).
+- **Now:** closeout after `D4` completion.
 - **Next:** resume `R9` mobile visual QA after viewport-tooling fix.
-- **Later:** continue deferred cloud/mobile tasks (`D5`-`D8`, `E3`) once `D4` is complete.
+- **Later:** continue deferred cloud/mobile tasks (`D5`-`D8`, `E3`).
 
 ### R11 Responsive Layout — Design Exploration (2026-04-23)
 
@@ -245,7 +245,7 @@ These tracks are complete and archived to keep the active queue focused on curre
 | F3  | P3       | OUT_OF_SCOPE | Import/export  | Define format (e.g. vCard/CSV), privacy constraints, MVP cut.            | Requires product/UX decisions.                                                          |
 | F4  | P4       | OUT_OF_SCOPE | Collaboration  | Family/team tier and sharing model.                                      | Not needed for Phase 1 closeout.                                                        |
 | F5  | P3       | OUT_OF_SCOPE | Operations     | Error reporting, backups, support/on-call workflow.                      | Post-MVP operational maturity.                                                          |
-| D4  | P2       | IN_PROGRESS  | Cloud QA       | Smoke test production web URL (auth + one mutation).                     | Re-entered after R9 blocker; homepage smoke PASS, auth+mutation validation in progress. |
+| D4  | P2       | DONE         | Cloud QA       | Smoke test production web URL (auth + one mutation).                     | Prod smoke completed on `https://widados-contacts.netlify.app/`: authenticated sign-in + contact mutation validated by manual run (owner confirmation, 2026-04-24). |
 | D5  | P2       | OUT_OF_SCOPE | Mobile release | `eas login` + `eas build:configure` in `apps/mobile`.                    | Deferred by web-first strategy.                                                         |
 | D6  | P2       | OUT_OF_SCOPE | Mobile release | Build Android internal/preview and install on device.                    | Depends on D5; deferred by web-first strategy.                                          |
 | D7  | P3       | OUT_OF_SCOPE | Mobile release | Build iOS internal/simulator when Apple side ready.                      | Depends on D5; deferred by web-first strategy.                                          |
@@ -418,7 +418,8 @@ This section is the authoritative rewrite blueprint for R1.
 
 ## Verification Log
 
-- 2026-04-24: Re-ran cloud re-entry gates: `pnpm netlify:env:check` PASS (`.env.cloud` present, publishable key format valid, Netlify production env contains `VITE_SUPABASE_URL` + `VITE_SUPABASE_PUBLISHABLE_KEY`), and `pnpm smoke:netlify-home` PASS (`OK 200 https://widados-contacts.netlify.app/`). `D4` remains **IN_PROGRESS** pending authenticated sign-in + one production contact mutation evidence.
+- 2026-04-24: `D4` marked **DONE** after manual production validation on `https://widados-contacts.netlify.app/` (owner-confirmed authenticated sign-in + one contact mutation). Cloud smoke gate complete.
+- 2026-04-24: Re-ran cloud re-entry gates: `pnpm netlify:env:check` PASS (`.env.cloud` present, publishable key format valid, Netlify production env contains `VITE_SUPABASE_URL` + `VITE_SUPABASE_PUBLISHABLE_KEY`), and `pnpm smoke:netlify-home` PASS (`OK 200 https://widados-contacts.netlify.app/`). This was the pre-final step before authenticated mutation validation.
 - 2026-04-24: Auth UX hardening shipped on web: sign-in failure for unconfirmed email now exposes `Resend verification`, wired to Supabase `auth.resend({ type: "signup", email, options: { emailRedirectTo } })`; web lint + typecheck PASS before merge.
 - 2026-04-24: CI runtime hardening: `.github/workflows/ci.yml` upgraded to `actions/checkout@v6`, `actions/setup-node@v6`, `pnpm/action-setup@v5`; GitHub Actions run `24894750158` PASS with Node24-native actions and no Node20 deprecation annotation.
 - 2026-04-24: PM status update: set `R9` to **BLOCKED** (mobile viewport automation mismatch: requested `375x812` renders ~`634x801`), moved active execution to cloud re-entry `D4`, and queued `R9` resumption after tooling fix or manual real-device mobile QA.
