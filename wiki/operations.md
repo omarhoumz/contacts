@@ -133,6 +133,18 @@ Guidelines:
   2. **D2** — Build/publish in root **`netlify.toml`** (`pnpm install --frozen-lockfile` + `pnpm --filter @widados/web build`, `apps/web/dist`). Preview: `pnpm netlify:deploy` (draft deploy + build). Production: `pnpm netlify:deploy:prod`. Both pass **`--filter @widados/web`** to Netlify CLI so the monorepo project prompt does not block; raw CLI: `netlify deploy --prod --build --filter @widados/web`.
   3. **D3** — From **repo root**, ensure `apps/backend/supabase/.env.cloud` exists with **`SUPABASE_URL`** and **`SUPABASE_PUBLISHABLE_KEY`** (same file as `pnpm env:supabase:cloud`). Run **`pnpm netlify:env:check`** (read-only: local file + Netlify key names). Then **`pnpm netlify:env:push`** (sets `VITE_*` on Netlify for **production** + **deploy-preview** with **`--force`**; publishable key with **`--secret`** — default scopes include the build step). Confirm with **`pnpm netlify:env:list`** or **`pnpm netlify:env:check`** (exit 0). **Note:** run Netlify env commands via these scripts or **`cd apps/web`** — the repo root triggers a monorepo picker for some `netlify` subcommands. Manual alternative: `cd apps/web` then `netlify env:set …`. Then redeploy (`pnpm netlify:deploy:prod` or UI).
   4. **D4** — `pnpm netlify:open` (or `netlify open:site`) after deploy. **Smoke:** sign-in + one contact mutation on the production URL. Optional quick check: **`pnpm smoke:netlify-home`** (HTTP 200 + HTML contains app shell marker only; not a substitute for auth/API smoke).
+
+### Production auth + routing checklist (web)
+
+- Supabase Auth URL config (Dashboard -> Authentication -> URL Configuration):
+  - **Site URL** = your production app URL (for example `https://<your-site>.netlify.app`)
+  - **Redirect URLs** include:
+    - `https://<your-site>.netlify.app/contacts`
+    - `https://<your-site>.netlify.app/*` (optional wildcard if your policy allows it)
+- Netlify SPA fallback:
+  - Keep `netlify.toml` redirect:
+    - `from = "/*"` -> `to = "/index.html"` with `status = 200`
+  - This ensures direct deep links like `/contacts`, `/trash`, `/manage-labels` load the SPA instead of 404.
 - EAS:
   - `eas login`
   - `eas build:configure`

@@ -96,7 +96,12 @@ export function useWebAppState() {
   const signUp = async () => {
     setAuthBusy(true);
     setFeedback(null);
-    const { data, error: signError } = await client.auth.signUp({ email, password });
+    const emailRedirectTo = `${window.location.origin}/contacts`;
+    const { data, error: signError } = await client.auth.signUp({
+      email,
+      password,
+      options: { emailRedirectTo },
+    });
     if (signError) {
       setFeedback({ tone: "error", text: signError.message });
       setAuthBusy(false);
