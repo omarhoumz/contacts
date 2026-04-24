@@ -3,7 +3,8 @@ import { useEffect, useState } from "react";
 type Breakpoint = "mobile" | "tablet" | "desktop";
 
 function detect(): Breakpoint {
-  const w = window.innerWidth;
+  const rootW = document.getElementById("root")?.getBoundingClientRect().width ?? Infinity;
+  const w = Math.min(window.innerWidth, document.documentElement.clientWidth, rootW);
   if (w <= 640) return "mobile";
   if (w <= 1023) return "tablet";
   return "desktop";
