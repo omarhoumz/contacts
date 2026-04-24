@@ -1,5 +1,39 @@
 export const SIDEBAR_W = 220;
 export const SIDEBAR_W_COLLAPSED = 48;
+export type ThemeMode = "light" | "dark";
+
+const LIGHT_THEME = {
+  "--bg-app": "#f8fafc",
+  "--bg-surface": "#ffffff",
+  "--bg-subtle": "#f8fafc",
+  "--bg-card": "#ffffff",
+  "--border-strong": "#e2e8f0",
+  "--border-soft": "#f1f5f9",
+  "--text-primary": "#0f172a",
+  "--text-secondary": "#374151",
+  "--text-muted": "#64748b",
+  "--text-subtle": "#94a3b8",
+};
+
+const DARK_THEME = {
+  "--bg-app": "#020617",
+  "--bg-surface": "#0f172a",
+  "--bg-subtle": "#111827",
+  "--bg-card": "#0b1220",
+  "--border-strong": "#334155",
+  "--border-soft": "#1e293b",
+  "--text-primary": "#e2e8f0",
+  "--text-secondary": "#cbd5e1",
+  "--text-muted": "#94a3b8",
+  "--text-subtle": "#64748b",
+};
+
+export function applyTheme(mode: ThemeMode) {
+  if (typeof document === "undefined") return;
+  const root = document.documentElement;
+  const vars = mode === "dark" ? DARK_THEME : LIGHT_THEME;
+  for (const [k, v] of Object.entries(vars)) root.style.setProperty(k, v);
+}
 
 export const ui = {
   // ── Signed-out page ──────────────────────────────────────────────────────
@@ -8,7 +42,7 @@ export const ui = {
     alignItems: "center",
     justifyContent: "center",
     minHeight: "100vh",
-    background: "#f8fafc",
+    background: "var(--bg-app)",
   },
   signedOutInner: {
     maxWidth: 400,
@@ -18,19 +52,19 @@ export const ui = {
   signedOutTitle: {
     fontSize: 28,
     fontWeight: 700,
-    color: "#0f172a",
+    color: "var(--text-primary)",
     letterSpacing: "-0.03em",
     marginBottom: 4,
   },
   signedOutSubtitle: {
     fontSize: 14,
-    color: "#64748b",
+    color: "var(--text-muted)",
     marginTop: 0,
     marginBottom: 28,
   },
   signedOutCard: {
-    background: "#ffffff",
-    border: "1px solid #e2e8f0",
+    background: "var(--bg-surface)",
+    border: "1px solid var(--border-strong)",
     borderRadius: 14,
     padding: "24px 20px",
     boxShadow: "0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04)",
@@ -39,7 +73,7 @@ export const ui = {
   // ── Authenticated shell ───────────────────────────────────────────────────
   shell: {
     minHeight: "100vh",
-    background: "#f8fafc",
+    background: "var(--bg-app)",
     transition: "margin-inline-start 0.2s ease",
   },
 
@@ -50,8 +84,8 @@ export const ui = {
     insetInlineStart: 0,
     height: "100vh",
     zIndex: 30,
-    background: "#ffffff",
-    borderInlineEnd: "1px solid #e2e8f0",
+    background: "var(--bg-surface)",
+    borderInlineEnd: "1px solid var(--border-strong)",
     display: "flex",
     flexDirection: "column" as const,
     overflow: "hidden",
@@ -63,7 +97,7 @@ export const ui = {
     gap: 8,
     paddingBlock: "20px 14px",
     paddingInline: 20,
-    borderBottom: "1px solid #f1f5f9",
+    borderBottom: "1px solid var(--border-soft)",
     flexShrink: 0,
     overflow: "hidden",
   },
@@ -79,14 +113,14 @@ export const ui = {
   sidebarAppName: {
     fontSize: 20,
     fontWeight: 700,
-    color: "#0f172a",
+    color: "var(--text-primary)",
     margin: 0,
     letterSpacing: "-0.03em",
     whiteSpace: "nowrap" as const,
   },
   sidebarEmail: {
     fontSize: 12,
-    color: "#94a3b8",
+    color: "var(--text-subtle)",
     margin: "4px 0 0",
     overflow: "hidden" as const,
     textOverflow: "ellipsis",
@@ -96,7 +130,7 @@ export const ui = {
     background: "none",
     border: "none",
     cursor: "pointer",
-    color: "#94a3b8",
+    color: "var(--text-subtle)",
     padding: 4,
     display: "flex",
     alignItems: "center",
@@ -121,7 +155,7 @@ export const ui = {
     paddingInlineStart: 20,
     paddingInlineEnd: 16,
     fontSize: 14,
-    color: "#374151",
+    color: "var(--text-secondary)",
     cursor: "pointer",
     border: "none",
     background: "none",
@@ -152,7 +186,7 @@ export const ui = {
   sidebarFooter: {
     paddingBlock: 12,
     paddingInline: 20,
-    borderTop: "1px solid #f1f5f9",
+    borderTop: "1px solid var(--border-soft)",
     flexShrink: 0,
   },
   sidebarFooterCollapsed: {
@@ -185,8 +219,8 @@ export const ui = {
     gap: 10,
     padding: "0 24px",
     height: 56,
-    background: "#ffffff",
-    borderBottom: "1px solid #e2e8f0",
+    background: "var(--bg-surface)",
+    borderBottom: "1px solid var(--border-strong)",
     position: "sticky" as const,
     top: 0,
     zIndex: 10,
@@ -195,7 +229,7 @@ export const ui = {
   topBarTitle: {
     fontSize: 20,
     fontWeight: 700,
-    color: "#0f172a",
+    color: "var(--text-primary)",
     margin: 0,
     flex: 1,
     letterSpacing: "-0.03em",
@@ -210,32 +244,32 @@ export const ui = {
     insetInlineEnd: 10,
     top: "50%",
     transform: "translateY(-50%)",
-    color: "#94a3b8",
+    color: "var(--text-subtle)",
     pointerEvents: "none" as const,
     display: "flex",
   },
   topBarSearch: {
-    border: "1px solid #e2e8f0",
+    border: "1px solid var(--border-strong)",
     borderRadius: 8,
     padding: "7px 34px 7px 12px",
     fontSize: 13,
-    background: "#f8fafc",
+    background: "var(--bg-subtle)",
     width: 280,
     fontFamily: "inherit",
-    color: "#0f172a",
+    color: "var(--text-primary)",
     outline: "none",
   },
   composeSection: {
     padding: "14px 24px",
-    background: "#f8fafc",
-    borderBottom: "1px solid #e2e8f0",
+    background: "var(--bg-subtle)",
+    borderBottom: "1px solid var(--border-strong)",
     flexShrink: 0,
   },
   composeSectionTitle: {
     margin: "0 0 10px",
     fontSize: 13,
     fontWeight: 600,
-    color: "#374151",
+    color: "var(--text-secondary)",
   },
   mainBody: {
     padding: 24,
@@ -244,7 +278,7 @@ export const ui = {
 
   // ── List card ─────────────────────────────────────────────────────────────
   listCard: {
-    background: "#ffffff",
+    background: "var(--bg-card)",
     borderRadius: 8,
     boxShadow: "0 1px 4px rgba(0,0,0,0.07), 0 1px 2px rgba(0,0,0,0.05)",
     overflow: "hidden",
@@ -252,8 +286,8 @@ export const ui = {
   listCardFooter: {
     padding: "10px 16px",
     fontSize: 13,
-    color: "#94a3b8",
-    borderTop: "1px solid #f1f5f9",
+    color: "var(--text-subtle)",
+    borderTop: "1px solid var(--border-soft)",
   },
   contactRow: {
     display: "flex",
@@ -261,14 +295,14 @@ export const ui = {
     gap: 12,
     padding: "0 16px",
     height: 48,
-    borderBottom: "1px solid #f1f5f9",
+    borderBottom: "1px solid var(--border-soft)",
   },
   contactRowActions: {
     display: "flex",
     alignItems: "center",
     gap: 6,
     padding: "8px 16px 12px 60px",
-    borderBottom: "1px solid #f1f5f9",
+    borderBottom: "1px solid var(--border-soft)",
     flexWrap: "wrap" as const,
     gap2: 6,
   },
@@ -303,32 +337,32 @@ export const ui = {
   feedbackBanner: {
     padding: "10px 24px",
     fontSize: 13,
-    borderBottom: "1px solid #e2e8f0",
+    borderBottom: "1px solid var(--border-strong)",
     flexShrink: 0,
   },
 
   // ── Form primitives ───────────────────────────────────────────────────────
   input: {
     width: "100%",
-    border: "1px solid #e2e8f0",
+    border: "1px solid var(--border-strong)",
     borderRadius: 8,
     padding: "9px 12px",
-    background: "#ffffff",
+    background: "var(--bg-surface)",
     boxSizing: "border-box" as const,
     fontFamily: "inherit",
     fontSize: 14,
-    color: "#0f172a",
+    color: "var(--text-primary)",
     outline: "none",
   },
   compactInput: {
-    border: "1px solid #e2e8f0",
+    border: "1px solid var(--border-strong)",
     borderRadius: 8,
     padding: "8px 12px",
-    background: "#ffffff",
+    background: "var(--bg-surface)",
     boxSizing: "border-box" as const,
     fontFamily: "inherit",
     fontSize: 14,
-    color: "#0f172a",
+    color: "var(--text-primary)",
     outline: "none",
   },
   primaryButton: {
@@ -344,9 +378,9 @@ export const ui = {
     whiteSpace: "nowrap" as const,
   },
   secondaryButton: {
-    border: "1px solid #e2e8f0",
-    background: "#f8fafc",
-    color: "#374151",
+    border: "1px solid var(--border-strong)",
+    background: "var(--bg-subtle)",
+    color: "var(--text-secondary)",
     borderRadius: 8,
     padding: "8px 14px",
     cursor: "pointer",
@@ -356,9 +390,9 @@ export const ui = {
     whiteSpace: "nowrap" as const,
   },
   smallButton: {
-    border: "1px solid #e2e8f0",
-    background: "#f8fafc",
-    color: "#374151",
+    border: "1px solid var(--border-strong)",
+    background: "var(--bg-subtle)",
+    color: "var(--text-secondary)",
     borderRadius: 6,
     padding: "4px 10px",
     cursor: "pointer",
@@ -387,7 +421,7 @@ export const ui = {
   },
   sectionHint: {
     marginTop: 0,
-    color: "#64748b",
+    color: "var(--text-muted)",
     fontSize: 13,
   },
 };

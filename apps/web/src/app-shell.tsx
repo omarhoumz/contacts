@@ -65,6 +65,8 @@ export function AppShell({ children }: AppShellProps) {
           collapsed={collapsed}
           onToggleCollapse={toggleCollapsed}
           onSignOut={s.signOut}
+          themeMode={s.themeMode}
+          onToggleTheme={s.toggleTheme}
         />
       )}
 

@@ -17,6 +17,8 @@ type SidebarNavProps = {
   collapsed: boolean;
   onToggleCollapse: () => void;
   onSignOut: () => void;
+  themeMode: "light" | "dark";
+  onToggleTheme: () => void;
 };
 
 // Order matches the mockup: Contacts → Fix & Merge → Import → Trash → Manage Labels
@@ -37,6 +39,8 @@ export function SidebarNav({
   collapsed,
   onToggleCollapse,
   onSignOut,
+  themeMode,
+  onToggleTheme,
 }: SidebarNavProps) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const w = collapsed ? SIDEBAR_W_COLLAPSED : SIDEBAR_W;
@@ -114,6 +118,15 @@ export function SidebarNav({
           ...(collapsed ? ui.sidebarFooterCollapsed : {}),
         }}
       >
+        {!collapsed && (
+          <button
+            onClick={onToggleTheme}
+            style={{ ...ui.smallButton, marginBottom: 10, width: "100%" }}
+            aria-label="Toggle theme"
+          >
+            {themeMode === "dark" ? "Light mode" : "Dark mode"}
+          </button>
+        )}
         <button
           onClick={onSignOut}
           disabled={authBusy}

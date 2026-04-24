@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { createClient } from "@supabase/supabase-js";
 import { useWebContactsDomain } from "./use-web-contacts-domain";
 import { useWebLabelsDomain } from "./use-web-labels-domain";
+import { applyTheme, type ThemeMode } from "./ui-styles";
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL ?? "";
 const supabasePublishableKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY ?? "";
@@ -9,6 +10,12 @@ const supabasePublishableKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY ?? 
 type Feedback = { tone: "error" | "success" | "info"; text: string };
 
 export function useWebAppState() {
+  const [themeMode, setThemeMode] = useState<ThemeMode>(() => {
+    if (typeof window === "undefined") return "light";
+    const stored = localStorage.getItem("theme-mode");
+    if (stored === "light" || stored === "dark") return stored;
+    return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+  });
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [feedback, setFeedback] = useState<Feedback | null>(null);
@@ -47,6 +54,19 @@ export function useWebAppState() {
       subscription.unsubscribe();
     };
   }, []);
+
+  useEffect(() => {
+    applyTheme(themeMode);
+    try {
+      localStorage.setItem("theme-mode", themeMode);
+    } catch {
+      // ignore
+    }
+  }, [themeMode]);
+
+  const toggleTheme = () => {
+    setThemeMode((prev) => (prev === "dark" ? "light" : "dark"));
+  };
 
   const labelsDomain = useWebLabelsDomain({ client, setFeedback });
 
@@ -133,6 +153,7 @@ export function useWebAppState() {
     labelBusy: labelsDomain.labelBusy,
     displayedContacts: contacts.displayedContacts,
     isAuthenticated,
+    themeMode,
     setEmail,
     setPassword,
     setDisplayName: contacts.setDisplayName,
@@ -146,6 +167,7 @@ export function useWebAppState() {
     setEditLabelName: labelsDomain.setEditLabelName,
     setEditLabelColor: labelsDomain.setEditLabelColor,
     setShowTrash: contacts.setShowTrash,
+    toggleTheme,
     signUp,
     signIn,
     signOut,
