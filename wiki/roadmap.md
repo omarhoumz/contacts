@@ -12,7 +12,7 @@ This file is the single source of truth for roadmap, progress, and execution.
 ### Now / Next / Later
 
 - **Now:** `R7` — end-to-end web acceptance pass.
-- **Next:** `R8` docs closeout → `R10` phone + email → `R11` responsive layout → `R9` dark mode.
+- **Next:** `R8` docs closeout → `R10` phone + email → `R11` responsive layout → `R12` BE search → `R9` dark mode.
 - **Later:** `R9` dark mode; then re-enter deferred cloud/mobile tasks (`D4`-`D8`, `E3`).
 
 ### R11 Responsive Layout — Design Exploration (2026-04-23)
@@ -134,7 +134,8 @@ Routes:
 | R8  | P1       | TODO         | docs        | R7         | Fold rewrite outcomes into roadmap/operations docs; define post-rewrite backlog and cloud/mobile re-entry criteria.                      | Updated roadmap + operations/docs include rewrite decisions, deferred items, and explicit gates to resume D4–D8 and E3.                                                                                                                                                                                                                                                                                      |
 | R10 | P1       | TODO         | code+test   | R7         | Phone + email fields on contacts: DB migration (`phone text`, `email text` nullable columns), shared Zod schema update, create/edit form fields (web), contact row secondary line display, search expanded to match phone/email. Web-first; mobile parity in a follow-up slice. | Migration applied locally; contacts can be created and edited with phone and email; values shown in contact row (secondary line below name or in expanded panel); phone/email values are matched by the search filter; `pnpm test` passes with updated search coverage; `pnpm typecheck` clean. |
 | R11 | P1       | TODO         | code+design | R10        | Responsive layout — mobile + tablet breakpoints. Mobile (≤640px): bottom nav bar (Contacts / Trash / Labels / More), sidebar hidden behind hamburger drawer overlay. Tablet (641–1023px): sidebar auto-collapses to icon-only (48px) on mount. Desktop (≥1024px): current 2-column layout unchanged. Touch targets ≥44px on mobile. Web only; React Native mobile app is a separate track. | Resizing to 375px shows bottom nav + no sidebar; resizing to 768px shows collapsed sidebar; desktop unchanged; no horizontal overflow at any breakpoint; `pnpm typecheck` clean. |
-| R9  | P2       | TODO         | code+design | R11        | Dark mode: system preference (`prefers-color-scheme`) on load + manual toggle in sidebar footer, persisted to `localStorage`. Web-first. | All routes (auth page, contacts, trash, manage labels) render correctly in both modes; toggle persists across reloads; no hard-coded light-only colours remain in `ui-styles.ts`.                                                                                                                                                                                                                            |
+| R12 | P2       | TODO         | code+test   | R10        | Backend-enabled search: replace client-side `contactMatchesQuery` filter with a debounced Supabase `ilike` query across `display_name`, `phone`, `email`, and label names (via join). Keeps zero-query state (empty input = load all). Add GIN-indexed `tsvector` column as a follow-up optimisation only if `ilike` proves slow at scale. Web-first; mobile parity in same slice. | Empty search loads all contacts; typing debounces 300ms then fires server query; results match on name, phone, email, and label name; network tab shows one request per settled input (not one per keystroke); `pnpm typecheck` clean; existing 35 unit tests still pass (pure helpers remain for offline/fallback use). |
+| R9  | P2       | TODO         | code+design | R12        | Dark mode: system preference (`prefers-color-scheme`) on load + manual toggle in sidebar footer, persisted to `localStorage`. Web-first. | All routes (auth page, contacts, trash, manage labels) render correctly in both modes; toggle persists across reloads; no hard-coded light-only colours remain in `ui-styles.ts`.                                                                                                                                                                                                                            |
 
 
 ## RLS verification (cross-user)
@@ -336,7 +337,8 @@ This section is the authoritative rewrite blueprint for R1.
 9. `R8` docs + cloud/mobile re-entry criteria
 10. `R10` phone + email fields on contacts (P1)
 11. `R11` responsive layout — mobile bottom nav + tablet auto-collapse (P1)
-12. `R9` dark mode (last before post-MVP)
+12. `R12` backend-enabled search — debounced `ilike` across all contact fields (P2)
+13. `R9` dark mode (last before post-MVP)
 
 ## Verification Log
 
