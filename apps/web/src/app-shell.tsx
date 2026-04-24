@@ -52,7 +52,8 @@ export function AppShell({ children }: AppShellProps) {
         ...(isMobile
           ? {
               height: "100dvh",
-              overflow: "hidden",
+              display: "flex",
+              flexDirection: "column",
             }
           : {}),
       }}
@@ -72,6 +73,8 @@ export function AppShell({ children }: AppShellProps) {
           ...ui.mainContent,
           ...(isMobile
             ? {
+                flex: 1,
+                minHeight: 0,
                 overflowY: "auto",
                 paddingBlockEnd: 64,
               }
