@@ -409,6 +409,8 @@ This section is the authoritative rewrite blueprint for R1.
 
 ## Verification Log
 
+- 2026-04-24: Auth UX hardening shipped on web: sign-in failure for unconfirmed email now exposes `Resend verification`, wired to Supabase `auth.resend({ type: "signup", email, options: { emailRedirectTo } })`; web lint + typecheck PASS before merge.
+- 2026-04-24: CI runtime hardening: `.github/workflows/ci.yml` upgraded to `actions/checkout@v6`, `actions/setup-node@v6`, `pnpm/action-setup@v5`; GitHub Actions run `24894750158` PASS with Node24-native actions and no Node20 deprecation annotation.
 - 2026-04-21: A3 complete, `pnpm typecheck` green after TS config/dependency fixes (`dfd1f18`).
 - 2026-04-21: A4 complete, `pnpm build` green locally after typecheck fixes.
 - 2026-04-21: A5 complete: CI run `24793452426` passed on `main` after workflow fix commit `05693b4`.
