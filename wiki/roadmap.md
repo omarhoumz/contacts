@@ -5,7 +5,7 @@ This file is the single source of truth for roadmap, progress, and execution.
 ## Snapshot
 
 - **Branch:** `main`
-- **Last updated:** 2026-04-23
+- **Last updated:** 2026-04-24
 - **Current focus:** Web-first rewrite execution with stability and regression gates (mobile deferred until web is stable)
 - **Primary owner:** agents and maintainers using this board
 
@@ -60,7 +60,7 @@ Approved mockups (absolute paths on this machine):
 | Trash         | MVP      | Trashed contacts, restore, delete forever                                    |
 | Fix & Merge   | Post-MVP | Sidebar item shown greyed out; no route code                                 |
 | Import        | Post-MVP | Sidebar item shown greyed out; no route code                                 |
-| Manage Labels | Post-MVP | Sidebar item shown greyed out; label creation stays inline in Contacts route |
+| Manage Labels | MVP      | Full labels lifecycle in progress (`R14`: edit + delete)                     |
 
 
 **Right aside (contact details):** Always visible as a post-MVP placeholder in the authenticated shell. No implementation until explicitly scoped.
@@ -72,7 +72,8 @@ Routes:
 - `/` → redirect to `/contacts`
 - `/contacts` → active contacts list (MVP)
 - `/trash` → trash list (MVP)
-- `/fix-merge`, `/import`, `/manage-labels` → not implemented; nav items are visual-only stubs (greyed out, no click handler)
+- `/fix-merge`, `/import` → not implemented; nav items are visual-only stubs (greyed out, no click handler)
+- `/manage-labels` → MVP route for labels management (create already shipped; edit/delete in `R14`)
 
 ## Status Definitions (for agents)
 
@@ -86,7 +87,9 @@ Routes:
 
 1. Senior PM picks the next highest-priority task (**TODO** or continue **IN_PROGRESS**) and confirms dependencies/scope.
 2. Senior Fullstack engineer implements the task and confirms implementation quality against requirements.
-3. Senior QA engineer validates behavior with manual web testing in Cursor browser (localhost), skipping mobile manual QA unless explicitly requested; add/update automated tests when needed. Always set viewport to at least 1280×800 before interacting — small viewports cause layout clipping and false failures.
+3. Senior QA engineer validates behavior with manual web testing in Cursor browser (localhost), skipping mobile manual QA unless explicitly requested; add/update automated tests when needed.
+   - Desktop-first checks: use viewport at least 1280×800.
+   - Mobile/responsive tasks: validate at 375×812, 768×1024, and 1280×800.
 4. If QA fails, Senior Fullstack engineer implements feedback and hands back to QA.
 5. Repeat steps 3-4 until QA passes.
 6. If QA passes, Senior PM validates acceptance criteria and performs the end PM check.
@@ -138,7 +141,7 @@ Routes:
 | R10 | P1       | DONE         | code+test   | R7         | Phone + email fields on contacts: leveraged existing normalized `contact_emails`/`contact_phones` tables (no new migration). Extended SELECT query, `ContactRow` type, `getPrimaryEmail`/`getPrimaryPhone` helpers, create/edit form fields, contact row secondary line, search on phone/email. Web-first; mobile deferred.                                                                | No migration needed. `CONTACT_SELECT` extended with `contact_emails(email,is_primary)` + `contact_phones(e164_phone,is_primary)`. Form: Phone + Email inputs; edit pre-fills from primary row. Secondary line `phone · email` in contact row. Search matches all email/phone entries. 46 Vitest tests pass (up from 35); `pnpm typecheck` clean; 11-step browser QA all PASS (2026-04-23).                                      |
 | R11 | P1       | DONE         | code+design | R10        | Responsive layout — mobile + tablet breakpoints. Mobile (≤640px): bottom nav bar (Contacts / Trash / Labels / More), sidebar hidden behind hamburger drawer overlay. Tablet (641–1023px): sidebar auto-collapses to icon-only (48px) on mount. Desktop (≥1024px): current 2-column layout unchanged. Touch targets ≥44px on mobile. Web only; React Native mobile app is a separate track. | `useBreakpoint` hook (resize + matchMedia listeners); `AppShell` hides sidebar + shows `BottomNav` on mobile, auto-collapses on tablet, restores user pref on desktop; `BottomNav` 4-tab bar (Contacts/Trash/Labels/Sign out), 64px height, 44px+ touch targets; tablet QA PASS via browser agent; mobile browser-use viewport QA blocked by known tool limitation — code logic verified by review; typecheck + 46 tests clean. |
 | R13 | P1       | DONE         | code+test   | R10,R11    | Add field-level validation and country-aware phone input for contacts. Validate email format and normalize/validate phone values as E.164 before write. Include country selector in compose/edit and keep search behavior unchanged.                                                                                                                                                       | Added `phone-country.ts` with `libphonenumber-js`-based normalization/validation (`parsePhoneNumberFromString`, `isValid`), country selector in contacts form, and stricter contact schema (`email` + `phone`). Contact create/edit now block invalid email/phone with explicit feedback. Typecheck clean; 46 tests pass.                                                                                                       |
-| R14 | P1       | TODO         | code+test   | R4,R13     | Labels edit and delete: add rename + recolor + delete actions for labels in Manage Labels, with safe-delete behavior for assigned labels (confirm + unassign relations), feedback states, and keyboard-accessible controls. Web-first.                                                                                                                                                  | User can rename and recolor existing labels; delete requires confirmation and removes label assignments safely; contacts list/search stays stable after label changes; typecheck clean; regression tests updated for label lifecycle and assignment cleanup.                                                                                                                                                      |
+| R14 | P1       | TODO         | code+test   | R4,R13     | Labels edit and delete: add rename + recolor + delete actions for labels in Manage Labels, with safe-delete behavior for assigned labels (confirm + unassign relations), feedback states, and keyboard-accessible controls. Web-first.                                                                                                                                                     | User can rename and recolor existing labels; delete requires confirmation and removes label assignments safely; contacts list/search stays stable after label changes; typecheck clean; regression tests updated for label lifecycle and assignment cleanup.                                                                                                                                                                    |
 | R12 | P2       | TODO         | code+test   | R10        | Backend-enabled search: replace client-side `contactMatchesQuery` filter with a debounced Supabase `ilike` query across `display_name`, `phone`, `email`, and label names (via join). Keeps zero-query state (empty input = load all). Add GIN-indexed `tsvector` column as a follow-up optimisation only if `ilike` proves slow at scale. Web-first; mobile parity in same slice.         | Empty search loads all contacts; typing debounces 300ms then fires server query; results match on name, phone, email, and label name; network tab shows one request per settled input (not one per keystroke); `pnpm typecheck` clean; existing 35 unit tests still pass (pure helpers remain for offline/fallback use).                                                                                                        |
 | R9  | P2       | TODO         | code+design | R12        | Dark mode: system preference (`prefers-color-scheme`) on load + manual toggle in sidebar footer, persisted to `localStorage`. Web-first.                                                                                                                                                                                                                                                   | All routes (auth page, contacts, trash, manage labels) render correctly in both modes; toggle persists across reloads; no hard-coded light-only colours remain in `ui-styles.ts`.                                                                                                                                                                                                                                               |
 
@@ -166,7 +169,7 @@ All conditions below must be true before resuming cloud/Netlify rollout tasks:
 | ---- | ---------------------------------------------------------------------------- | --------------------------- |
 | C1   | R7 web acceptance pass complete — rewritten app is stable baseline           | ✅ Done                      |
 | C2   | R8 docs closeout merged — architecture decisions captured                    | ✅ Done                      |
-| C3   | R10 phone + email fields shipped — schema is stable before cloud deploy      | ⬜ Pending                   |
+| C3   | R10 phone + email fields shipped — schema is stable before cloud deploy      | ✅ Done                      |
 | C4   | No P1 bugs open on `main`                                                    | ⬜ Check at time of re-entry |
 | C5   | `.env.cloud` values verified current (Supabase publishable key, project URL) | ⬜ Check at time of re-entry |
 
@@ -179,8 +182,8 @@ Once all gates pass: run `pnpm netlify:env:push` then `pnpm netlify:deploy:prod`
 | Gate | Condition                                                                                  | Status                       |
 | ---- | ------------------------------------------------------------------------------------------ | ---------------------------- |
 | M1   | R7 web acceptance pass complete                                                            | ✅ Done                       |
-| M2   | R10 phone + email fields shipped (shared schema must be stable)                            | ⬜ Pending                    |
-| M3   | R11 responsive web layout done (defines boundary between web-responsive and native mobile) | ⬜ Pending                    |
+| M2   | R10 phone + email fields shipped (shared schema must be stable)                            | ✅ Done                       |
+| M3   | R11 responsive web layout done (defines boundary between web-responsive and native mobile) | ✅ Done                       |
 | M4   | Decision made: continue with React Native `apps/mobile` or rewrite for web-only PWA        | ⬜ Pending — product decision |
 
 
@@ -384,8 +387,10 @@ This section is the authoritative rewrite blueprint for R1.
 9. `R8` docs + cloud/mobile re-entry criteria
 10. `R10` phone + email fields on contacts (P1)
 11. `R11` responsive layout — mobile bottom nav + tablet auto-collapse (P1)
-12. `R12` backend-enabled search — debounced `ilike` across all contact fields (P2)
-13. `R9` dark mode (last before post-MVP)
+12. `R13` field-level validation + country-aware phone input (P1) ✅
+13. `R14` labels edit + delete (P1) ⏳
+14. `R12` backend-enabled search — debounced `ilike` across all contact fields (P2)
+15. `R9` dark mode (last before post-MVP)
 
 ## Verification Log
 
@@ -436,6 +441,7 @@ This section is the authoritative rewrite blueprint for R1.
 - 2026-04-23: **R8** DONE — `wiki/operations.md` updated with web app architecture (routing, state, styling, auth loop fix, sidebar, tests); `wiki/roadmap.md` updated with Cloud Re-entry Criteria (C1–C5), Mobile Re-entry Criteria (M1–M4), and Post-Rewrite Architecture Decisions section. Post-rewrite backlog (R10–R12, R9) defined with dependencies and AC.
 - 2026-04-23: **R11** DONE — `useBreakpoint` hook (resize + matchMedia); `AppShell` hides sidebar + shows `BottomNav` on mobile (≤640px), auto-collapses on tablet (641–1023px), restores pref on desktop (≥1024px); `BottomNav` 4-tab bar with 44px+ touch targets. Tablet PASS; mobile viewport blocked by browser-use tool limitation (code verified by logic review). 46 tests + typecheck clean.
 - 2026-04-24: **R13** DONE — added field-level hardening for contacts forms: country-aware phone selector + `libphonenumber-js` normalization/validation to E.164, stricter email/phone schema checks, and explicit invalid-input feedback in create/edit flow. Typecheck clean; 46 tests pass.
+- 2026-04-24: PM hygiene pass completed — promoted Manage Labels to MVP scope, refreshed snapshot date, aligned cloud/mobile gate statuses with completed tasks (`R10`, `R11`), and split QA viewport policy into desktop baseline plus required responsive checkpoints.
 - 2026-04-23: **R10** DONE — Phone + email fields leveraged existing normalized `contact_emails`/`contact_phones` tables (no new migration). `CONTACT_SELECT` extended; `ContactRow` type updated with `ContactEmailRow`/`ContactPhoneRow`; `getPrimaryEmail`/`getPrimaryPhone` helpers added to `contact-search.ts`; `contactMatchesQuery` extended to search all email + phone entries; create/edit form gains Phone + Email inputs; edit pre-fills from primary row; contact list shows `phone · email` secondary line. 46 Vitest tests pass (up from 35); typecheck clean; 11-step browser QA all PASS.
 - 2026-04-23: **R7** DONE — full 12-step manual acceptance pass completed in Cursor browser. All steps PASS: signed-out gating, sign-in, contact create/edit (··· menu), search/filter, Manage Labels route (label create with colour swatches), label assignment, soft delete, trash view, restore, permanent delete, sign-out. Two bugs found and fixed during pass: (1) auth `getUser` loop in `onAuthStateChange` → reads session directly from event now; (2) `<input type="color">` on Manage Labels crashed headless browser → replaced with preset colour swatch buttons. Web accepted as stable baseline.
 
@@ -445,4 +451,3 @@ This section is the authoritative rewrite blueprint for R1.
   - `PNPM_HOME="$PWD/.pnpm-home" pnpm install --store-dir "$PWD/.pnpm-store"`
 - External tasks (Supabase/Netlify/EAS) require human credentials and dashboard access.
 - Do not fabricate secrets, URLs, or build IDs; leave task as **BLOCKED** with what is needed.
-
