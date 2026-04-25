@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { useRouterState } from "@tanstack/react-router";
 import { createClient } from "@supabase/supabase-js";
 import { useWebContactsDomain } from "./use-web-contacts-domain";
 import { useWebLabelsDomain } from "./use-web-labels-domain";
@@ -10,6 +11,7 @@ const supabasePublishableKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY ?? 
 type Feedback = { tone: "error" | "success" | "info"; text: string };
 
 export function useWebAppState() {
+  const trashList = useRouterState({ select: (st) => st.location.pathname === "/trash" });
   const [themeMode, setThemeMode] = useState<ThemeMode>(() => {
     if (typeof window === "undefined") return "light";
     const stored = localStorage.getItem("theme-mode");
@@ -86,6 +88,7 @@ export function useWebAppState() {
     client,
     isAuthenticated,
     sessionEmail,
+    trashList,
     loadLabels: labelsDomain.loadLabels,
     setFeedback,
   });
@@ -96,14 +99,18 @@ export function useWebAppState() {
     }
   }, [sessionEmail]);
 
-  const signUp = async () => {
+  const signUp = async (creds?: { email: string; password: string }) => {
     setAuthBusy(true);
     setFeedback(null);
     setCanResendVerification(false);
+    const em = (creds?.email ?? email).trim();
+    const pw = creds?.password ?? password;
+    setEmail(em);
+    setPassword(pw);
     const emailRedirectTo = `${window.location.origin}/contacts`;
     const { data, error: signError } = await client.auth.signUp({
-      email,
-      password,
+      email: em,
+      password: pw,
       options: { emailRedirectTo },
     });
     if (signError) {
@@ -116,11 +123,15 @@ export function useWebAppState() {
     setAuthBusy(false);
   };
 
-  const signIn = async () => {
+  const signIn = async (creds?: { email: string; password: string }) => {
     setAuthBusy(true);
     setFeedback(null);
     setCanResendVerification(false);
-    const { data, error: signError } = await client.auth.signInWithPassword({ email, password });
+    const em = (creds?.email ?? email).trim();
+    const pw = creds?.password ?? password;
+    setEmail(em);
+    setPassword(pw);
+    const { data, error: signError } = await client.auth.signInWithPassword({ email: em, password: pw });
     if (signError) {
       if (signError.message.toLowerCase().includes("email not confirmed")) {
         setCanResendVerification(true);
@@ -131,12 +142,11 @@ export function useWebAppState() {
     }
     setSessionEmail(data.user?.email ?? null);
     setFeedback({ tone: "success", text: "Signed in." });
-    await contacts.refreshData();
     setAuthBusy(false);
   };
 
-  const resendVerification = async () => {
-    const trimmedEmail = email.trim();
+  const resendVerification = async (overrideEmail?: string) => {
+    const trimmedEmail = (overrideEmail ?? email).trim();
     if (!trimmedEmail) {
       setFeedback({ tone: "error", text: "Enter your email first." });
       return;
@@ -212,12 +222,13 @@ export function useWebAppState() {
     setNewLabelColor: labelsDomain.setNewLabelColor,
     setEditLabelName: labelsDomain.setEditLabelName,
     setEditLabelColor: labelsDomain.setEditLabelColor,
-    setShowTrash: contacts.setShowTrash,
     toggleTheme,
     signUp,
     signIn,
     signOut,
     resendVerification,
+    resetContactForm: contacts.resetContactForm,
+    prepareEditContact: contacts.prepareEditContact,
     createContact: contacts.createContact,
     updateContact: contacts.updateContact,
     softDeleteContact: contacts.softDeleteContact,

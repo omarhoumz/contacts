@@ -1,7 +1,9 @@
 import { useState } from "react";
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { useQueryClient } from "@tanstack/react-query";
 import { labelCreateSchema } from "@widados/shared";
 import type { LabelRow } from "./contact-search";
+import { webContactsQueryKeyRoot } from "./use-web-contacts-domain";
 
 type Feedback = { tone: "error" | "success" | "info"; text: string };
 
@@ -11,12 +13,13 @@ type UseWebLabelsDomainParams = {
 };
 
 export function useWebLabelsDomain(params: UseWebLabelsDomainParams) {
+  const queryClient = useQueryClient();
   const [labels, setLabels] = useState<LabelRow[]>([]);
   const [newLabelName, setNewLabelName] = useState("");
-  const [newLabelColor, setNewLabelColor] = useState("#4f46e5");
+  const [newLabelColor, setNewLabelColor] = useState("#2563eb");
   const [editingLabelId, setEditingLabelId] = useState<string | null>(null);
   const [editLabelName, setEditLabelName] = useState("");
-  const [editLabelColor, setEditLabelColor] = useState("#4f46e5");
+  const [editLabelColor, setEditLabelColor] = useState("#2563eb");
   const [labelBusy, setLabelBusy] = useState(false);
 
   const loadLabels = async () => {
@@ -32,20 +35,23 @@ export function useWebLabelsDomain(params: UseWebLabelsDomainParams) {
     setLabels([]);
   };
 
-  const createLabel = async () => {
+  const invalidateContacts = () =>
+    queryClient.invalidateQueries({ queryKey: [...webContactsQueryKeyRoot] });
+
+  const createLabel = async (input?: { name: string; color: string }) => {
     setLabelBusy(true);
     params.setFeedback(null);
     try {
       const parsed = labelCreateSchema.safeParse({
-        name: newLabelName,
-        color: newLabelColor,
+        name: input?.name ?? newLabelName,
+        color: input?.color ?? newLabelColor,
       });
       if (!parsed.success) {
         params.setFeedback({
           tone: "error",
           text: parsed.error.issues.map((e) => e.message).join("; "),
         });
-        return;
+        return false;
       }
       const { data: userData, error: userError } = await params.client.auth.getUser();
       if (userError || !userData.user) {
@@ -53,7 +59,7 @@ export function useWebLabelsDomain(params: UseWebLabelsDomainParams) {
           tone: "error",
           text: userError?.message ?? "Sign in required.",
         });
-        return;
+        return false;
       }
       const { error: insertError } = await params.client.from("labels").insert({
         name: parsed.data.name,
@@ -62,12 +68,14 @@ export function useWebLabelsDomain(params: UseWebLabelsDomainParams) {
       });
       if (insertError) {
         params.setFeedback({ tone: "error", text: insertError.message });
-        return;
+        return false;
       }
       params.setFeedback({ tone: "success", text: "Label created." });
       setNewLabelName("");
-      setNewLabelColor("#4f46e5");
+      setNewLabelColor("#2563eb");
       await loadLabels();
+      await invalidateContacts();
+      return true;
     } finally {
       setLabelBusy(false);
     }
@@ -76,30 +84,30 @@ export function useWebLabelsDomain(params: UseWebLabelsDomainParams) {
   const beginEditLabel = (label: LabelRow) => {
     setEditingLabelId(label.id);
     setEditLabelName(label.name);
-    setEditLabelColor(label.color ?? "#4f46e5");
+    setEditLabelColor(label.color ?? "#2563eb");
   };
 
   const cancelEditLabel = () => {
     setEditingLabelId(null);
     setEditLabelName("");
-    setEditLabelColor("#4f46e5");
+    setEditLabelColor("#2563eb");
   };
 
-  const saveLabelEdit = async () => {
-    if (!editingLabelId) return;
+  const saveLabelEdit = async (input?: { name: string; color: string }) => {
+    if (!editingLabelId) return false;
     setLabelBusy(true);
     params.setFeedback(null);
     try {
       const parsed = labelCreateSchema.safeParse({
-        name: editLabelName,
-        color: editLabelColor,
+        name: input?.name ?? editLabelName,
+        color: input?.color ?? editLabelColor,
       });
       if (!parsed.success) {
         params.setFeedback({
           tone: "error",
           text: parsed.error.issues.map((e) => e.message).join("; "),
         });
-        return;
+        return false;
       }
       const { data: userData, error: userError } = await params.client.auth.getUser();
       if (userError || !userData.user) {
@@ -107,7 +115,7 @@ export function useWebLabelsDomain(params: UseWebLabelsDomainParams) {
           tone: "error",
           text: userError?.message ?? "Sign in required.",
         });
-        return;
+        return false;
       }
       const { error: updateError } = await params.client
         .from("labels")
@@ -119,11 +127,13 @@ export function useWebLabelsDomain(params: UseWebLabelsDomainParams) {
         .eq("user_id", userData.user.id);
       if (updateError) {
         params.setFeedback({ tone: "error", text: updateError.message });
-        return;
+        return false;
       }
       params.setFeedback({ tone: "success", text: "Label updated." });
       cancelEditLabel();
       await loadLabels();
+      await invalidateContacts();
+      return true;
     } finally {
       setLabelBusy(false);
     }
@@ -179,6 +189,7 @@ export function useWebLabelsDomain(params: UseWebLabelsDomainParams) {
           : "Label deleted.",
       });
       await loadLabels();
+      await invalidateContacts();
     } finally {
       setLabelBusy(false);
     }

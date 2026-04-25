@@ -9,6 +9,7 @@ import {
   IconChevronsRight,
   IconLogOut,
 } from "./icons";
+import { Moon, Sun } from "lucide-react";
 import { Button } from "./components/ui/button";
 import { cn } from "./lib/cn";
 
@@ -122,20 +123,25 @@ export function SidebarNav({
       <div
         className={cn(
           "border-t px-5 py-3",
-          collapsed && "flex justify-center px-0",
+          collapsed && "flex flex-col items-center gap-2 px-0",
         )}
       >
-        {!collapsed && (
-          <Button
-            onClick={onToggleTheme}
-            variant="secondary"
-            size="sm"
-            className="mb-2 w-full"
-            aria-label="Toggle theme"
-          >
-            {themeMode === "dark" ? "Light mode" : "Dark mode"}
-          </Button>
-        )}
+        <Button
+          onClick={onToggleTheme}
+          variant="secondary"
+          size={collapsed ? "icon" : "sm"}
+          className={cn(!collapsed && "mb-2 w-full")}
+          aria-label={themeMode === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+          title={collapsed ? (themeMode === "dark" ? "Light mode" : "Dark mode") : undefined}
+        >
+          {collapsed ? (
+            themeMode === "dark" ? <Sun size={16} /> : <Moon size={16} />
+          ) : themeMode === "dark" ? (
+            "Light mode"
+          ) : (
+            "Dark mode"
+          )}
+        </Button>
         <Button
           onClick={onSignOut}
           disabled={authBusy}

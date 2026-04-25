@@ -4,7 +4,6 @@ import { BottomNav } from "./bottom-nav";
 import { useWebApp } from "./web-app-context";
 import { useBreakpoint } from "./use-breakpoint";
 import { cn } from "./lib/cn";
-import { AlertCircle, CheckCircle2, Info } from "lucide-react";
 
 const LS_KEY = "sidebar-collapsed";
 
@@ -62,29 +61,12 @@ export function AppShell({ children }: AppShellProps) {
       )}
 
       <main className={cn("mx-auto w-full max-w-5xl p-4 sm:p-5", isMobile && "min-h-0 flex-1 overflow-y-auto pb-16")}>
-        {s.feedback ? (
-          <div
-            className={cn(
-              "mb-3 flex items-center gap-2 rounded-md border px-3 py-2 text-sm",
-              s.feedback.tone === "error" && "border-destructive/40 bg-destructive/10 text-destructive",
-              s.feedback.tone === "success" && "border-success/40 bg-success/10 text-success",
-              s.feedback.tone === "info" && "border-info/40 bg-info/10 text-info",
-            )}
-          >
-            {s.feedback.tone === "error" ? (
-              <AlertCircle size={14} />
-            ) : s.feedback.tone === "success" ? (
-              <CheckCircle2 size={14} />
-            ) : (
-              <Info size={14} />
-            )}
-            {s.feedback.text}
-          </div>
-        ) : null}
         {children}
       </main>
 
-      {isMobile && <BottomNav onSignOut={s.signOut} />}
+      {isMobile && (
+        <BottomNav onSignOut={s.signOut} themeMode={s.themeMode} onToggleTheme={s.toggleTheme} />
+      )}
     </div>
   );
 }

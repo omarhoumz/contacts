@@ -61,10 +61,14 @@ export function useMobileAppState() {
     }
   }, [sessionEmail]);
 
-  const signUp = async () => {
+  const signUp = async (creds?: { email: string; password: string }) => {
     setAuthBusy(true);
     setFeedback(null);
-    const { error } = await client.auth.signUp({ email, password });
+    const em = (creds?.email ?? email).trim();
+    const pw = creds?.password ?? password;
+    setEmail(em);
+    setPassword(pw);
+    const { error } = await client.auth.signUp({ email: em, password: pw });
     if (error) {
       setFeedback({ tone: "error", text: error.message });
       setAuthBusy(false);
@@ -75,10 +79,14 @@ export function useMobileAppState() {
     setAuthBusy(false);
   };
 
-  const signIn = async () => {
+  const signIn = async (creds?: { email: string; password: string }) => {
     setAuthBusy(true);
     setFeedback(null);
-    const { error } = await client.auth.signInWithPassword({ email, password });
+    const em = (creds?.email ?? email).trim();
+    const pw = creds?.password ?? password;
+    setEmail(em);
+    setPassword(pw);
+    const { error } = await client.auth.signInWithPassword({ email: em, password: pw });
     if (error) {
       setFeedback({ tone: "error", text: error.message });
       setAuthBusy(false);
@@ -109,6 +117,9 @@ export function useMobileAppState() {
     email,
     password,
     displayName: contacts.displayName,
+    contactPhone: contacts.phone,
+    contactEmail: contacts.email,
+    contactPhoneCountry: contacts.phoneCountry,
     query: contacts.query,
     editingId: contacts.editingId,
     labels: labelsDomain.labels,
@@ -124,8 +135,13 @@ export function useMobileAppState() {
     setEmail,
     setPassword,
     setDisplayName: contacts.setDisplayName,
+    setContactPhone: contacts.setPhone,
+    setContactEmail: contacts.setEmail,
+    setContactPhoneCountry: contacts.setPhoneCountry,
     setQuery: contacts.setQuery,
     setEditingId: contacts.setEditingId,
+    resetContactForm: contacts.resetContactForm,
+    prepareEditContact: contacts.prepareEditContact,
     setNewLabelName: labelsDomain.setNewLabelName,
     setNewLabelColor: labelsDomain.setNewLabelColor,
     setShowTrash: contacts.setShowTrash,

@@ -84,3 +84,44 @@
     font-family: inherit;
   }
 }
+
+@layer components {
+  [data-sonner-toast] {
+    border-width: 1px !important;
+    border-style: solid !important;
+  }
+
+  /* Light mode */
+  :root [data-sonner-toast][data-type="success"] {
+    background: #ecfdf5 !important;
+    border-color: #86efac !important;
+    color: #14532d !important;
+  }
+  :root [data-sonner-toast][data-type="error"] {
+    background: #fef2f2 !important;
+    border-color: #fca5a5 !important;
+    color: #7f1d1d !important;
+  }
+  :root [data-sonner-toast][data-type="info"] {
+    background: #f0f9ff !important;
+    border-color: #7dd3fc !important;
+    color: #0c4a6e !important;
+  }
+
+  /* Dark mode */
+  .dark [data-sonner-toast][data-type="success"] {
+    background: #052e16 !important;
+    border-color: #15803d !important;
+    color: #dcfce7 !important;
+  }
+  .dark [data-sonner-toast][data-type="error"] {
+    background: #450a0a !important;
+    border-color: #b91c1c !important;
+    color: #fee2e2 !important;
+  }
+  .dark [data-sonner-toast][data-type="info"] {
+    background: #082f49 !important;
+    border-color: #0369a1 !important;
+    color: #e0f2fe !important;
+  }
+}

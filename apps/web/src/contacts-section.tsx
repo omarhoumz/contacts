@@ -1,8 +1,8 @@
 import { useState } from "react";
+import { Link } from "@tanstack/react-router";
 import { normalizeLabels, getPrimaryPhone, getPrimaryEmail, type ContactRow, type LabelRow } from "./contact-search";
-import { detectCountryFromE164, type PhoneCountry } from "./phone-country";
 import { IconMoreHorizontal } from "./icons";
-import { Button } from "./components/ui/button";
+import { Button, buttonVariants } from "./components/ui/button";
 import { Card } from "./components/ui/card";
 import { cn } from "./lib/cn";
 
@@ -25,11 +25,6 @@ type ContactsSectionProps = {
   labels: LabelRow[];
   dataBusy: boolean;
   mutationBusy: boolean;
-  setEditingId: (value: string | null) => void;
-  setDisplayName: (value: string) => void;
-  setContactPhone: (value: string) => void;
-  setContactEmail: (value: string) => void;
-  setContactPhoneCountry: (value: PhoneCountry) => void;
   softDeleteContact: (id: string) => void;
   restoreContact: (id: string) => void;
   permanentlyDeleteContact: (id: string) => void;
@@ -53,7 +48,7 @@ export function ContactsSection(props: ContactsSectionProps) {
         <p className="m-0 text-sm text-muted-foreground">
           {props.showTrash
             ? "Trash is empty."
-            : "No contacts yet — add your first one above."}
+            : "No contacts yet — create one with New contact."}
         </p>
       </Card>
     );
@@ -163,22 +158,14 @@ export function ContactsSection(props: ContactsSectionProps) {
                     </>
                   ) : (
                     <>
-                      <Button
-                        onClick={() => {
-                          props.setEditingId(contact.id);
-                          props.setDisplayName(contact.display_name);
-                          props.setContactPhone(getPrimaryPhone(contact) ?? "");
-                          props.setContactEmail(getPrimaryEmail(contact) ?? "");
-                          props.setContactPhoneCountry(
-                            detectCountryFromE164(getPrimaryPhone(contact) ?? ""),
-                          );
-                          setExpandedId(null);
-                        }}
-                        variant="secondary"
-                        size="sm"
+                      <Link
+                        to="/contacts/$contactId/edit"
+                        params={{ contactId: contact.id }}
+                        onClick={() => setExpandedId(null)}
+                        className={cn(buttonVariants({ variant: "secondary", size: "sm" }))}
                       >
                         Edit
-                      </Button>
+                      </Link>
                       <Button
                         onClick={() => {
                           props.softDeleteContact(contact.id);

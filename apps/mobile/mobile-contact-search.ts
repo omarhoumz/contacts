@@ -16,6 +16,18 @@ export function normalizeLabels(value: LabelRow | LabelRow[] | null | undefined)
   return Array.isArray(value) ? value : [value];
 }
 
+export function getPrimaryEmail(c: ContactRow): string | null {
+  const rows = c.contact_emails ?? [];
+  const primary = rows.find((r) => r.is_primary);
+  return primary?.email ?? rows[0]?.email ?? null;
+}
+
+export function getPrimaryPhone(c: ContactRow): string | null {
+  const rows = c.contact_phones ?? [];
+  const primary = rows.find((r) => r.is_primary);
+  return primary?.e164_phone ?? rows[0]?.e164_phone ?? null;
+}
+
 export function contactMatchesQuery(c: ContactRow, q: string) {
   const needle = q.trim().toLowerCase();
   if (!needle) return true;

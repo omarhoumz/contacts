@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import { useWebApp } from "./web-app-context";
 import { ContactsSection } from "./contacts-section";
 import { IconSearch } from "./icons";
@@ -6,11 +5,6 @@ import { Input } from "./components/ui/input";
 
 export function TrashRoute() {
   const s = useWebApp();
-
-  useEffect(() => {
-    s.setShowTrash(true);
-    void s.refreshData(true);
-  }, []);
 
   return (
     <>
@@ -38,11 +32,6 @@ export function TrashRoute() {
           labels={s.labels}
           dataBusy={s.dataBusy}
           mutationBusy={s.mutationBusy}
-          setEditingId={s.setEditingId}
-          setDisplayName={s.setDisplayName}
-          setContactPhone={s.setContactPhone}
-          setContactEmail={s.setContactEmail}
-          setContactPhoneCountry={s.setContactPhoneCountry}
           softDeleteContact={s.softDeleteContact}
           restoreContact={s.restoreContact}
           permanentlyDeleteContact={s.permanentlyDeleteContact}

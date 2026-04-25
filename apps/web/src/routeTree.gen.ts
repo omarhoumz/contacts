@@ -10,13 +10,27 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TrashRouteImport } from './routes/trash'
+import { Route as SignUpRouteImport } from './routes/sign-up'
+import { Route as SignInRouteImport } from './routes/sign-in'
 import { Route as ManageLabelsRouteImport } from './routes/manage-labels'
 import { Route as ContactsRouteImport } from './routes/contacts'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ContactsNewRouteImport } from './routes/contacts.new'
+import { Route as ContactsContactIdEditRouteImport } from './routes/contacts.$contactId.edit'
 
 const TrashRoute = TrashRouteImport.update({
   id: '/trash',
   path: '/trash',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SignUpRoute = SignUpRouteImport.update({
+  id: '/sign-up',
+  path: '/sign-up',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SignInRoute = SignInRouteImport.update({
+  id: '/sign-in',
+  path: '/sign-in',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ManageLabelsRoute = ManageLabelsRouteImport.update({
@@ -34,38 +48,87 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ContactsNewRoute = ContactsNewRouteImport.update({
+  id: '/new',
+  path: '/new',
+  getParentRoute: () => ContactsRoute,
+} as any)
+const ContactsContactIdEditRoute = ContactsContactIdEditRouteImport.update({
+  id: '/$contactId/edit',
+  path: '/$contactId/edit',
+  getParentRoute: () => ContactsRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/contacts': typeof ContactsRoute
+  '/contacts': typeof ContactsRouteWithChildren
   '/manage-labels': typeof ManageLabelsRoute
+  '/sign-in': typeof SignInRoute
+  '/sign-up': typeof SignUpRoute
   '/trash': typeof TrashRoute
+  '/contacts/new': typeof ContactsNewRoute
+  '/contacts/$contactId/edit': typeof ContactsContactIdEditRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/contacts': typeof ContactsRoute
+  '/contacts': typeof ContactsRouteWithChildren
   '/manage-labels': typeof ManageLabelsRoute
+  '/sign-in': typeof SignInRoute
+  '/sign-up': typeof SignUpRoute
   '/trash': typeof TrashRoute
+  '/contacts/new': typeof ContactsNewRoute
+  '/contacts/$contactId/edit': typeof ContactsContactIdEditRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/contacts': typeof ContactsRoute
+  '/contacts': typeof ContactsRouteWithChildren
   '/manage-labels': typeof ManageLabelsRoute
+  '/sign-in': typeof SignInRoute
+  '/sign-up': typeof SignUpRoute
   '/trash': typeof TrashRoute
+  '/contacts/new': typeof ContactsNewRoute
+  '/contacts/$contactId/edit': typeof ContactsContactIdEditRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/contacts' | '/manage-labels' | '/trash'
+  fullPaths:
+    | '/'
+    | '/contacts'
+    | '/manage-labels'
+    | '/sign-in'
+    | '/sign-up'
+    | '/trash'
+    | '/contacts/new'
+    | '/contacts/$contactId/edit'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/contacts' | '/manage-labels' | '/trash'
-  id: '__root__' | '/' | '/contacts' | '/manage-labels' | '/trash'
+  to:
+    | '/'
+    | '/contacts'
+    | '/manage-labels'
+    | '/sign-in'
+    | '/sign-up'
+    | '/trash'
+    | '/contacts/new'
+    | '/contacts/$contactId/edit'
+  id:
+    | '__root__'
+    | '/'
+    | '/contacts'
+    | '/manage-labels'
+    | '/sign-in'
+    | '/sign-up'
+    | '/trash'
+    | '/contacts/new'
+    | '/contacts/$contactId/edit'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  ContactsRoute: typeof ContactsRoute
+  ContactsRoute: typeof ContactsRouteWithChildren
   ManageLabelsRoute: typeof ManageLabelsRoute
+  SignInRoute: typeof SignInRoute
+  SignUpRoute: typeof SignUpRoute
   TrashRoute: typeof TrashRoute
 }
 
@@ -76,6 +139,20 @@ declare module '@tanstack/react-router' {
       path: '/trash'
       fullPath: '/trash'
       preLoaderRoute: typeof TrashRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sign-up': {
+      id: '/sign-up'
+      path: '/sign-up'
+      fullPath: '/sign-up'
+      preLoaderRoute: typeof SignUpRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sign-in': {
+      id: '/sign-in'
+      path: '/sign-in'
+      fullPath: '/sign-in'
+      preLoaderRoute: typeof SignInRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/manage-labels': {
@@ -99,13 +176,43 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/contacts/new': {
+      id: '/contacts/new'
+      path: '/new'
+      fullPath: '/contacts/new'
+      preLoaderRoute: typeof ContactsNewRouteImport
+      parentRoute: typeof ContactsRoute
+    }
+    '/contacts/$contactId/edit': {
+      id: '/contacts/$contactId/edit'
+      path: '/$contactId/edit'
+      fullPath: '/contacts/$contactId/edit'
+      preLoaderRoute: typeof ContactsContactIdEditRouteImport
+      parentRoute: typeof ContactsRoute
+    }
   }
 }
 
+interface ContactsRouteChildren {
+  ContactsNewRoute: typeof ContactsNewRoute
+  ContactsContactIdEditRoute: typeof ContactsContactIdEditRoute
+}
+
+const ContactsRouteChildren: ContactsRouteChildren = {
+  ContactsNewRoute: ContactsNewRoute,
+  ContactsContactIdEditRoute: ContactsContactIdEditRoute,
+}
+
+const ContactsRouteWithChildren = ContactsRoute._addFileChildren(
+  ContactsRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  ContactsRoute: ContactsRoute,
+  ContactsRoute: ContactsRouteWithChildren,
   ManageLabelsRoute: ManageLabelsRoute,
+  SignInRoute: SignInRoute,
+  SignUpRoute: SignUpRoute,
   TrashRoute: TrashRoute,
 }
 export const routeTree = rootRouteImport

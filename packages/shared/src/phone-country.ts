@@ -74,3 +74,13 @@ export function detectCountryFromE164(value: string): PhoneCountry {
   const match = sorted.find((c) => digits.startsWith(c.dialCode));
   return match?.code ?? fallbackCountry;
 }
+
+/** Infer calling country from a single phone input (E.164 or national with default). */
+export function tryUpdateCountryFromPhoneInput(raw: string, defaultCountry: PhoneCountry): PhoneCountry {
+  const t = raw.trim();
+  if (!t) return defaultCountry;
+  const parsed = parsePhoneNumberFromString(t, defaultCountry);
+  if (parsed?.country) return parsed.country as PhoneCountry;
+  if (t.startsWith("+")) return detectCountryFromE164(t);
+  return defaultCountry;
+}

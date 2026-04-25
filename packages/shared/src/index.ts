@@ -1,5 +1,8 @@
 import { z } from "zod";
 
+export * from "./phone-country";
+export * from "./form-schemas";
+
 export const contactSchema = z.object({
   id: z.string().uuid().optional(),
   display_name: z.string().min(1),
@@ -22,7 +25,7 @@ const hexColor = z
 
 export const labelCreateSchema = z.object({
   name: z.string().trim().min(1).max(80),
-  color: hexColor.optional().default("#4f46e5"),
+  color: hexColor,
 });
 
 export type LabelCreate = z.infer<typeof labelCreateSchema>;
