@@ -53,12 +53,22 @@ export function formatDialPrefix(country: PhoneCountry): string {
 export function normalizePhoneE164(raw: string, country: PhoneCountry): string {
   const trimmed = raw.trim();
   if (!trimmed) return "";
+  const dial = getCountryCallingCode(country);
+  // Accept user input that duplicates selected dial code without '+' (e.g. "2123400..." with MA selected).
+  if (!trimmed.startsWith("+")) {
+    const digitsOnly = trimmed.replace(/[^\d]/g, "");
+    if (digitsOnly.startsWith(dial)) {
+      const withPlus = `+${digitsOnly}`;
+      const parsedPlus = parsePhoneNumberFromString(withPlus);
+      if (parsedPlus?.isValid()) return parsedPlus.number;
+    }
+  }
   const parsed = parsePhoneNumberFromString(trimmed, country);
-  if (parsed) return parsed.number;
+  if (parsed?.isValid()) return parsed.number;
   const formatter = new AsYouType(country);
   formatter.input(trimmed);
   const maybe = formatter.getNumber();
-  return maybe?.number ?? "";
+  return maybe?.isValid() ? maybe.number : "";
 }
 
 export function isLikelyValidE164(value: string): boolean {

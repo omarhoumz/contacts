@@ -13,16 +13,16 @@ function RootComponent() {
   const s = useWebAppState();
   const navigate = useNavigate();
   const pathname = useRouterState({ select: (st) => st.location.pathname });
+  const search = useRouterState({ select: (st) => st.location.search as Record<string, unknown> });
   const isAuthPage = pathname === "/sign-in" || pathname === "/sign-up";
+  const redirectRaw = typeof search.redirect === "string" ? search.redirect : null;
+  const safeRedirect =
+    redirectRaw && redirectRaw.startsWith("/") && !redirectRaw.startsWith("//") ? redirectRaw : "/contacts";
 
   useEffect(() => {
     if (!s.authResolved || !s.isAuthenticated || !isAuthPage) return;
-    const params = new URLSearchParams(window.location.search);
-    const raw = params.get("redirect");
-    const safe =
-      raw && raw.startsWith("/") && !raw.startsWith("//") ? raw : "/contacts";
-    void navigate({ to: safe as "/contacts", replace: true });
-  }, [s.authResolved, s.isAuthenticated, isAuthPage, navigate]);
+    void navigate({ to: safeRedirect as "/contacts", replace: true });
+  }, [s.authResolved, s.isAuthenticated, isAuthPage, navigate, safeRedirect]);
 
   useEffect(() => {
     if (!s.authResolved || s.isAuthenticated || isAuthPage) return;
@@ -55,6 +55,10 @@ function RootComponent() {
     );
   }
 
+  if (s.isAuthenticated && isAuthPage) {
+    return <div className="min-h-screen bg-background" />;
+  }
+
   if (!s.isAuthenticated) {
     if (!isAuthPage) {
       return (
@@ -70,10 +74,6 @@ function RootComponent() {
         </div>
       </WebAppContext.Provider>
     );
-  }
-
-  if (isAuthPage) {
-    return <div className="min-h-screen bg-background" />;
   }
 
   return (

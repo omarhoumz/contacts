@@ -73,66 +73,75 @@ export function ContactEditorPanel(props: ContactEditorPanelProps) {
       <p className="mb-3 text-sm font-semibold text-foreground">{props.title}</p>
       <form className="flex flex-col gap-2" onSubmit={handleSubmit}>
         <div className="grid grid-cols-1 items-center gap-2 md:grid-cols-2 xl:grid-cols-3">
-          <Input
-            placeholder="Display name *"
-            disabled={s.mutationBusy}
-            className="min-w-0"
-            autoFocus
-            aria-invalid={Boolean(form.formState.errors.display_name)}
-            {...form.register("display_name")}
-          />
-          {form.formState.errors.display_name ? (
-            <p className="text-xs text-destructive md:col-span-2">{form.formState.errors.display_name.message}</p>
-          ) : null}
-          <Controller
-            control={form.control}
-            name="phone"
-            render={({ field }) => (
-              <div className="flex min-w-0 gap-2">
-                <select
-                  aria-label="Phone country"
-                  disabled={s.mutationBusy}
-                  value={phoneCountry}
-                  onChange={(e) => {
-                    const next = e.target.value as PhoneCountry;
-                    setPhoneCountry(next);
-                    s.setContactPhoneCountry(next);
-                  }}
-                  className="h-9 rounded-md border border-input bg-background px-2 text-xs text-foreground"
-                >
-                  {PHONE_COUNTRIES.map((c) => (
-                    <option key={c.code} value={c.code}>
-                      {c.code} {formatDialPrefix(c.code)}
-                    </option>
-                  ))}
-                </select>
-                <Input
-                  placeholder="Phone (E.164 or local)"
-                  disabled={s.mutationBusy}
-                  className="min-w-0"
-                  value={field.value}
-                  onChange={(e) => {
-                    const v = e.target.value;
-                    field.onChange(v);
-                    const next = tryUpdateCountryFromPhoneInput(v, phoneCountry);
-                    setPhoneCountry(next);
-                    s.setContactPhoneCountry(next);
-                  }}
-                />
-              </div>
-            )}
-          />
-          <Input
-            placeholder="Email (optional)"
-            type="email"
-            disabled={s.mutationBusy}
-            className="min-w-0"
-            aria-invalid={Boolean(form.formState.errors.email)}
-            {...form.register("email")}
-          />
-          {form.formState.errors.email ? (
-            <p className="text-xs text-destructive md:col-span-2">{form.formState.errors.email.message}</p>
-          ) : null}
+          <div className="min-w-0">
+            <Input
+              placeholder="Display name *"
+              disabled={s.mutationBusy}
+              className="min-w-0"
+              autoFocus
+              aria-invalid={Boolean(form.formState.errors.display_name)}
+              {...form.register("display_name")}
+            />
+            <p className="mt-1 min-h-4 text-xs text-destructive" aria-live="polite">
+              {form.formState.errors.display_name?.message ?? ""}
+            </p>
+          </div>
+          <div className="min-w-0">
+            <Controller
+              control={form.control}
+              name="phone"
+              render={({ field }) => (
+                <div className="flex min-w-0 gap-2">
+                  <select
+                    aria-label="Phone country"
+                    disabled={s.mutationBusy}
+                    value={phoneCountry}
+                    onChange={(e) => {
+                      const next = e.target.value as PhoneCountry;
+                      setPhoneCountry(next);
+                      s.setContactPhoneCountry(next);
+                    }}
+                    className="h-9 rounded-md border border-input bg-background px-2 text-xs text-foreground"
+                  >
+                    {PHONE_COUNTRIES.map((c) => (
+                      <option key={c.code} value={c.code}>
+                        {c.code} {formatDialPrefix(c.code)}
+                      </option>
+                    ))}
+                  </select>
+                  <Input
+                    placeholder="Phone (E.164 or local)"
+                    disabled={s.mutationBusy}
+                    className="min-w-0"
+                    value={field.value}
+                    onChange={(e) => {
+                      const v = e.target.value;
+                      field.onChange(v);
+                      const next = tryUpdateCountryFromPhoneInput(v, phoneCountry);
+                      setPhoneCountry(next);
+                      s.setContactPhoneCountry(next);
+                    }}
+                  />
+                </div>
+              )}
+            />
+            <p className="mt-1 min-h-4 text-xs text-destructive" aria-live="polite">
+              {form.formState.errors.phone?.message ?? ""}
+            </p>
+          </div>
+          <div className="min-w-0">
+            <Input
+              placeholder="Email (optional)"
+              type="email"
+              disabled={s.mutationBusy}
+              className="min-w-0"
+              aria-invalid={Boolean(form.formState.errors.email)}
+              {...form.register("email")}
+            />
+            <p className="mt-1 min-h-4 text-xs text-destructive" aria-live="polite">
+              {form.formState.errors.email?.message ?? ""}
+            </p>
+          </div>
         </div>
         <div className="flex flex-wrap gap-2">
           <Button type="submit" disabled={s.mutationBusy || s.dataBusy}>
