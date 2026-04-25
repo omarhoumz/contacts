@@ -82,8 +82,12 @@ export function ContactsSection(props: ContactsSectionProps) {
                 </div>
 
                 <div className="flex min-w-0 flex-1 items-center gap-2 overflow-hidden">
-                  <div className="min-w-0 flex-1">
-                    <div className="truncate text-sm font-semibold text-foreground">
+                  <Link
+                    to="/contacts/$contactId/edit"
+                    params={{ contactId: contact.id }}
+                    className="min-w-0 flex-1 no-underline"
+                  >
+                    <div className="truncate text-sm font-semibold text-foreground hover:underline">
                       {contact.display_name}
                     </div>
                     {(getPrimaryPhone(contact) ?? getPrimaryEmail(contact)) && (
@@ -93,7 +97,7 @@ export function ContactsSection(props: ContactsSectionProps) {
                           .join(" · ")}
                       </div>
                     )}
-                  </div>
+                  </Link>
 
                   {assignedLabels.length > 0 && (
                     <div className="flex shrink-0 gap-1">

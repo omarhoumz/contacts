@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useLayoutEffect } from "react";
+import { useEffect } from "react";
 import { useWebApp } from "../web-app-context";
 import { ContactEditorPanel } from "../contact-editor-panel";
 import { buttonVariants } from "../components/ui/button";
@@ -12,9 +12,9 @@ export const Route = createFileRoute("/contacts/new")({
 function ContactsNewPage() {
   const s = useWebApp();
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     s.resetContactForm();
-  }, []);
+  }, [s]);
 
   return (
     <>

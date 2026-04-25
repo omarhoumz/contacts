@@ -60,20 +60,20 @@ export function normalizePhoneE164(raw: string, country: PhoneCountry): string {
     if (digitsOnly.startsWith(dial)) {
       const withPlus = `+${digitsOnly}`;
       const parsedPlus = parsePhoneNumberFromString(withPlus);
-      if (parsedPlus?.isValid()) return parsedPlus.number;
+      if (parsedPlus?.isPossible()) return parsedPlus.number;
     }
   }
   const parsed = parsePhoneNumberFromString(trimmed, country);
-  if (parsed?.isValid()) return parsed.number;
+  if (parsed?.isPossible()) return parsed.number;
   const formatter = new AsYouType(country);
   formatter.input(trimmed);
   const maybe = formatter.getNumber();
-  return maybe?.isValid() ? maybe.number : "";
+  return maybe?.isPossible() ? maybe.number : "";
 }
 
 export function isLikelyValidE164(value: string): boolean {
   const parsed = parsePhoneNumberFromString(value);
-  return Boolean(parsed?.isValid());
+  return Boolean(parsed?.isPossible());
 }
 
 export function detectCountryFromE164(value: string): PhoneCountry {
