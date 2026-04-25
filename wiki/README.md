@@ -7,6 +7,7 @@ This wiki is the structured source of truth for product, architecture, security,
 - [Decisions (ADR)](decisions.md)
 - [Architecture](architecture.md)
 - [Roadmap](roadmap.md)
+- [Tech Audit Runbook (A to Z)](audits/tech-audit-runbook.md)
 - [Operations Playbook](operations.md)
 - [Security](security.md)
 - [Deployment](deployment.md)
