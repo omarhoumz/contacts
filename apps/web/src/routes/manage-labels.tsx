@@ -1,6 +1,10 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { ManageLabelsRoute } from "../manage-labels-route";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/manage-labels")({
-  component: ManageLabelsRoute,
+  beforeLoad: () => {
+    throw redirect({
+      to: "/labels",
+      replace: true,
+    });
+  },
 });

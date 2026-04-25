@@ -32,7 +32,7 @@ const NAV_ORDER: Array<
   { kind: "stub",  label: "Fix & Merge",                          Icon: IconMerge  },
   { kind: "stub",  label: "Import",                               Icon: IconUpload },
   { kind: "route", to: "/trash",         label: "Trash",          Icon: IconTrash  },
-  { kind: "route", to: "/manage-labels", label: "Labels",         Icon: IconTag    },
+  { kind: "route", to: "/labels",        label: "Labels",         Icon: IconTag    },
 ];
 
 export function SidebarNav({

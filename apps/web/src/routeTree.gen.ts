@@ -13,6 +13,7 @@ import { Route as TrashRouteImport } from './routes/trash'
 import { Route as SignUpRouteImport } from './routes/sign-up'
 import { Route as SignInRouteImport } from './routes/sign-in'
 import { Route as ManageLabelsRouteImport } from './routes/manage-labels'
+import { Route as LabelsRouteImport } from './routes/labels'
 import { Route as ContactsRouteImport } from './routes/contacts'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ContactsNewRouteImport } from './routes/contacts.new'
@@ -36,6 +37,11 @@ const SignInRoute = SignInRouteImport.update({
 const ManageLabelsRoute = ManageLabelsRouteImport.update({
   id: '/manage-labels',
   path: '/manage-labels',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LabelsRoute = LabelsRouteImport.update({
+  id: '/labels',
+  path: '/labels',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ContactsRoute = ContactsRouteImport.update({
@@ -62,6 +68,7 @@ const ContactsContactIdEditRoute = ContactsContactIdEditRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/contacts': typeof ContactsRouteWithChildren
+  '/labels': typeof LabelsRoute
   '/manage-labels': typeof ManageLabelsRoute
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
@@ -72,6 +79,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/contacts': typeof ContactsRouteWithChildren
+  '/labels': typeof LabelsRoute
   '/manage-labels': typeof ManageLabelsRoute
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
@@ -83,6 +91,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/contacts': typeof ContactsRouteWithChildren
+  '/labels': typeof LabelsRoute
   '/manage-labels': typeof ManageLabelsRoute
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
@@ -95,6 +104,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/contacts'
+    | '/labels'
     | '/manage-labels'
     | '/sign-in'
     | '/sign-up'
@@ -105,6 +115,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/contacts'
+    | '/labels'
     | '/manage-labels'
     | '/sign-in'
     | '/sign-up'
@@ -115,6 +126,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/contacts'
+    | '/labels'
     | '/manage-labels'
     | '/sign-in'
     | '/sign-up'
@@ -126,6 +138,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ContactsRoute: typeof ContactsRouteWithChildren
+  LabelsRoute: typeof LabelsRoute
   ManageLabelsRoute: typeof ManageLabelsRoute
   SignInRoute: typeof SignInRoute
   SignUpRoute: typeof SignUpRoute
@@ -160,6 +173,13 @@ declare module '@tanstack/react-router' {
       path: '/manage-labels'
       fullPath: '/manage-labels'
       preLoaderRoute: typeof ManageLabelsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/labels': {
+      id: '/labels'
+      path: '/labels'
+      fullPath: '/labels'
+      preLoaderRoute: typeof LabelsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/contacts': {
@@ -210,6 +230,7 @@ const ContactsRouteWithChildren = ContactsRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ContactsRoute: ContactsRouteWithChildren,
+  LabelsRoute: LabelsRoute,
   ManageLabelsRoute: ManageLabelsRoute,
   SignInRoute: SignInRoute,
   SignUpRoute: SignUpRoute,

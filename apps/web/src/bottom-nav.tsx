@@ -20,7 +20,7 @@ type NavItem = {
 const NAV_ITEMS: NavItem[] = [
   { to: "/contacts", label: "Contacts", icon: <IconUser size={22} /> },
   { to: "/trash", label: "Trash", icon: <IconTrash size={22} /> },
-  { to: "/manage-labels", label: "Labels", icon: <IconTag size={22} /> },
+  { to: "/labels", label: "Labels", icon: <IconTag size={22} /> },
 ];
 
 export function BottomNav({ onSignOut, themeMode, onToggleTheme }: BottomNavProps) {
