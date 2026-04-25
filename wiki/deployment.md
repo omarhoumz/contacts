@@ -1,5 +1,8 @@
 # Deployment
 
+Last verified: 2026-04-25  
+Owner: Platform
+
 ## Locked Stack
 - Web hosting: Netlify
 - Backend: Supabase

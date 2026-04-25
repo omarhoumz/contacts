@@ -40,7 +40,7 @@ export function ContactEditorPanel(props: ContactEditorPanelProps) {
       email: s.contactEmail,
       phone: s.contactPhone,
     });
-  }, [s.editingId, s.displayName, s.contactEmail, s.contactPhone, form.reset]);
+  }, [s.editingId, s.displayName, s.contactEmail, s.contactPhone, s.contactPhoneCountry, form]);
 
   const pushToDomain = (data: ContactFormValues) => {
     s.setDisplayName(data.display_name);

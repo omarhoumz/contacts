@@ -40,61 +40,94 @@ type ContactEditorScreenProps = {
 };
 
 export function ContactEditorScreen(props: ContactEditorScreenProps) {
-  const [phoneCountry, setPhoneCountry] = useState<PhoneCountry>(() => props.contactPhoneCountry);
+  const {
+    mode,
+    contactId,
+    displayName,
+    setDisplayName,
+    contactPhone,
+    setContactPhone,
+    contactEmail,
+    setContactEmail,
+    contactPhoneCountry,
+    setContactPhoneCountry,
+    mutationBusy,
+    dataBusy,
+    resetContactForm,
+    prepareEditContact,
+    createContact,
+    updateContact,
+    onCancel,
+  } = props;
+  const [phoneCountry, setPhoneCountry] = useState<PhoneCountry>(() => contactPhoneCountry);
   const form = useForm<ContactFormValues>({
     resolver: zodResolver(contactFormSchema),
     defaultValues: {
-      display_name: props.displayName,
-      email: props.contactEmail,
-      phone: props.contactPhone,
+      display_name: displayName,
+      email: contactEmail,
+      phone: contactPhone,
     },
   });
 
   useEffect(() => {
-    setPhoneCountry(props.contactPhoneCountry);
+    setPhoneCountry(contactPhoneCountry);
     form.reset({
-      display_name: props.displayName,
-      email: props.contactEmail,
-      phone: props.contactPhone,
+      display_name: displayName,
+      email: contactEmail,
+      phone: contactPhone,
     });
-  }, [props.mode, props.contactId, props.displayName, props.contactEmail, props.contactPhone, form.reset]);
+  }, [
+    mode,
+    contactId,
+    displayName,
+    contactEmail,
+    contactPhone,
+    contactPhoneCountry,
+    form,
+  ]);
 
   useEffect(() => {
-    if (props.mode !== "edit" || !props.contactId) return;
+    if (mode !== "edit" || !contactId) return;
     let cancelled = false;
     void (async () => {
-      const ok = await props.prepareEditContact(props.contactId!);
+      const ok = await prepareEditContact(contactId);
       if (cancelled) return;
-      if (!ok) props.onCancel();
+      if (!ok) onCancel();
     })();
     return () => {
       cancelled = true;
-      props.resetContactForm();
+      resetContactForm();
     };
-  }, [props.mode, props.contactId]);
+  }, [
+    mode,
+    contactId,
+    prepareEditContact,
+    onCancel,
+    resetContactForm,
+  ]);
 
-  const title = props.mode === "new" ? "New contact" : "Edit contact";
-  const hint = props.mode === "new" ? "Parity with web /contacts/new." : "Parity with web /contacts/:id/edit.";
+  const title = mode === "new" ? "New contact" : "Edit contact";
+  const hint = mode === "new" ? "Parity with web /contacts/new." : "Parity with web /contacts/:id/edit.";
 
   const pushToDomain = (data: ContactFormValues) => {
-    props.setDisplayName(data.display_name);
-    props.setContactEmail(data.email);
-    props.setContactPhone(data.phone);
+    setDisplayName(data.display_name);
+    setContactEmail(data.email);
+    setContactPhone(data.phone);
     const next = tryUpdateCountryFromPhoneInput(data.phone, phoneCountry);
     setPhoneCountry(next);
-    props.setContactPhoneCountry(next);
+    setContactPhoneCountry(next);
     return { ...data, phoneCountry: next };
   };
 
   const handleSave = form.handleSubmit(async (data) => {
     const values = pushToDomain(data);
-    const ok = props.mode === "new" ? await props.createContact(values) : await props.updateContact(values);
-    if (ok) props.onCancel();
+    const ok = mode === "new" ? await createContact(values) : await updateContact(values);
+    if (ok) onCancel();
   });
 
   const handleCancel = () => {
-    props.resetContactForm();
-    props.onCancel();
+    resetContactForm();
+    onCancel();
   };
 
   return (
@@ -105,7 +138,7 @@ export function ContactEditorScreen(props: ContactEditorScreenProps) {
         placeholder="Display name"
         value={form.watch("display_name")}
         onChangeText={(t) => form.setValue("display_name", t, { shouldValidate: true })}
-        editable={!props.mutationBusy}
+        editable={!mutationBusy}
         className="rounded-md border border-slate-300 p-2"
       />
       {form.formState.errors.display_name ? (
@@ -122,9 +155,9 @@ export function ContactEditorScreen(props: ContactEditorScreenProps) {
               field.onChange(t);
               const next = tryUpdateCountryFromPhoneInput(t, phoneCountry);
               setPhoneCountry(next);
-              props.setContactPhoneCountry(next);
+              setContactPhoneCountry(next);
             }}
-            editable={!props.mutationBusy}
+            editable={!mutationBusy}
             className="rounded-md border border-slate-300 p-2"
           />
         )}
@@ -135,7 +168,7 @@ export function ContactEditorScreen(props: ContactEditorScreenProps) {
         onChangeText={(t) => form.setValue("email", t, { shouldValidate: true })}
         keyboardType="email-address"
         autoCapitalize="none"
-        editable={!props.mutationBusy}
+        editable={!mutationBusy}
         className="rounded-md border border-slate-300 p-2"
       />
       {form.formState.errors.email ? (
@@ -143,11 +176,11 @@ export function ContactEditorScreen(props: ContactEditorScreenProps) {
       ) : null}
       <View className="flex-row flex-wrap gap-2">
         <Button
-          title={props.mutationBusy ? "Saving…" : props.mode === "new" ? "Create" : "Save"}
+          title={mutationBusy ? "Saving…" : mode === "new" ? "Create" : "Save"}
           onPress={() => void handleSave()}
-          disabled={props.mutationBusy || props.dataBusy}
+          disabled={mutationBusy || dataBusy}
         />
-        <Button title="Cancel" onPress={handleCancel} disabled={props.mutationBusy} />
+        <Button title="Cancel" onPress={handleCancel} disabled={mutationBusy} />
       </View>
     </View>
   );

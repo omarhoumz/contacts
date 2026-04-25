@@ -19,13 +19,16 @@ This file is the single source of truth for roadmap, progress, and execution.
 ## Recurring Tech Audit Schedule
 
 Audit process reference:
+
 - [Tech Audit Runbook (A to Z)](audits/tech-audit-runbook.md)
 
 Cadence:
+
 - Full stack tech audit: once per quarter
 - Focused risk audit: monthly (highest-risk area only)
 
 Next planned full audit:
+
 - **Target window:** 2026-07 (first full week)
 - **Owner:** TBD (assign in monthly planning)
 - **Scope baseline:** web + mobile + backend + shared + CI/CD + docs/process
@@ -42,6 +45,21 @@ Use this template to schedule each next cycle:
   - CI baseline captured (`pnpm lint`, `pnpm typecheck`, `pnpm test`)
   - Known incidents/risks to prioritize
 ```
+
+Audit remediation steering cadence (when active):
+- Weekly architect+PM steering committee decision meeting
+- Twice-weekly engineering blocker sync
+- Daily async update for Critical/High risk closure
+
+### Audit Quality Scorecard (quarterly target)
+
+| Metric | Target |
+| --- | --- |
+| CI test gate pass rate | >95% |
+| Critical risks open | 0 by milestone M2 |
+| Placeholder tests in critical packages | 0 |
+| Hook anti-pattern violations in CI | 0 new |
+| Docs freshness (core runbooks) | >90% |
 
 ### R11 Responsive Layout — Design Exploration (2026-04-23)
 
@@ -515,3 +533,4 @@ This section is the authoritative rewrite blueprint for R1.
   - `PNPM_HOME="$PWD/.pnpm-home" pnpm install --store-dir "$PWD/.pnpm-store"`
 - External tasks (Supabase/Netlify/EAS) require human credentials and dashboard access.
 - Do not fabricate secrets, URLs, or build IDs; leave task as **BLOCKED** with what is needed.
+

@@ -1,4 +1,11 @@
-export type LabelRow = { id: string; name: string; color: string };
+import {
+  normalizeSharedLabels,
+  pickPrimaryEmail,
+  pickPrimaryPhone,
+  type SharedLabelRow,
+} from "@widados/shared";
+
+export type LabelRow = SharedLabelRow;
 export type ContactLabelJoin = { label_id: string; labels: LabelRow | LabelRow[] | null };
 export type ContactEmailRow = { email: string; is_primary: boolean };
 export type ContactPhoneRow = { e164_phone: string; is_primary: boolean };
@@ -12,20 +19,15 @@ export type ContactRow = {
 };
 
 export function normalizeLabels(value: LabelRow | LabelRow[] | null | undefined): LabelRow[] {
-  if (!value) return [];
-  return Array.isArray(value) ? value : [value];
+  return normalizeSharedLabels(value);
 }
 
 export function getPrimaryEmail(c: ContactRow): string | null {
-  const rows = c.contact_emails ?? [];
-  const primary = rows.find((r) => r.is_primary);
-  return primary?.email ?? rows[0]?.email ?? null;
+  return pickPrimaryEmail(c.contact_emails);
 }
 
 export function getPrimaryPhone(c: ContactRow): string | null {
-  const rows = c.contact_phones ?? [];
-  const primary = rows.find((r) => r.is_primary);
-  return primary?.e164_phone ?? rows[0]?.e164_phone ?? null;
+  return pickPrimaryPhone(c.contact_phones);
 }
 
 export function contactMatchesQuery(c: ContactRow, q: string) {

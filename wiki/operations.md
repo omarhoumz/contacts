@@ -1,5 +1,8 @@
 # Operations Playbook
 
+Last verified: 2026-04-25  
+Owner: Platform + QA
+
 Common commands and runbooks for humans and agents working in this repo.
 
 ## Task Board Workflow
@@ -12,6 +15,16 @@ Common commands and runbooks for humans and agents working in this repo.
 - Set task `DONE` with evidence in the table and `Verification Log`
 - If blocked, set `BLOCKED` with explicit unblock condition
 - If scope drifts, add a new row with priority and status
+
+## Audit Remediation Governance
+
+Use this governance model when executing audit remediation programs:
+
+- Weekly 60-minute steering review with: Principal Architect, Platform Lead, Backend Lead, Frontend Lead, Senior PM, QA Lead.
+- Twice-weekly engineering blocker sync for cross-team dependencies.
+- Daily async update for Critical/High risk items.
+- Architecture-affecting changes require an ADR update in `wiki/decisions.md`.
+- PM owns milestone trade-offs and risk acceptance for deferred Medium/Low items.
 
 ## Local Dev Commands
 

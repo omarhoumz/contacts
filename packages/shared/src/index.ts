@@ -2,6 +2,7 @@ import { z } from "zod";
 
 export * from "./phone-country";
 export * from "./form-schemas";
+export * from "./contact-helpers";
 
 export const contactSchema = z.object({
   id: z.string().uuid().optional(),

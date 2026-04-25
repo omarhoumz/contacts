@@ -1,4 +1,11 @@
-export type LabelRow = { id: string; name: string; color: string };
+import {
+  normalizeSharedLabels,
+  pickPrimaryEmail,
+  pickPrimaryPhone,
+  type SharedLabelRow,
+} from "@widados/shared";
+
+export type LabelRow = SharedLabelRow;
 export type ContactLabelJoin = { label_id: string; labels: LabelRow | LabelRow[] | null };
 export type ContactEmailRow = { email: string; is_primary: boolean };
 export type ContactPhoneRow = { e164_phone: string; is_primary: boolean };
@@ -14,8 +21,7 @@ export type ContactRow = {
 // ── Normalisation ──────────────────────────────────────────────────────────────
 
 export function normalizeLabels(value: LabelRow | LabelRow[] | null | undefined): LabelRow[] {
-  if (!value) return [];
-  return Array.isArray(value) ? value : [value];
+  return normalizeSharedLabels(value);
 }
 
 // ── Search / filter ────────────────────────────────────────────────────────────
@@ -42,14 +48,12 @@ export function contactMatchesQuery(c: ContactRow, q: string): boolean {
 
 /** Returns the primary email address, falling back to the first one. */
 export function getPrimaryEmail(c: ContactRow): string | null {
-  const rows = c.contact_emails ?? [];
-  return (rows.find((e) => e.is_primary) ?? rows[0])?.email ?? null;
+  return pickPrimaryEmail(c.contact_emails);
 }
 
 /** Returns the primary phone number, falling back to the first one. */
 export function getPrimaryPhone(c: ContactRow): string | null {
-  const rows = c.contact_phones ?? [];
-  return (rows.find((p) => p.is_primary) ?? rows[0])?.e164_phone ?? null;
+  return pickPrimaryPhone(c.contact_phones);
 }
 
 /** Client-side filter against a query string (empty query = show all). */

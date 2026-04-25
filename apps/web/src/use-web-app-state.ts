@@ -3,7 +3,8 @@ import { useRouterState } from "@tanstack/react-router";
 import { createClient } from "@supabase/supabase-js";
 import { useWebContactsDomain } from "./use-web-contacts-domain";
 import { useWebLabelsDomain } from "./use-web-labels-domain";
-type ThemeMode = "light" | "dark";
+import { useWebThemeState } from "./use-web-theme-state";
+import { useWebAuthSession } from "./use-web-auth-session";
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL ?? "";
 const supabasePublishableKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY ?? "";
@@ -12,62 +13,18 @@ type Feedback = { tone: "error" | "success" | "info"; text: string };
 
 export function useWebAppState() {
   const trashList = useRouterState({ select: (st) => st.location.pathname === "/trash" });
-  const [themeMode, setThemeMode] = useState<ThemeMode>(() => {
-    if (typeof window === "undefined") return "light";
-    const stored = localStorage.getItem("theme-mode");
-    if (stored === "light" || stored === "dark") return stored;
-    return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
-  });
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [feedback, setFeedback] = useState<Feedback | null>(null);
-  const [sessionEmail, setSessionEmail] = useState<string | null>(null);
-  const [authResolved, setAuthResolved] = useState(false);
   const [authBusy, setAuthBusy] = useState(false);
   const [canResendVerification, setCanResendVerification] = useState(false);
   const client = useMemo(
     () => createClient(supabaseUrl, supabasePublishableKey, { auth: { persistSession: true } }),
     [],
   );
+  const { themeMode, toggleTheme } = useWebThemeState();
+  const { sessionEmail, setSessionEmail, authResolved } = useWebAuthSession(client);
   const isAuthenticated = authResolved && Boolean(sessionEmail);
-
-  // Initial session check on mount — calls getUser() once to avoid relying
-  // on potentially stale localStorage token without server verification.
-  const syncInitialSession = async () => {
-    const { data, error } = await client.auth.getUser();
-    if (error || !data.user) {
-      setSessionEmail(null);
-    } else {
-      setSessionEmail(data.user.email ?? null);
-    }
-    setAuthResolved(true);
-  };
-
-  useEffect(() => {
-    void syncInitialSession();
-    // onAuthStateChange carries the session object — read it directly
-    // instead of calling getUser() again, which would create a request loop.
-    const {
-      data: { subscription },
-    } = client.auth.onAuthStateChange((_event, session) => {
-      setSessionEmail(session?.user?.email ?? null);
-      setAuthResolved(true);
-    });
-    return () => {
-      subscription.unsubscribe();
-    };
-  }, []);
-
-  useEffect(() => {
-    if (typeof document !== "undefined") {
-      document.documentElement.classList.toggle("dark", themeMode === "dark");
-    }
-    try {
-      localStorage.setItem("theme-mode", themeMode);
-    } catch {
-      // ignore
-    }
-  }, [themeMode]);
 
   useEffect(() => {
     if (!feedback) return;
@@ -77,10 +34,6 @@ export function useWebAppState() {
     }, timeoutMs);
     return () => window.clearTimeout(timer);
   }, [feedback]);
-
-  const toggleTheme = () => {
-    setThemeMode((prev) => (prev === "dark" ? "light" : "dark"));
-  };
 
   const labelsDomain = useWebLabelsDomain({ client, setFeedback });
 
@@ -97,7 +50,7 @@ export function useWebAppState() {
     if (!sessionEmail) {
       labelsDomain.clearLabels();
     }
-  }, [sessionEmail]);
+  }, [sessionEmail, labelsDomain]);
 
   const signUp = async (creds?: { email: string; password: string }) => {
     setAuthBusy(true);

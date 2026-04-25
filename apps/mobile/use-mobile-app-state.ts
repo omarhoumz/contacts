@@ -3,6 +3,7 @@ import { createClient } from "@supabase/supabase-js";
 import { supabaseAuthStorage } from "./supabase-storage";
 import { useMobileContactsDomain } from "./use-mobile-contacts-domain";
 import { useMobileLabelsDomain } from "./use-mobile-labels-domain";
+import { useMobileAuthSession } from "./use-mobile-auth-session";
 
 const env = (globalThis as { process?: { env?: Record<string, string | undefined> } }).process?.env;
 const supabaseUrl = env?.EXPO_PUBLIC_SUPABASE_URL ?? "";
@@ -14,7 +15,6 @@ export function useMobileAppState() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [feedback, setFeedback] = useState<Feedback | null>(null);
-  const [sessionEmail, setSessionEmail] = useState<string | null>(null);
   const [authBusy, setAuthBusy] = useState(false);
 
   const client = useMemo(
@@ -25,14 +25,7 @@ export function useMobileAppState() {
     [],
   );
 
-  const syncSession = async () => {
-    const { data, error } = await client.auth.getUser();
-    if (error || !data.user) {
-      setSessionEmail(null);
-      return;
-    }
-    setSessionEmail(data.user.email ?? null);
-  };
+  const { sessionEmail, syncSession } = useMobileAuthSession(client);
 
   const labelsDomain = useMobileLabelsDomain({ client, setFeedback });
 
@@ -44,22 +37,10 @@ export function useMobileAppState() {
   });
 
   useEffect(() => {
-    void syncSession();
-    const {
-      data: { subscription },
-    } = client.auth.onAuthStateChange(() => {
-      void syncSession();
-    });
-    return () => {
-      subscription.unsubscribe();
-    };
-  }, []);
-
-  useEffect(() => {
     if (!sessionEmail) {
       labelsDomain.clearLabels();
     }
-  }, [sessionEmail]);
+  }, [sessionEmail, labelsDomain]);
 
   const signUp = async (creds?: { email: string; password: string }) => {
     setAuthBusy(true);

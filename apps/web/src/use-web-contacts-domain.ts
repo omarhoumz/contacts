@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
@@ -90,6 +90,7 @@ type ContactSubmitValues = {
 };
 
 export function useWebContactsDomain(params: UseWebContactsDomainParams) {
+  const { client, isAuthenticated, sessionEmail, trashList, loadLabels, setFeedback } = params;
   const queryClient = useQueryClient();
   const [query, setQuery] = useState("");
   const [debouncedQuery, setDebouncedQuery] = useState("");
@@ -98,7 +99,7 @@ export function useWebContactsDomain(params: UseWebContactsDomainParams) {
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
   const [phoneCountry, setPhoneCountry] = useState<PhoneCountry>(() => getDefaultPhoneCountryFromLocale());
-  const showTrash = params.trashList;
+  const showTrash = trashList;
   const [mutationBusy, setMutationBusy] = useState(false);
 
   useEffect(() => {
@@ -107,19 +108,19 @@ export function useWebContactsDomain(params: UseWebContactsDomainParams) {
   }, [query]);
 
   useEffect(() => {
-    if (!params.sessionEmail) {
+    if (!sessionEmail) {
       setDebouncedQuery("");
     }
-  }, [params.sessionEmail]);
+  }, [sessionEmail]);
 
   const listQuery = useQuery({
-    queryKey: webContactsQueryKey(params.trashList, debouncedQuery),
+    queryKey: webContactsQueryKey(trashList, debouncedQuery),
     queryFn: async () => {
-      const rows = await fetchWebContactRows(params.client, params.trashList, debouncedQuery);
-      await params.loadLabels();
+      const rows = await fetchWebContactRows(client, trashList, debouncedQuery);
+      await loadLabels();
       return rows;
     },
-    enabled: params.isAuthenticated,
+    enabled: isAuthenticated,
     staleTime: 30_000,
     networkMode: "online",
     retry: 1,
@@ -127,17 +128,17 @@ export function useWebContactsDomain(params: UseWebContactsDomainParams) {
 
   useEffect(() => {
     if (!listQuery.isError || !listQuery.error) return;
-    params.setFeedback({
+    setFeedback({
       tone: "error",
       text: listQuery.error instanceof Error ? listQuery.error.message : "Failed to load contacts",
     });
-  }, [listQuery.isError, listQuery.error, params.setFeedback]);
+  }, [listQuery.isError, listQuery.error, setFeedback]);
 
   const contactRows = listQuery.data ?? [];
   const contactRowsRef = useRef<ContactRow[]>([]);
   contactRowsRef.current = contactRows;
 
-  const displayedContacts = useMemo(() => contactRows, [contactRows]);
+  const displayedContacts = contactRows;
 
   const dataBusy = listQuery.isPending && contactRows.length === 0;
 
@@ -156,32 +157,42 @@ export function useWebContactsDomain(params: UseWebContactsDomainParams) {
     const trimmedEmail = values.email.trim();
     const normalizedPhone = normalizePhoneE164(values.phone, values.phoneCountry);
 
-    await params.client.from("contact_emails").delete().eq("contact_id", contactId);
+    const { error: deleteEmailError } = await client
+      .from("contact_emails")
+      .delete()
+      .eq("contact_id", contactId);
+    if (deleteEmailError) throw new Error(deleteEmailError.message);
     if (trimmedEmail) {
-      await params.client.from("contact_emails").insert({
+      const { error: insertEmailError } = await client.from("contact_emails").insert({
         contact_id: contactId,
         user_id: userId,
         email: trimmedEmail,
         is_primary: true,
         label: "other",
       });
+      if (insertEmailError) throw new Error(insertEmailError.message);
     }
 
-    await params.client.from("contact_phones").delete().eq("contact_id", contactId);
+    const { error: deletePhoneError } = await client
+      .from("contact_phones")
+      .delete()
+      .eq("contact_id", contactId);
+    if (deletePhoneError) throw new Error(deletePhoneError.message);
     if (normalizedPhone) {
-      await params.client.from("contact_phones").insert({
+      const { error: insertPhoneError } = await client.from("contact_phones").insert({
         contact_id: contactId,
         user_id: userId,
         e164_phone: normalizedPhone,
         is_primary: true,
         label: "other",
       });
+      if (insertPhoneError) throw new Error(insertPhoneError.message);
     }
   };
 
   const createContact = async (input?: Partial<ContactSubmitValues>): Promise<boolean> => {
     setMutationBusy(true);
-    params.setFeedback(null);
+    setFeedback(null);
     const values: ContactSubmitValues = {
       display_name: input?.display_name ?? displayName,
       email: input?.email ?? email,
@@ -195,25 +206,25 @@ export function useWebContactsDomain(params: UseWebContactsDomainParams) {
       phone: values.phone,
     });
     if (!parsed.success) {
-      params.setFeedback({ tone: "error", text: "Enter valid display name and email." });
+      setFeedback({ tone: "error", text: "Enter valid display name and email." });
       setMutationBusy(false);
       return false;
     }
     if (values.phone.trim() && !isLikelyValidE164(normalizedPhone)) {
-      params.setFeedback({
+      setFeedback({
         tone: "error",
         text: "Enter a valid phone number including area code.",
       });
       setMutationBusy(false);
       return false;
     }
-    const { data: userData, error: userError } = await params.client.auth.getUser();
+    const { data: userData, error: userError } = await client.auth.getUser();
     if (userError || !userData.user) {
-      params.setFeedback({ tone: "error", text: userError?.message ?? "Sign in required." });
+      setFeedback({ tone: "error", text: userError?.message ?? "Sign in required." });
       setMutationBusy(false);
       return false;
     }
-    const { data: inserted, error: insertError } = await params.client
+    const { data: inserted, error: insertError } = await client
       .from("contacts")
       .insert({
         display_name: parsed.data.display_name,
@@ -228,12 +239,21 @@ export function useWebContactsDomain(params: UseWebContactsDomainParams) {
       .select("id")
       .single();
     if (insertError || !inserted) {
-      params.setFeedback({ tone: "error", text: insertError?.message ?? "Insert failed." });
+      setFeedback({ tone: "error", text: insertError?.message ?? "Insert failed." });
       setMutationBusy(false);
       return false;
     }
-    await upsertContactFields(inserted.id, userData.user.id, values);
-    params.setFeedback({ tone: "success", text: "Contact created." });
+    try {
+      await upsertContactFields(inserted.id, userData.user.id, values);
+    } catch (error) {
+      setFeedback({
+        tone: "error",
+        text: error instanceof Error ? error.message : "Failed to save contact fields.",
+      });
+      setMutationBusy(false);
+      return false;
+    }
+    setFeedback({ tone: "success", text: "Contact created." });
     setDisplayName("");
     setPhone("");
     setEmail("");
@@ -250,11 +270,11 @@ export function useWebContactsDomain(params: UseWebContactsDomainParams) {
         : null;
     const targetId = editingId ?? routeEditId;
     if (!targetId) {
-      params.setFeedback({ tone: "error", text: "No contact selected for editing." });
+      setFeedback({ tone: "error", text: "No contact selected for editing." });
       return false;
     }
     setMutationBusy(true);
-    params.setFeedback(null);
+    setFeedback(null);
     const values: ContactSubmitValues = {
       display_name: input?.display_name ?? displayName,
       email: input?.email ?? email,
@@ -268,35 +288,44 @@ export function useWebContactsDomain(params: UseWebContactsDomainParams) {
       phone: values.phone,
     });
     if (!parsed.success) {
-      params.setFeedback({ tone: "error", text: "Enter valid display name and email." });
+      setFeedback({ tone: "error", text: "Enter valid display name and email." });
       setMutationBusy(false);
       return false;
     }
     if (values.phone.trim() && !isLikelyValidE164(normalizedPhone)) {
-      params.setFeedback({
+      setFeedback({
         tone: "error",
         text: "Enter a valid phone number including area code.",
       });
       setMutationBusy(false);
       return false;
     }
-    const { data: userData2, error: userError2 } = await params.client.auth.getUser();
+    const { data: userData2, error: userError2 } = await client.auth.getUser();
     if (userError2 || !userData2.user) {
-      params.setFeedback({ tone: "error", text: userError2?.message ?? "Sign in required." });
+      setFeedback({ tone: "error", text: userError2?.message ?? "Sign in required." });
       setMutationBusy(false);
       return false;
     }
-    const { error: updateError } = await params.client
+    const { error: updateError } = await client
       .from("contacts")
       .update({ display_name: parsed.data.display_name })
       .eq("id", targetId);
     if (updateError) {
-      params.setFeedback({ tone: "error", text: updateError.message });
+      setFeedback({ tone: "error", text: updateError.message });
       setMutationBusy(false);
       return false;
     }
-    await upsertContactFields(targetId, userData2.user.id, values);
-    params.setFeedback({ tone: "success", text: "Contact updated." });
+    try {
+      await upsertContactFields(targetId, userData2.user.id, values);
+    } catch (error) {
+      setFeedback({
+        tone: "error",
+        text: error instanceof Error ? error.message : "Failed to update contact fields.",
+      });
+      setMutationBusy(false);
+      return false;
+    }
+    setFeedback({ tone: "success", text: "Contact updated." });
     setEditingId(null);
     setDisplayName("");
     setPhone("");
@@ -309,47 +338,47 @@ export function useWebContactsDomain(params: UseWebContactsDomainParams) {
 
   const softDeleteContact = async (id: string) => {
     setMutationBusy(true);
-    const { error: deleteError } = await params.client
+    const { error: deleteError } = await client
       .from("contacts")
       .update({ deleted_at: new Date().toISOString() })
       .eq("id", id);
     if (deleteError) {
-      params.setFeedback({ tone: "error", text: deleteError.message });
+      setFeedback({ tone: "error", text: deleteError.message });
       setMutationBusy(false);
       return;
     }
-    params.setFeedback({ tone: "success", text: "Moved to trash." });
+    setFeedback({ tone: "success", text: "Moved to trash." });
     await invalidateContacts();
     setMutationBusy(false);
   };
 
   const restoreContact = async (id: string) => {
     setMutationBusy(true);
-    params.setFeedback(null);
-    const { error: restoreError } = await params.client
+    setFeedback(null);
+    const { error: restoreError } = await client
       .from("contacts")
       .update({ deleted_at: null })
       .eq("id", id);
     if (restoreError) {
-      params.setFeedback({ tone: "error", text: restoreError.message });
+      setFeedback({ tone: "error", text: restoreError.message });
       setMutationBusy(false);
       return;
     }
-    params.setFeedback({ tone: "success", text: "Contact restored." });
+    setFeedback({ tone: "success", text: "Contact restored." });
     await invalidateContacts();
     setMutationBusy(false);
   };
 
   const permanentlyDeleteContact = async (id: string) => {
     setMutationBusy(true);
-    params.setFeedback(null);
-    const { error: delError } = await params.client.from("contacts").delete().eq("id", id);
+    setFeedback(null);
+    const { error: delError } = await client.from("contacts").delete().eq("id", id);
     if (delError) {
-      params.setFeedback({ tone: "error", text: delError.message });
+      setFeedback({ tone: "error", text: delError.message });
       setMutationBusy(false);
       return;
     }
-    params.setFeedback({ tone: "success", text: "Contact deleted forever." });
+    setFeedback({ tone: "success", text: "Contact deleted forever." });
     await invalidateContacts();
     setMutationBusy(false);
   };
@@ -377,19 +406,19 @@ export function useWebContactsDomain(params: UseWebContactsDomainParams) {
       populateFormFromContactRow(cached);
       return true;
     }
-    const { data, error } = await params.client
+    const { data, error } = await client
       .from("contacts")
       .select(CONTACT_SELECT)
       .eq("id", contactId)
       .is("deleted_at", null)
       .maybeSingle();
     if (error) {
-      params.setFeedback({ tone: "error", text: error.message });
+      setFeedback({ tone: "error", text: error.message });
       resetContactForm();
       return false;
     }
     if (!data) {
-      params.setFeedback({ tone: "error", text: "Contact not found." });
+      setFeedback({ tone: "error", text: "Contact not found." });
       resetContactForm();
       return false;
     }
@@ -399,37 +428,37 @@ export function useWebContactsDomain(params: UseWebContactsDomainParams) {
 
   const toggleContactLabel = async (contactId: string, labelId: string, currentlyAssigned: boolean) => {
     setMutationBusy(true);
-    params.setFeedback(null);
-    const { data: userData, error: userError } = await params.client.auth.getUser();
+    setFeedback(null);
+    const { data: userData, error: userError } = await client.auth.getUser();
     if (userError || !userData.user) {
-      params.setFeedback({ tone: "error", text: userError?.message ?? "Sign in required." });
+      setFeedback({ tone: "error", text: userError?.message ?? "Sign in required." });
       setMutationBusy(false);
       return;
     }
     if (currentlyAssigned) {
-      const { error: delError } = await params.client
+      const { error: delError } = await client
         .from("contact_labels")
         .delete()
         .eq("contact_id", contactId)
         .eq("label_id", labelId);
       if (delError) {
-        params.setFeedback({ tone: "error", text: delError.message });
+        setFeedback({ tone: "error", text: delError.message });
         setMutationBusy(false);
         return;
       }
-      params.setFeedback({ tone: "success", text: "Label removed." });
+      setFeedback({ tone: "success", text: "Label removed." });
     } else {
-      const { error: insError } = await params.client.from("contact_labels").insert({
+      const { error: insError } = await client.from("contact_labels").insert({
         contact_id: contactId,
         label_id: labelId,
         user_id: userData.user.id,
       });
       if (insError) {
-        params.setFeedback({ tone: "error", text: insError.message });
+        setFeedback({ tone: "error", text: insError.message });
         setMutationBusy(false);
         return;
       }
-      params.setFeedback({ tone: "success", text: "Label added." });
+      setFeedback({ tone: "success", text: "Label added." });
     }
     await invalidateContacts();
     setMutationBusy(false);

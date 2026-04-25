@@ -1,5 +1,8 @@
 # Security
 
+Last verified: 2026-04-25  
+Owner: Security + Backend
+
 ## Core Principles
 - Deny-by-default data model via RLS
 - Least privilege for all credentials

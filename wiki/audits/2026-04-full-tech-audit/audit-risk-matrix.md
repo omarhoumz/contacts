@@ -1,31 +1,34 @@
 # Full Stack Tech Audit Risk Matrix
 
 Scoring model:
+
 - Likelihood: 1 (rare) to 5 (frequent)
 - Impact: 1 (limited) to 5 (severe)
 - Score = Likelihood x Impact
 
-## Top Risks
+## Top Risks (Post-remediation snapshot 2026-04-25)
 
-| Risk ID | Description | Likelihood | Impact | Score | Severity | Owner (proposed) |
-|---|---|---:|---:|---:|---|---|
-| R-01 | Regressions merge because CI omits tests | 4 | 5 | 20 | Critical | Platform/CI |
-| R-02 | Cross-platform domain drift from duplicated hooks | 5 | 4 | 20 | Critical | App Architecture |
-| R-03 | Silent partial writes on contact child rows | 3 | 5 | 15 | High | Data/API |
-| R-04 | Oversized app-state hooks causing hidden coupling | 4 | 4 | 16 | High | Frontend Leads |
-| R-05 | Weak hook lint enforcement misses effect anti-patterns | 4 | 3 | 12 | Medium | DX/Tooling |
-| R-06 | Backend typecheck placeholder weakens gate confidence | 3 | 3 | 9 | Medium | Backend |
-| R-07 | `SECURITY DEFINER` in public schema | 2 | 4 | 8 | Medium | Backend/Security |
-| R-08 | Node version mismatch between CI and deploy | 3 | 3 | 9 | Medium | Platform |
-| R-09 | Migration check brittle to file growth | 3 | 2 | 6 | Low-Med | Platform/Backend |
-| R-10 | Security headers incomplete | 2 | 3 | 6 | Low-Med | Platform/Security |
 
-## Heatmap Summary
+| Risk ID | Description                                            | Likelihood | Impact | Score | Severity | Owner (proposed)  | Status |
+| ------- | ------------------------------------------------------ | ---------- | ------ | ----- | -------- | ----------------- | ------ |
+| R-01    | Regressions merge because CI omits tests               | 2          | 4      | 8     | Medium   | Platform/CI       | Mitigated (CI now runs tests) |
+| R-02    | Cross-platform domain drift from duplicated hooks      | 4          | 4      | 16    | Critical | App Architecture  | Reduced (shared helper extraction started) |
+| R-03    | Silent partial writes on contact child rows            | 2          | 4      | 8     | Medium   | Data/API          | Mitigated (explicit write error handling added) |
+| R-04    | Oversized app-state hooks causing hidden coupling      | 3          | 4      | 12    | High     | Frontend Leads    | Reduced (auth/theme/session decomposition slices) |
+| R-05    | Weak hook lint enforcement misses effect anti-patterns | 2          | 3      | 6     | Low-Med  | DX/Tooling        | Mitigated (react-hooks lint rules enabled) |
+| R-06    | Backend typecheck placeholder weakens gate confidence  | 2          | 3      | 6     | Low-Med  | Backend           | Mitigated (backend config gate added) |
+| R-07    | `SECURITY DEFINER` in public schema                    | 2          | 4      | 8     | Medium   | Backend/Security  | Reduced (private-schema trigger migration added) |
+| R-08    | Node version mismatch between CI and deploy            | 1          | 3      | 3     | Low      | Platform          | Mitigated (Node 20 policy aligned) |
+| R-09    | Migration check brittle to file growth                 | 2          | 2      | 4     | Low      | Platform/Backend  | Mitigated (structural migration check) |
+| R-10    | Security headers incomplete                            | 1          | 3      | 3     | Low      | Platform/Security | Mitigated (CSP + HSTS headers added) |
 
-- **Critical zone (>= 16):** R-01, R-02, R-04
-- **High zone (12-15):** R-03, R-05
-- **Medium zone (8-11):** R-06, R-07, R-08
-- **Low-Medium (< 8):** R-09, R-10
+
+## Heatmap Summary (current)
+
+- **Critical zone (>= 16):** R-02
+- **High zone (12-15):** R-04
+- **Medium zone (8-11):** R-01, R-03, R-07
+- **Low-Medium (< 8):** R-05, R-06, R-08, R-09, R-10
 
 ## Risk Treatment Strategy
 

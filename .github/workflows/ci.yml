@@ -8,14 +8,12 @@ on:
 jobs:
   checks:
     runs-on: ubuntu-latest
-    env:
-      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
     steps:
       - uses: actions/checkout@v6
       - uses: pnpm/action-setup@v5
       - uses: actions/setup-node@v6
         with:
-          node-version: 24
+          node-version: 20
           cache: "pnpm"
       - name: Install dependencies
         run: pnpm install --no-frozen-lockfile
@@ -23,11 +21,13 @@ jobs:
         run: pnpm lint
       - name: Typecheck
         run: pnpm typecheck
+      - name: Test
+        run: pnpm test
       - name: Build
         run: pnpm build
       - name: Storybook static build present
         run: test -f apps/ui-lib-docs/storybook-static/index.html
       - name: Supabase migration check
         run: |
-          test -f apps/backend/supabase/migrations/20260421_initial_schema.sql
-          test -f apps/backend/supabase/migrations/20260422_rls_contact_children_hardening.sql
+          test -d apps/backend/supabase/migrations
+          test "$(ls -1 apps/backend/supabase/migrations/*.sql 2>/dev/null | wc -l)" -gt 0

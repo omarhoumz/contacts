@@ -13,13 +13,14 @@ function ContactEditPage() {
   const { contactId } = Route.useParams();
   const s = useWebApp();
   const navigate = useNavigate();
+  const { prepareEditContact, resetContactForm } = s;
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
     setReady(false);
     void (async () => {
-      const ok = await s.prepareEditContact(contactId);
+      const ok = await prepareEditContact(contactId);
       if (cancelled) return;
       if (!ok) {
         void navigate({ to: "/contacts" });
@@ -29,9 +30,9 @@ function ContactEditPage() {
     })();
     return () => {
       cancelled = true;
-      s.resetContactForm();
+      resetContactForm();
     };
-  }, [contactId]);
+  }, [contactId, navigate, prepareEditContact, resetContactForm]);
 
   if (!ready) {
     return (
