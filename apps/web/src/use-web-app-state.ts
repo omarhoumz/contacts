@@ -141,7 +141,7 @@ export function useWebAppState() {
       return;
     }
     setSessionEmail(data.user?.email ?? null);
-    setFeedback({ tone: "success", text: "Signed in." });
+    setFeedback(null);
     setAuthBusy(false);
   };
 

@@ -15,6 +15,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "./components/ui/dialog";
+import { Card } from "./components/ui/card";
 import type { LabelRow } from "./contact-search";
 
 
@@ -177,7 +178,7 @@ export function ManageLabelsRoute() {
   return (
     <>
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-        <h2 className="text-xl font-semibold tracking-tight">Manage Labels</h2>
+        <h2 className="text-xl font-semibold tracking-tight">Labels</h2>
         <Dialog open={createOpen} onOpenChange={setCreateOpen}>
           <DialogTrigger className={cn(buttonVariants())}>New label</DialogTrigger>
           <DialogContent aria-describedby={undefined}>
@@ -219,12 +220,17 @@ export function ManageLabelsRoute() {
       ) : null}
 
       <div>
-        {s.labels.length === 0 && !s.dataBusy && (
-          <p className="mt-12 text-center text-sm text-muted-foreground">No labels yet — create one with New label.</p>
-        )}
-        {s.dataBusy && <p className="py-5 text-sm text-muted-foreground">Loading…</p>}
-        <ul className="m-0 list-none rounded-xl border bg-card p-0">
-          {s.labels.map((l) => (
+        {s.dataBusy ? (
+          <Card className="p-12 text-center">
+            <p className="m-0 text-sm text-muted-foreground">Loading…</p>
+          </Card>
+        ) : s.labels.length === 0 ? (
+          <Card className="p-12 text-center">
+            <p className="m-0 text-sm text-muted-foreground">No labels yet — create one with New label.</p>
+          </Card>
+        ) : (
+          <ul className="m-0 list-none rounded-xl border bg-card p-0">
+            {s.labels.map((l) => (
             <li key={l.id} className="flex items-center gap-2 border-b px-3 py-3 last:border-b-0">
               <span
                 className={`h-3.5 w-3.5 shrink-0 rounded-full ${COLOR_CLASSES[l.color ?? ""] ?? "bg-slate-300"}`}
@@ -260,8 +266,9 @@ export function ManageLabelsRoute() {
                 </Button>
               </div>
             </li>
-          ))}
-        </ul>
+            ))}
+          </ul>
+        )}
       </div>
     </>
   );

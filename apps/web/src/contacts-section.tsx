@@ -36,7 +36,7 @@ export function ContactsSection(props: ContactsSectionProps) {
 
   if (props.dataBusy) {
     return (
-      <Card className="p-4">
+      <Card className="p-12 text-center">
         <p className="m-0 text-sm text-muted-foreground">Loading…</p>
       </Card>
     );

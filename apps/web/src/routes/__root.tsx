@@ -1,4 +1,4 @@
-import { createRootRoute, Outlet, useRouterState } from "@tanstack/react-router";
+import { createRootRoute, Outlet, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { toast } from "sonner";
 import { useWebAppState } from "../use-web-app-state";
@@ -11,6 +11,7 @@ export const Route = createRootRoute({
 
 function RootComponent() {
   const s = useWebAppState();
+  const navigate = useNavigate();
   const pathname = useRouterState({ select: (st) => st.location.pathname });
   const isAuthPage = pathname === "/sign-in" || pathname === "/sign-up";
 
@@ -20,18 +21,21 @@ function RootComponent() {
     const raw = params.get("redirect");
     const safe =
       raw && raw.startsWith("/") && !raw.startsWith("//") ? raw : "/contacts";
-    window.location.assign(safe);
-  }, [s.authResolved, s.isAuthenticated, isAuthPage]);
+    void navigate({ to: safe as "/contacts", replace: true });
+  }, [s.authResolved, s.isAuthenticated, isAuthPage, navigate]);
 
   useEffect(() => {
     if (!s.authResolved || s.isAuthenticated || isAuthPage) return;
-    const qs = new URLSearchParams();
-    qs.set("redirect", pathname);
-    window.location.assign(`/sign-in?${qs.toString()}`);
-  }, [s.authResolved, s.isAuthenticated, isAuthPage, pathname]);
+    void navigate({
+      to: "/sign-in",
+      search: { redirect: pathname } as Record<string, string>,
+      replace: true,
+    });
+  }, [s.authResolved, s.isAuthenticated, isAuthPage, pathname, navigate]);
 
   useEffect(() => {
     if (!s.feedback) return;
+    if (s.feedback.tone === "success" && s.feedback.text === "Signed in.") return;
     if (s.feedback.tone === "error") {
       toast.error(s.feedback.text);
       return;
@@ -52,6 +56,13 @@ function RootComponent() {
   }
 
   if (!s.isAuthenticated) {
+    if (!isAuthPage) {
+      return (
+        <div className="flex min-h-screen items-center justify-center bg-background">
+          <p className="text-sm text-muted-foreground">Loading…</p>
+        </div>
+      );
+    }
     return (
       <WebAppContext.Provider value={s}>
         <div className="flex min-h-screen items-center justify-center bg-background px-5">
@@ -62,11 +73,7 @@ function RootComponent() {
   }
 
   if (isAuthPage) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-background">
-        <p className="text-sm text-muted-foreground">Redirecting…</p>
-      </div>
-    );
+    return <div className="min-h-screen bg-background" />;
   }
 
   return (
