@@ -47,19 +47,22 @@ Use this template to schedule each next cycle:
 ```
 
 Audit remediation steering cadence (when active):
+
 - Weekly architect+PM steering committee decision meeting
 - Twice-weekly engineering blocker sync
 - Daily async update for Critical/High risk closure
 
 ### Audit Quality Scorecard (quarterly target)
 
-| Metric | Target |
-| --- | --- |
-| CI test gate pass rate | >95% |
-| Critical risks open | 0 by milestone M2 |
-| Placeholder tests in critical packages | 0 |
-| Hook anti-pattern violations in CI | 0 new |
-| Docs freshness (core runbooks) | >90% |
+
+| Metric                                 | Target            |
+| -------------------------------------- | ----------------- |
+| CI test gate pass rate                 | >95%              |
+| Critical risks open                    | 0 by milestone M2 |
+| Placeholder tests in critical packages | 0                 |
+| Hook anti-pattern violations in CI     | 0 new             |
+| Docs freshness (core runbooks)         | >90%              |
+
 
 ### R11 Responsive Layout — Design Exploration (2026-04-23)
 
